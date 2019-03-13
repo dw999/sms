@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>SMS Server Installation</title>  
+  <link rel="stylesheet" type="text/css" href="manual.css" media="screen" />
+</head>
+
+<body>
+  <table width=100% class=table cellspacing=1 cellpadding=1>
+  <tr>
+    <td colspan=2 class=heading><b><u>SMS Server Installation Guide</u></b></td>
+  </tr>
+
+  <tr>
+    <td width=10>1.</td>
+    <td><b>Prepare SMS server installation package</b></td>
+  </tr>
+   
+  <tr>
+    <td></td>
+    <td>
+      - Decompress SMS server installation package: <b><font color='darkblue'>tar -xzvf sms_server_1_0.tgz</font></b>
+    </td>
+  </tr>
+   
+  <tr>
+    <td></td>
+    <td>
+      - Make sure all installation shell scripts are executable: <b><font color='darkblue'>chmod +x *.sh</font></b> and <b><font color='darkblue'>chmod +x ffmpeg/*.sh</font></b>
+    </td>
+  </tr>
+
+  <tr><td colspan=2>&nbsp;</td></tr>
+
+  <tr>
+    <td width=10>2.</td>
+    <td><b>Prerequisites of SMS server installation</b></td>
+  </tr>
+ 
+  <tr>
+    <td></td>
+    <td>
+      - You are root or root equivalent user, i.e. You must be super user.
+    </td>
+  </tr>
+ 
+  <tr>
+    <td></td>
+    <td>
+      - Network connection of your CentOS Linux server is well configured and fast enough (> 1Mb/s).
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td>
+      - You have registered two domain names for the decoy site and messaging site, and they have already been pointed to your server's public IP address.
+    </td>
+  </tr>
+ 
+  <tr>
+    <td></td>
+    <td>
+      - You have an email address for the SMS administrator. (Note: It should not link to your true identity)
+    </td>
+  </tr>
+ 
+  <tr>
+    <td></td>
+    <td>
+      - You have registered at least one Gmail account for SMS operations. (Note: It MUST be Gmail account) However, if Gmail is blocked by local government, see Figure 11 for work-around.
+    </td>
+  </tr>
+ 
+  <tr><td colspan=2>&nbsp;</td></tr>
+
+  <tr>
+    <td width=10>3.</td>
+    <td><b>Install SMS server</b></td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td>
+      If all prerequisites of SMS server installation are fulfilled, you may now install SMS server.<br>
+      <br>
+      Login Linux server as super user, open a terminal window, and go to the directory where decompressed SMS server installation<br>
+      packages located, then execute installation script:<br>
+      <br>
+      # <font color='darkblue'><b>./install_sms_centos.sh</b></font><br>
+      <br>
+      Screen like Figure 1 will be displayed. You may now press enter to start SMS server installion.
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td>
+      <table class=table>
+      <tr>
+        <td align=center>
+          <a href="start_install.png"><img src='start_install.png' width=850></a><br>Figure 1    
+        </td>
+      </tr>  
+      </table>
+    </td>
+  </tr>
+  
+  <tr><td colspan=2>&nbsp;</td></tr>
+
+  <tr>
+    <td></td>
+    <td>
+      Installation process is divided into 10 steps, they are:<br>
+      Step 1: Install required applications<br>
+      Step 2: Install required Perl libraries<br>
+      Step 3: Get required Javascript libraries<br>
+      Step 4: Copy program files and Javascript libraries to pre-defined directories<br>
+      Step 5: Prepare database server and create databases<br>
+      Step 6. Input essential data to SMS<br>
+      Step 7: Install SSL certificates to the sites<br>
+      Step 8: Configure the Linux system settings<br>
+      Step 9: Build audio file converter FFmpeg (optional)<br>
+      Step 10: Install system defender (optional)<br>
+      <br>
+      After you press the enter, step 1 will proceed, and screen like Figure 2 will be seem.
+    </td>
+  </tr>
+  
+  <tr>
+    <td></td>
+    <td>
+      <table class=table>
+      <tr>
+        <td align=center>
+          <a href="step_1_install_req_apps.png"><img src='step_1_install_req_apps.png' width=850></a><br>Figure 2    
+        </td>
+      </tr>  
+      </table>
+    </td>
+  </tr>
+  
+  <tr><td colspan=2>&nbsp;</td></tr>
+  
+  <tr>
+    <td></td>
+    <td>
+      All applications on step 1 will be installed automatically. However, an application CPAN needs to be configured<br>
+      in this stage, because it is needed in next step. Installation program will instruct you how to configure CPAN,<br>
+      just as Figure 3, 4 and 5 shown. After CPAN has been configured, you need to input 'quit' to exit CPAN in order<br>
+      to proceed to next step.
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td>
+      <table class=table>
+      <tr>
+        <td align=center>
+          <a href="step_1_config_cpan.png"><img src='step_1_config_cpan.png' width=850></a><br>Figure 3    
+        </td>
+      </tr>  
+      </table>
+    </td>
+  </tr>
+  
+  <tr><td colspan=2>&nbsp;</td></tr>
+
+  <tr>
+    <td></td>
+    <td>
+      <table class=table>
+      <tr>
+        <td align=center>
+          <a href="step_1_config_cpan_2.png"><img src='step_1_config_cpan_2.png' width=850></a><br>Figure 4    
+        </td>
+      </tr>  
+      </table>
+    </td>
+  </tr>
+  
+  <tr><td colspan=2>&nbsp;</td></tr>
+
+  <tr>
+    <td></td>
+    <td>
+      <table class=table>
+      <tr>
+        <td align=center>
+          <a href="step_1_config_cpan_3.png"><img src='step_1_config_cpan_3.png' width=850></a><br>Figure 5    
+        </td>
+      </tr>  
+      </table>
+    </td>
+  </tr>
+  
+  <tr><td colspan=2>&nbsp;</td></tr>
+  
+  <tr>
+    <td></td>
+    <td>
+      After you quit CPAN, step 2 will be started automatically to install all required Perl libraries as Figure 6 shown.<br>
+      This stage may need more than 15 minutes to be completed, so please be patient.
+    </td>
+  </tr>
+  
+  <tr>
+    <td></td>
+    <td>
+      <table class=table>
+      <tr>
+        <td align=center>
+          <a href="step_2_install_perl_lib.png"><img src='step_2_install_perl_lib.png' width=850></a><br>Figure 6
+        </td>
+      </tr>  
+      </table>
+    </td>
+  </tr>
+  
+  <tr><td colspan=2>&nbsp;</td></tr>
+  
+  <tr>
+    <td></td>
+    <td>
+      Step 3 will bring in required javascript libraries automatically, no user intervention is needed.
+    </td>
+  </tr>
+  
+  <tr>
+    <td></td>
+    <td>
+      <table class=table>
+      <tr>
+        <td align=center>
+          <a href="step_3_install_js_lib.png"><img src='step_3_install_js_lib.png' width=850></a><br>Figure 7
+        </td>
+      </tr>  
+      </table>
+    </td>
+  </tr>
+  
+  <tr><td colspan=2>&nbsp;</td></tr>
+
+  <tr>
+    <td></td>
+    <td>
+      Once all required javascript libraries are downloaded, it will go to step 4 automatically. In this<br>
+      step, all SMS server programs and required javascript libraries will be moved to pre-defined directories,<br>
+      and directories access rights will also be configured.
+    </td>
+  </tr>
+  
+  <tr>
+    <td></td>
+    <td>
+      <table class=table>
+      <tr>
+        <td align=center>
+          <a href="step_4_copy_programs.png"><img src='step_4_copy_programs.png' width=850></a><br>Figure 8
+        </td>
+      </tr>  
+      </table>
+    </td>
+  </tr>
+  
+  <tr><td colspan=2>&nbsp;</td></tr>
+  
+  <tr>
+    <td></td>
+    <td>
+      As shown on Figure 8, step 5 is going to prepare (it means configuration) MariaDB database server and<br>
+      create required databases used by SMS server.<br>
+      <br>
+      When you prepare the MariaDB database server, you need to create password for the database server administrator<br>
+      (also called 'root', but it is not the same 'root' of CentOS Linux 7), and accept default configuration settings<br>
+      to harden database server's security (Figure 9).<br>
+      <br>
+      When MariaDB database server has been configured, screen like Figure 10 will show up. You need to press enter to<br>
+      proceed to create databases for SMS server, and you will be asked to input database server administrator password<br>
+      you have just created.
+    </td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td>
+      <table class=table>
+      <tr>
+        <td align=center>
+          <a href="step_5_config_db_server.png"><img src='step_5_config_db_server.png' width=850></a><br>Figure 9
+        </td>
+      </tr>  
+      </table>
+    </td>
+  </tr>
+  
+  <tr><td colspan=2>&nbsp;</td></tr>
+
+  <tr>
+    <td></td>
+    <td>
+      <table class=table>
+      <tr>
+        <td align=center>
+          <a href="step_5_install_databases.png"><img src='step_5_install_databases.png' width=850></a><br>Figure 10
+        </td>
+      </tr>  
+      </table>
+    </td>
+  </tr>
+  
+  <tr><td colspan=2>&nbsp;</td></tr>
+
+  <tr>
+    <td></td>
+    <td>
+      Step 6 is very important, in here you need to give the system seven essential data for your SMS server.<br>
+      They are SMS connection mode, DNS name of the decoy site, DNS name of the messaging site, email address of<br>
+      the SMS server administrator, worker Gmail address for SMS operations, the worker Gmail login username and<br>
+      it's password. Any incorrect input data will let SMS server malfunction.<br>
+      <br>
+      Please also note that you MUST put '<b>https://</b>' in front of your DNS names of the decoy site and messaging<br>
+      site, just as Figure 11 shown.<br>
+      <br>
+      After you input all these data, you require to verify and confirm them. If all input data are correct, press<br>
+      'Y' and then enter to save them. Otherwise, press 'N' to input them again.
+    </td>
+  </tr>
+  
+  <tr>
+    <td></td>
+    <td>
+      <table class=table>
+      <tr>
+        <td align=center>
+          <a href="step_6_input_essential_data.png"><img src='step_6_input_essential_data.png' width=850></a><br>Figure 11
+        </td>
+      </tr>  
+      </table>
+    </td>
+  </tr>
+  
+  <tr><td colspan=2>&nbsp;</td></tr>
+  
+  <tr>
+    <td></td>
+    <td>
+      Step 7 will generate SSL certificates in accordance with DNS names of your decoy site and messaging site you input<br>
+      previously. In this step, you will be asked to input your email address (just use the same email for the SMS administrator),<br>
+      and three questions. Figure 12 provides you an example.<br>
+      <br>
+      <b>Note:</b><br>
+      This step is often failure (Figure 13), but don't worry, you can repeat this process later after intallation by running<br>
+      the below command to subscribe SSL certificates again:<br>
+      <br>
+      # <font color='darkblue'><b>certbot --apache</b></font><br>
+      <br>
+      Please also note that SSL certificates are used to provide the secrecy of your online communication, which is the most<br>
+      important part of the SMS server. Therefore, you must ensure your SSL certificates installation successful before using<br>
+      SMS server. You could check how secure of your web sites by using testing site https://www.ssllabs.com:<br>
+      <br>
+      e.g.) https://www.ssllabs.com/ssltest/analyze.html?d=argogo.mywire.org<br>
+      <br>
+      It will give security ratings for your site (similar to Figure 14). If grade of overall rating is below A, that means something<br>
+      is wrong on security of your sites, please fix all the issues before using SMS server for your messaging operation.
+    </td>
+  </tr>
+  
+  <tr>
+    <td></td>
+    <td>
+      <table class=table>
+      <tr>
+        <td align=center>
+          <a href="step_7_install_ssl_cert_3.png"><img src='step_7_install_ssl_cert_3.png' width=850></a><br>Figure 12
+        </td>
+      </tr>  
+      </table>
+    </td>
+  </tr>
+  
+  <tr><td colspan=2>&nbsp;</td></tr>
+
+  <tr>
+    <td></td>
+    <td>
+      <table class=table>
+      <tr>
+        <td align=center>
+          <a href="step_7_install_ssl_cert_4.png"><img src='step_7_install_ssl_cert_4.png' width=850></a><br>Figure 13
+        </td>
+      </tr>  
+      </table>
+    </td>
+  </tr>
+  
+  <tr><td colspan=2>&nbsp;</td></tr>
+
+  <tr><td colspan=2>&nbsp;</td></tr>
+
+  <tr>
+    <td></td>
+    <td>
+      <table class=table>
+      <tr>
+        <td align=center>
+          <a href="web_site_rating.png"><img src='web_site_rating.png' width=850></a><br>Figure 14
+        </td>
+      </tr>  
+      </table>
+    </td>
+  </tr>
+  
+  <tr><td colspan=2>&nbsp;</td></tr>
+
+  <tr>
+    <td></td>
+    <td>
+      After running step 8 to configure some Linux system settings, you will process to optional step 9. You will be asked<br>
+      to build audio file converter FFmpeg. FFmpeg is used to convert some common audio input file formats used by Android<br>
+      to OGG audio file format, which is widely supported by HTML5 multimedia objects in many platforms (except iOS). If you<br>
+      don't have it, your audio input file will be treated by SMS server as file attachment. You must download it to your<br>
+      phone or computer to play, and can't play it on your web browser directly. Therefore, for a better user experience,<br>
+      it is worth to spend some time to build FFmpeg.
+    </td>
+  </tr>
+  
+  <tr>
+    <td></td>
+    <td>
+      <table class=table>
+      <tr>
+        <td align=center>
+          <a href="step_9_build_ffmpeg.png"><img src='step_9_build_ffmpeg.png' width=850></a><br>Figure 15
+        </td>
+      </tr>  
+      </table>
+    </td>
+  </tr>
+  
+  <tr><td colspan=2>&nbsp;</td></tr>
+
+  <tr>
+    <td></td>
+    <td>
+      The next optional installation item is system defender. It is not the necessary component to drive SMS<br>
+      server, but it will provide minimum protection to your SMS server from cyber criminals. So, it is better<br>
+      to have it. The installation program needs to create database for system defender, you will be asked to<br>
+      input the database server administrator password here.
+    </td>
+  </tr>
+  
+  <tr>
+    <td></td>
+    <td>
+      <table class=table>
+      <tr>
+        <td align=center>
+          <a href="step_10_install_defender.png"><img src='step_10_install_defender.png' width=850></a><br>Figure 16
+        </td>
+      </tr>  
+      </table>
+    </td>
+  </tr>
+  
+  <tr><td colspan=2>&nbsp;</td></tr>
+  
+  <tr>
+    <td></td>
+    <td>
+      Finally, the installation program will reboot your CentOS Linux server for you.
+    </td>
+  </tr>
+  
+  <tr>
+    <td></td>
+    <td>
+      <table class=table>
+      <tr>
+        <td align=center>
+          <a href="final_step_reboot.png"><img src='final_step_reboot.png' width=850></a><br>Figure 16
+        </td>
+      </tr>  
+      </table>
+    </td>
+  </tr>
+    
+  <tr><td colspan=2>&nbsp;</td></tr>
+  <tr><td colspan=2>&nbsp;</td></tr>
+
+  <tr>
+    <td></td>
+    <td>
+      <b><u>Supplementary</u></b><br>
+    </td>
+  </tr>
+  
+  <tr>
+    <td></td>
+    <td>
+      If SSL certificates generation is failure in step 7, you may do it again as Figure 17 shown. If everything is OK, screen<br>
+      similar to Figure 18 will be seem.  
+    </td>
+  </tr>
+  
+  <tr>
+    <td></td>
+    <td>
+      <table class=table>
+      <tr>
+        <td align=center>
+          <a href="apply_ssl_cert.png"><img src='apply_ssl_cert.png' width=850></a><br>Figure 17
+        </td>
+      </tr>  
+      </table>
+    </td>
+  </tr>
+  
+  <tr><td colspan=2>&nbsp;</td></tr>
+
+  <tr>
+    <td></td>
+    <td>
+      <table class=table>
+      <tr>
+        <td align=center>
+          <a href="apply_ssl_cert_3.png"><img src='apply_ssl_cert_3.png' width=850></a><br>Figure 18
+        </td>
+      </tr>  
+      </table>
+    </td>
+  </tr>
+
+  <tr><td colspan=2>&nbsp;</td></tr>  
+  </table>
+</body>
+</html>
