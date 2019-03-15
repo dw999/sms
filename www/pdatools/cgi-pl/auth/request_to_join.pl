@@ -1,4 +1,17 @@
 #!/usr/bin/perl
+###
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#      http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+###
 
 ##########################################################################################
 # Program: /www/pdatools/cgi-pl/auth/request_to_join.pl
@@ -219,7 +232,7 @@ sub printRegistedOkPage {
       <h1>Thanks You</h1>
     </div>
     
-    <div data-role="content" style="ui-content">
+    <div data-role="main" style="ui-body-d ui-content">
       $message
       <br>
       <br>
@@ -246,9 +259,9 @@ sub printJavascriptSection {
 	<link rel="shortcut icon" href="/favicon.ico">
 	<script src="/js/jquery.min.js"></script>
 	<script src="/js/jquery.mobile-1.4.5.min.js"></script>    
-  <script type="text/javascript" src="/js/common_lib.js"></script>
+  <script src="/js/common_lib.js"></script>
   
-  <script type="text/javascript">
+  <script>
     function goRegister() {
       var this_name = allTrim(document.getElementById("name").value);
       var this_email = allTrim(document.getElementById("email").value);
@@ -309,7 +322,7 @@ sub printInputForm {
       <h1>Welcome to Join</h1>
     </div>
   
-    <div data-role="content" style="ui-content">
+    <div data-role="main" style="ui-body-d ui-content">
       <label for="name"><b>Your Name $red_dot:</b></label>
       <input type=text id="name" name="name" value="$name" maxlength=125 required>
   
