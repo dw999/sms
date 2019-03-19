@@ -22,6 +22,8 @@
 # V1.0.01       2018-08-30      AY              Add thumbnail for uploaded image files.
 # V1.0.02       2018-09-13      AY              Let functions 'getGroupMessage' and 'getLastSentMessage'
 #                                               use a common data gathering function '_gatherMessage'.
+# V1.0.03       2019-03-19      AY              Show audio and video file download link for all platforms, 
+#                                               Amended function is '_gatherMessage'.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -813,15 +815,11 @@ sub _gatherMessage {
 __HTML
         }
         elsif ($file_type =~ /audio/) {
-          my $download_link = '';
-          if ($is_iOS) {
-            #-- Since almost most HTML5 supported video files can't be played and switched to fallback section on iOS, so --#
-            #-- it needs to put a video file download link below to <audio> object, so that users still have alternative  --#
-            #-- way to get the video file.                                                                                --#
-            $download_link = <<__HTML;
-            <p><b>Download Audio:</b> <a href="/data/$filename$suffix" target="_blank">$filename$suffix</a></p>
+          #-- Since HTML5 multimedia files handling is not consistent, so that it needs to provide a download link below <audio> --#
+          #-- object, so that users still have chance to listen the audio file by downloading it.                                --#
+          my $download_link = <<__HTML;
+          <br><a href="/data/$filename$suffix" target="_blank">Download Audio</a>
 __HTML
-          }
           
           $file_link = <<__HTML;
           <audio controls>
@@ -833,12 +831,19 @@ __HTML
 __HTML
         }
         elsif ($file_type =~ /video/) {
+          #-- Since HTML5 multimedia files handling is not consistent, so that it needs to provide a download link below <video> --#
+          #-- object, so that users still have chance to view the video file by downloading it.                                  --#
+          my $download_link = <<__HTML;
+          <br><a href="/data/$filename$suffix" target="_blank">Download Video</a><br>
+__HTML
+          
           $file_link = <<__HTML;
           <video controls width="100%" preload="meta">
             <source src="/data/$filename$suffix" type="$file_type"/>
             <!-- Fallback content //-->
             <p><a href="/data/$filename$suffix" target="_blank"><img src="/images/folder.png" height="100px"></a><br>$filename$suffix</p>
-          </video>      
+          </video>
+          $download_link
 __HTML
         }          
         else {
