@@ -574,7 +574,7 @@ sub printEditFeatureForm {
   <div data-role="page" style="background-color:$PDA_BG_COLOR">
     <div data-role="header" data-position="fixed" data-tap-toggle="false">
       <a href="javascript:goBack()" data-icon="back" style="ui-btn-left" data-ajax="false">Back</a>
-      <h1>Add Feature</h1>
+      <h1>Edit Feature</h1>
     </div>
   
     <div data-role="content">
