@@ -18,7 +18,10 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-11-27      AY              Maintain features used on the decoy site.
+# V1.0.00       2018-11-27      DW              Maintain features used on the decoy site.
+# V1.0.01       2019-03-25      DW              Add optionl SQL script for database schema 
+#                                               updating as feature is added, modified and
+#                                               deleted.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -39,6 +42,7 @@ my $op = paramAntiXSS('op');                               # A = Add, E = Edit, 
 my $oper_mode = paramAntiXSS('oper_mode');                 # S = Save, others go to input form.
 my $feature_id = paramAntiXSS('feature_id');               # Unique ID of feature.
 my $feature_url = paramAntiXSS('feature_url');             # Feature calling URL.
+my $feature_sql = paramAntiXSS('feature_sql');             # SQL script to update database schema for specified feature.  
 my $feature_icon = paramAntiXSS('feature_icon');           # Feature icon file name.
 my $assign_to_list = paramAntiXSS('assign_to_list') + 0;   # 0 = No, 1 = Yes, assign this feature to list.
 my $list_order = paramAntiXSS('list_order') + 0;           # Listing order number. It must be an integer.   
@@ -49,14 +53,14 @@ my $dbx = dbconnect($COOKIE_MSG);
 my %user_info = printHead($COOKIE_PDA);                    # Defined on sm_webenv.pl
 my $user_id = $user_info{'USER_ID'} + 0;
 my @feature_list = ();                                     # List of defined features.
-my %feature_dtl = ($op eq 'E' && $oper_mode ne 'S')? getFeatureInfo($dbh, $feature_id) : ();
+my %feature_dtl = (($op eq 'D' || $op eq 'E') && $oper_mode ne 'S')? getFeatureInfo($dbh, $feature_id) : ();
 
 printJavascriptSection();
 
 if (isHeSysAdmin($dbx, $user_id)) {
   if ($op eq 'A') {
     if ($oper_mode eq 'S') {
-      my ($ok, $msg) = addNewFeature($dbh, $feature_url, $feature_icon, $assign_to_list, $list_order);
+      my ($ok, $msg) = addNewFeature($dbh, $feature_url, $feature_icon, $feature_sql, $assign_to_list, $list_order);
       if ($ok) {
         redirectTo("/cgi-pl/admin/feature_setup.pl");
       }
@@ -71,7 +75,7 @@ if (isHeSysAdmin($dbx, $user_id)) {
   }
   elsif ($op eq 'E') {
     if ($oper_mode eq 'S') {
-      my ($ok, $msg) = updateFeature($dbh, $feature_id, $feature_url, $feature_icon, $assign_to_list, $list_order);
+      my ($ok, $msg) = updateFeature($dbh, $feature_id, $feature_url, $feature_icon, $feature_sql, $assign_to_list, $list_order);
       if ($ok) {
         redirectTo("/cgi-pl/admin/feature_setup.pl");
       }
@@ -85,17 +89,24 @@ if (isHeSysAdmin($dbx, $user_id)) {
     }
   }
   elsif ($op eq 'D') {
-    if ($feature_id > 0) {
-      my ($ok, $msg) = deleteFeature($dbh, $feature_id);
-      if (!$ok) {
-        alert($msg);
-      }      
+    if ($oper_mode eq 'S') {    
+      if ($feature_id > 0) {
+        my ($ok, $msg) = deleteFeature($dbh, $feature_id, $feature_sql);
+        if ($ok) {
+          redirectTo("/cgi-pl/admin/feature_setup.pl");    
+        }
+        else {
+          alert($msg);
+          back();
+        }      
+      }
+      else {
+        alert("Invalid feature record id is given");
+      }
     }
     else {
-      alert("Invalid feature record id is given");
+      printDeleteFeatureForm(\%feature_dtl);      
     }
-    
-    redirectTo("/cgi-pl/admin/feature_setup.pl");
   }
   else {
     @feature_list = getFeatureFromStore($dbh);
@@ -222,13 +233,18 @@ sub printJavascriptSection {
     }
 
     function deleteFeature(feature_id) {
+      \$('#feature_id').val(feature_id);
+      \$('#op').val('D');
+      \$('#frm_feature').submit();          
+    }
+    
+    function goDeleteFeature() {
       if (confirm("Are you sure to delete this feature?")) {
         if (confirm("Last chance, really want to delete this feature?")) {
-          \$('#feature_id').val(feature_id);
-          \$('#op').val('D');
-          \$('#frm_feature').submit();          
+          \$('#oper_mode').val('S');
+          \$('#frm_feature').submit();
         }
-      }
+      }  
     }
   </script>
 __JS
@@ -247,8 +263,8 @@ sub isHeSysAdmin {
 
 
 sub addNewFeature {
-  my ($dbh, $feature_url, $feature_icon, $assign_to_list, $list_order) = @_;
-  my ($ok, $msg, $feature_id, $icon_url, $program_url);
+  my ($dbh, $feature_url, $feature_icon, $feature_sql, $assign_to_list, $list_order) = @_;
+  my ($ok, $msg, $feature_id, $icon_url, $program_url, @sqlcmd);
   
   $ok = 1;
   $msg = '';
@@ -260,8 +276,21 @@ sub addNewFeature {
   }
   
   if ($ok) {
+    if (allTrim($feature_sql) ne '') {
+      ($ok, $msg, @sqlcmd) = getSqlCmdFromUploadScript($feature_sql);
+    }
+    else {
+      @sqlcmd = ();
+    }
+  }
+  
+  if ($ok) {
     if (startTransaction($dbh)) {
       ($ok, $msg, $feature_id) = createFeature($dbh, $icon_url, $program_url);
+      
+      if ($ok && scalar(@sqlcmd) > 0) {
+        ($ok, $msg) = updateDatabaseSchema($dbh, \@sqlcmd);  
+      }
       
       if ($ok && $assign_to_list) {
         ($ok, $msg) = assignFeatureToList($dbh, $feature_id, $list_order);
@@ -334,6 +363,107 @@ sub processUploadFile {
   }
   
   return ($ok, $msg, $url);  
+}
+
+
+sub getSqlCmdFromUploadScript {
+  my ($sql_script) = @_;
+  my ($ok, $msg, $filename, $dirs, $suffix, $temp_filename, $store_path, $final_filename, @result);
+
+  $ok = 1;
+  $msg = '';
+  $store_path = '/tmp';
+  @result = ();
+  
+  $temp_filename = tmpFileName($sql_script);           # It is a function of CGI. Note: function tmpFileName will return the file name of a temporary file which is used to store the content of the upload file. 
+  ($filename, $dirs, $suffix) = fileNameParser($sql_script);
+  $final_filename = "$store_path/$filename$suffix";
+  
+  if (-f $final_filename) {
+    unlink $final_filename;
+  }
+  
+  if (!copy("$temp_filename", "$final_filename")) {
+    $msg = "Unable to process SQL script file $filename$suffix ($temp_filename --> $final_filename). Error: $!";
+    $ok = 0;
+  }
+  else {
+    my ($this_sql, $begin_sql) = ('', 0);
+     
+    open FILE, "<:encoding(UTF-8)", $final_filename;
+    while (<FILE>) {
+      my $this_line = allTrim($_);
+             
+      if ($this_line ne '' && !$begin_sql) {
+        if ($this_line =~ /;/) {
+          #-- The SQL command has one line only --#
+          $this_sql = $_;
+          $this_sql =~ s/;//g;        # Remove ';' character
+          push @result, $this_sql;
+          $this_sql = '';
+        }
+        else {
+          $begin_sql = 1;
+          $this_sql = '';
+        }        
+      }
+      elsif (($this_line eq '' || $this_line =~ /;/) && $begin_sql) {
+        #-- A blank line or ';' will be considered as ending of a SQL command --#
+        $begin_sql = 0;
+        #-- Take care the last line of the SQL command --#
+        $this_sql .= $_ if ($this_line ne '');
+        
+        if ($this_sql ne '') {
+          $this_sql =~ s/;//g;        # Remove ending ';' character, if any.
+          push @result, $this_sql;
+          $this_sql = '';
+        }        
+      }
+       
+      if ($begin_sql) {
+        #-- Note: Don't join $this_sql with $this_line, but use $_ instead. Otherwise, carriage return and space characters will be lost. --#
+        $this_sql .= $_;
+      }
+    }
+
+    if ($this_sql ne '' && $begin_sql) {
+      #-- Take care the last SQL command (if any). Please also note that SQL command be handled here having no ending ';' character. If it --#
+      #-- contains ';' character, it should has been handled in above looping. Therefore, it has no chance to reach here.                  --#
+      push @result, $this_sql;
+    }
+    
+    close(FILE);
+    #-- House keeping --# 
+    unlink $final_filename;
+  }
+  
+  #-- House keeping --#
+  unlink $temp_filename; 
+  
+  return ($ok, $msg, @result);
+}
+
+
+sub updateDatabaseSchema {
+  my ($dbh, $sqlcmd_ref) = @_;
+  my ($ok, $msg, $sql, $sth, @sqlcmd);
+  
+  $ok = 1;
+  $msg = '';
+  @sqlcmd = @$sqlcmd_ref;
+  
+  foreach my $this_sql (@sqlcmd) {
+    $sth = $dbh->prepare($this_sql);
+    if (!$sth->execute()) {
+      $msg = "Unable to execute below command from SQL script file. Error " . $sth->errstr . ":\n\n$this_sql";
+      $ok = 0;
+    }
+    $sth->finish;
+    
+    last if (!$ok);
+  }
+  
+  return ($ok, $msg);
 }
 
 
@@ -423,8 +553,8 @@ __SQL
 
 
 sub updateFeature {
-  my ($dbh, $feature_id, $new_ul_program, $new_ul_icon, $assign_to_list, $list_order) = @_;
-  my ($ok, $msg, $old_icon_file, $old_program_file, $icon_url, $program_url);
+  my ($dbh, $feature_id, $new_ul_program, $new_ul_icon, $feature_sql, $assign_to_list, $list_order) = @_;
+  my ($ok, $msg, $old_icon_file, $old_program_file, $icon_url, $program_url, @sqlcmd);
   
   $ok = 1;
   $msg = '';
@@ -440,8 +570,21 @@ sub updateFeature {
   }
   
   if ($ok) {
+    if (allTrim($feature_sql) ne '') {
+      ($ok, $msg, @sqlcmd) = getSqlCmdFromUploadScript($feature_sql);
+    }
+    else {
+      @sqlcmd = ();
+    }
+  }
+    
+  if ($ok) {
     if (startTransaction($dbh)) {
       ($ok, $msg) = updateFeatureRecord($dbh, $feature_id, $icon_url, $program_url);
+
+      if ($ok && scalar(@sqlcmd) > 0) {
+        ($ok, $msg) = updateDatabaseSchema($dbh, \@sqlcmd);  
+      }
       
       if ($ok) {
         if ($assign_to_list) {
@@ -556,11 +699,12 @@ __SQL
 
 sub printEditFeatureForm {
   my ($feature_dtl_ref) = @_;
-  my ($html, $checked, $url, $icon, $assign_to_list, $list_order, %feature_dtl);
+  my ($html, $checked, $url, $icon, $icon_img, $assign_to_list, $list_order, %feature_dtl);
   
   %feature_dtl = %$feature_dtl_ref;
   $url = extractFileName($feature_dtl{'url'});
   $icon = extractFileName($feature_dtl{'icon'});
+  $icon_img = $feature_dtl{'icon'};
   $checked = ($feature_dtl{'order'} > 0)? 'checked' : '';
   $assign_to_list = ($feature_dtl{'order'} > 0)? 1 : 0;
   $list_order = ($feature_dtl{'order'} > 0)? $feature_dtl{'order'} : 1; 
@@ -578,10 +722,12 @@ sub printEditFeatureForm {
     </div>
   
     <div data-role="content">
-      <label for="feature_icon"><b>Icon:</b></label>
+      <label for="feature_icon"><b>Icon:</b>&nbsp;<img src="$icon_img" width="30px"></label>
       <font color="blue">$icon</font> <input type=file id="feature_icon" name="feature_icon">
       <label for="feature_url"><b>Program File:</b></label>
       <font color="blue">$url</font> <input type=file id="feature_url" name="feature_url">
+      <label for="feature_sql"><b>SQL script File (Optional):</b></label>
+      <input type=file id="feature_sql" name="feature_sql">            
       <label for="assign_to_list"><b>Assign to Feature List:</b></label>
       <input type="checkbox" data-role="flipswitch" id="assign_to_list" name="assign_to_list" value="$assign_to_list" $checked>
       <br>
@@ -620,6 +766,8 @@ sub printAddFeatureForm {
       <input type=file id="feature_icon" name="feature_icon">
       <label for="feature_url"><b>Program File:</b></label>
       <input type=file id="feature_url" name="feature_url">
+      <label for="feature_sql"><b>SQL script File (Optional):</b></label>
+      <input type=file id="feature_sql" name="feature_sql">      
       <label for="assign_to_list"><b>Assign to Feature List:</b></label>
       <input type="checkbox" data-role="flipswitch" id="assign_to_list" name="assign_to_list" value="$assign_to_list" $checked>
       <br>
@@ -637,13 +785,48 @@ __HTML
 }
 
 
-sub deleteFeature {
-  my ($dbh, $feature_id) = @_;
-  my ($ok, $msg, $icon_file, $program_file);
+sub printDeleteFeatureForm {
+  my ($feature_dtl_ref) = @_;
+  my ($html, $url, $icon, %feature_dtl);
   
+  %feature_dtl = %$feature_dtl_ref;
+  $url = extractFileName($feature_dtl{'url'});
+  $icon = $feature_dtl{'icon'};
+  
+  $html = <<__HTML;
+  <form id="frm_feature" name="frm_feature" action="" method="post" enctype="multipart/form-data" data-ajax="false">
+  <input type=hidden id="op" name="op" value="$op">
+  <input type=hidden id="oper_mode" name="oper_mode" value="">
+  <input type=hidden id="feature_id" name="feature_id" value="$feature_id">
+  
+  <div data-role="page" style="background-color:$PDA_BG_COLOR">
+    <div data-role="header" data-position="fixed" data-tap-toggle="false">
+      <a href="javascript:goBack()" data-icon="back" style="ui-btn-left" data-ajax="false">Back</a>
+      <h1>Delete Feature</h1>
+    </div>
+  
+    <div data-role="content">
+      <label for="feature_icon"><b>Icon:</b>&nbsp;<img src="$icon" width="30px"></label>
+      <label for="feature_url"><b>Program File:</b>&nbsp;<font color="blue">$url</font></label>
+      <label for="feature_sql"><b>SQL script File (Optional):</b></label>
+      <input type=file id="feature_sql" name="feature_sql">            
+      <br>
+      <input type=button data-icon="delete" value="Delete" onClick="goDeleteFeature()">
+    </div>
+  </div>  
+__HTML
+  
+  print $html;  
+}
+
+
+sub deleteFeature {
+  my ($dbh, $feature_id, $feature_sql) = @_;
+  my ($ok, $msg, $icon_file, $program_file);
+
   ($icon_file, $program_file) = getFeatureDetails($dbh, $feature_id);
   
-  ($ok, $msg) = deleteFeatureRecords($dbh, $feature_id);
+  ($ok, $msg) = deleteFeatureRecords($dbh, $feature_id, $feature_sql);
   if ($ok) {
     unlink $icon_file;
     unlink $program_file;
@@ -676,11 +859,18 @@ __SQL
 
 
 sub deleteFeatureRecords {
-  my ($dbh, $feature_id) = @_;
-  my ($ok, $msg);
+  my ($dbh, $feature_id, $feature_sql) = @_;
+  my ($ok, $msg, @sqlcmd);
   
   $ok = 1;
   $msg = '';
+  
+  if (allTrim($feature_sql) ne '') {
+    ($ok, $msg, @sqlcmd) = getSqlCmdFromUploadScript($feature_sql);
+  }
+  else {
+    @sqlcmd = ();
+  }
   
   if (startTransaction($dbh)) {       # Defined on sm_db.pl
     ($ok, $msg) = deleteRecordFromFeatureStore($dbh, $feature_id);
@@ -689,6 +879,10 @@ sub deleteFeatureRecords {
       ($ok, $msg) = deleteRecordFromFeatureList($dbh, $feature_id);
     }
     
+    if ($ok && scalar(@sqlcmd) > 0) {
+      ($ok, $msg) = updateDatabaseSchema($dbh, \@sqlcmd);  
+    }
+        
     if ($ok) {
       commitTransaction($dbh);        # Defined on sm_db.pl
     }
