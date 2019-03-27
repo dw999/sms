@@ -5,7 +5,7 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-12-27      AY              Remove system setting 'audio_converter' as
+# V1.0.00       2018-12-27      DW              Remove system setting 'audio_converter' as
 #                                               user don't install FFmpeg audio converter.
 ##########################################################################################
 

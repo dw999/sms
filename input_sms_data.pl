@@ -5,9 +5,9 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-12-13      AY              Get important data for SMS server setup. It
+# V1.0.00       2018-12-13      DW              Get important data for SMS server setup. It
 #                                               is part of SMS installation program.
-# V1.0.01       2019-01-20      AY              Add connection mode input. 
+# V1.0.01       2019-01-20      DW              Add connection mode input. 
 ##########################################################################################
 
 push @INC, '/www/perl_lib';

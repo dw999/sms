@@ -18,7 +18,7 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-10-06      AY              Maintain a list of file types which are used
+# V1.0.00       2018-10-06      DW              Maintain a list of file types which are used
 #                                               to handle uploaded audio and video files
 #                                               playing and conversion.
 ##########################################################################################

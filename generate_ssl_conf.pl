@@ -5,7 +5,7 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-12-20      AY              Generate the ssl.conf for Apache web server
+# V1.0.00       2018-12-20      DW              Generate the ssl.conf for Apache web server
 #                                               by using user given data in previous step. 
 ##########################################################################################
 

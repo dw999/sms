@@ -18,11 +18,11 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-06-06      AY              Create user account.
-# V1.0.01       2018-08-10      AY              Remove using 'crypt' to encrypt user passwords
+# V1.0.00       2018-06-06      DW              Create user account.
+# V1.0.01       2018-08-10      DW              Remove using 'crypt' to encrypt user passwords
 #                                               due to it's serious limitation (only first 8
 #                                               characters are used for encrypted password).
-# V1.0.02       2018-09-21      AY              Use new encryption method to protect user passwords. 
+# V1.0.02       2018-09-21      DW              Use new encryption method to protect user passwords. 
 ##########################################################################################
 
 push @INC, '/www/perl_lib';

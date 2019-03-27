@@ -18,7 +18,7 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-10-02      AY              Check unread message count for all message 
+# V1.0.00       2018-10-02      DW              Check unread message count for all message 
 #                                               groups to specified user. 
 ##########################################################################################
 

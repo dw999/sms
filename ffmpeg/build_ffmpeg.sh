@@ -5,7 +5,7 @@
 #
 # Ver         Date            Author          Comment
 # =======     ===========     ===========     ==========================================
-# V1.0.00     2018-12-27      AY              Build multimedia file converter 'FFmpeg' for SMS on Red Hat/Centos 7.
+# V1.0.00     2018-12-27      DW              Build multimedia file converter 'FFmpeg' for SMS on Red Hat/Centos 7.
 #=========================================================================================================
 
 echo ""

@@ -18,8 +18,8 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-07-17      AY              Lock / Unlock user.
-# V1.0.01       2018-08-05      AY              If an user is locked, delete all active
+# V1.0.00       2018-07-17      DW              Lock / Unlock user.
+# V1.0.01       2018-08-05      DW              If an user is locked, delete all active
 #                                               session(s) of that user.
 ##########################################################################################
 

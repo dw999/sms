@@ -18,7 +18,7 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-07-17      AY              Demote user to common user or trusted user. 
+# V1.0.00       2018-07-17      DW              Demote user to common user or trusted user. 
 ##########################################################################################
 
 push @INC, '/www/perl_lib';

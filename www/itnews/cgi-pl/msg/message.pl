@@ -18,15 +18,15 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-06-14      AY              Show the main page of the messaging system.
-# V1.0.01       2018-08-06      AY              Add a scheduler to refresh this page per 30 seconds.
-# V1.0.02       2018-08-08      AY              Show private group indicator (a lock icon).
-# V1.0.03       2018-09-23      AY              - Add a new option for Telegram bot profile maintenance
+# V1.0.00       2018-06-14      DW              Show the main page of the messaging system.
+# V1.0.01       2018-08-06      DW              Add a scheduler to refresh this page per 30 seconds.
+# V1.0.02       2018-08-08      DW              Show private group indicator (a lock icon).
+# V1.0.03       2018-09-23      DW              - Add a new option for Telegram bot profile maintenance
 #                                                 for system administrators.
 #                                               - Add a new option for Telegram ID input on user
 #                                                 profile maintenance.
-# V1.0.04       2018-09-28      AY              Add system settings link
-# V1.0.05       2019-01-07      AY              Show user creation option on menu as connection mode
+# V1.0.04       2018-09-28      DW              Add system settings link
+# V1.0.05       2019-01-07      DW              Show user creation option on menu as connection mode
 #                                               is 1 or 3.
 ##########################################################################################
 

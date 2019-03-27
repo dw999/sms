@@ -18,7 +18,7 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     =========================
-# V1.0.00       2018-07-18      AY              Remind users for scheduled event(s).
+# V1.0.00       2018-07-18      DW              Remind users for scheduled event(s).
 ##########################################################################################
 
 push @INC, '/www/perl_lib';

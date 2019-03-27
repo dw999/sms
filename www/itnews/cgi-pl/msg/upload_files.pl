@@ -18,10 +18,10 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-08-02      AY              Upload file. Include photo images, video clip,
+# V1.0.00       2018-08-02      DW              Upload file. Include photo images, video clip,
 #                                               sound file and any document files. However, no
 #                                               Perl and Unix shell scripts are allowed.
-# V1.0.01       2018-08-27      AY              Add message reply consideration.  
+# V1.0.01       2018-08-27      DW              Add message reply consideration.  
 ##########################################################################################
 
 push @INC, '/www/perl_lib';

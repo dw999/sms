@@ -18,17 +18,17 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-06-05      AY              Let new user finalize registration process
+# V1.0.00       2018-06-05      DW              Let new user finalize registration process
 #                                               and create his/her account.
-# V1.0.01       2018-07-27      AY              With suggestions from the team, the remark 
+# V1.0.01       2018-07-27      DW              With suggestions from the team, the remark 
 #                                               3 is amended.
-# V1.0.02       2018-08-21      AY              Make 'alias' compulsory.
-# V1.0.03       2018-12-08      AY              Rewrite this function to use jQuery Mobile.
-# V1.0.04       2018-12-10      AY              With unknown reason, long escaped URI data
+# V1.0.02       2018-08-21      DW              Make 'alias' compulsory.
+# V1.0.03       2018-12-08      DW              Rewrite this function to use jQuery Mobile.
+# V1.0.04       2018-12-10      DW              With unknown reason, long escaped URI data
 #                                               let jQuery Mobile library raise error. So,
 #                                               this program is amended to work-around this
 #                                               issue.
-# V1.0.05       2019-01-14      AY              Add transient status 'S' for selected applicant
+# V1.0.05       2019-01-14      DW              Add transient status 'S' for selected applicant
 #                                               to ensure correct token must be given, before
 #                                               he/she can go to next step 'input_user_data.pl'.
 ##########################################################################################

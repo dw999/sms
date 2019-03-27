@@ -18,9 +18,9 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-07-20      AY              Get newly added message(s) for specified user
+# V1.0.00       2018-07-20      DW              Get newly added message(s) for specified user
 #                                               and specified group.
-# V1.0.01       2018-09-21      AY              Change parameter passing method as calling
+# V1.0.01       2018-09-21      DW              Change parameter passing method as calling
 #                                               function getGroupMessage.
 ##########################################################################################
 

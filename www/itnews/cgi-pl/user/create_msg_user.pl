@@ -18,7 +18,7 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-10-10      AY              Create user of the messaging system (As
+# V1.0.00       2018-10-10      DW              Create user of the messaging system (As
 #                                               connection_mode is 1 or 3 on system settings).
 ##########################################################################################
 

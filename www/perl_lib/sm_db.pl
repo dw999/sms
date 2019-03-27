@@ -18,7 +18,7 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-05-24      AY              Library functions used for database operations.
+# V1.0.00       2018-05-24      DW              Library functions used for database operations.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';

@@ -18,11 +18,11 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-06-21      AY              Create private (1 to 1) messaging group.
-# V1.0.01       2018-08-06      AY              Let default settings of private group is
+# V1.0.00       2018-06-21      DW              Create private (1 to 1) messaging group.
+# V1.0.01       2018-08-06      DW              Let default settings of private group is
 #                                               to remove message automatically, and period
 #                                               for read-after-deletion is 1 minute.
-# V1.0.02       2018-08-21      AY              Invite group member by using alias only.
+# V1.0.02       2018-08-21      DW              Invite group member by using alias only.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';

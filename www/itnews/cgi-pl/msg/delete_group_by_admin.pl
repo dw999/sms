@@ -18,7 +18,7 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-07-15      AY              Remove selected messaging group(s) by system
+# V1.0.00       2018-07-15      DW              Remove selected messaging group(s) by system
 #                                               administrator. 
 ##########################################################################################
 

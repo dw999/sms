@@ -18,7 +18,7 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-07-16      AY              Promote user to trusted user or system administrator. 
+# V1.0.00       2018-07-16      DW              Promote user to trusted user or system administrator. 
 ##########################################################################################
 
 push @INC, '/www/perl_lib';

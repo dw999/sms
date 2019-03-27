@@ -18,8 +18,8 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-06-05      AY              Let an applicant be accepted or rejected.
-# V1.0.01       2018-07-27      AY              Inform all system administrators if a new
+# V1.0.00       2018-06-05      DW              Let an applicant be accepted or rejected.
+# V1.0.01       2018-07-27      DW              Inform all system administrators if a new
 #                                               guy has been accepted.
 ##########################################################################################
 

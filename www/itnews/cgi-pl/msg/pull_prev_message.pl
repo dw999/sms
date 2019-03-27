@@ -18,7 +18,7 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-09-18      AY              Load previous message block for specified user
+# V1.0.00       2018-09-18      DW              Load previous message block for specified user
 #                                               and specified group. 
 ##########################################################################################
 

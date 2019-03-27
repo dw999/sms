@@ -18,18 +18,18 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-06-28      AY              Do secret messaging.
-# V1.0.01       2018-08-05      AY              Take appropriated action in accordance with
+# V1.0.00       2018-06-28      DW              Do secret messaging.
+# V1.0.01       2018-08-05      DW              Take appropriated action in accordance with
 #                                               returned value of 'update_token'.
-# V1.0.02       2018-08-08      AY              - Add auto-deletion and read-after-delete period
+# V1.0.02       2018-08-08      DW              - Add auto-deletion and read-after-delete period
 #                                                 setting option to private group administrator.
 #                                               - Show private group indicator (a lock icon).
-# V1.0.03       2018-08-11      AY              Increase height of message input box from 50px to 60px.
-# V1.0.04       2018-08-27      AY              Add file upload feature (include camera snapshot
+# V1.0.03       2018-08-11      DW              Increase height of message input box from 50px to 60px.
+# V1.0.04       2018-08-27      DW              Add file upload feature (include camera snapshot
 #                                               and video).
-# V1.0.05       2018-08-31      AY              Add audio input.
-# V1.0.06       2018-09-03      AY              Add manual inform option to group administrator.
-# V2.0.00       2018-09-10      AY              - Drop iframe but use <div> for messages container. It
+# V1.0.05       2018-08-31      DW              Add audio input.
+# V1.0.06       2018-09-03      DW              Add manual inform option to group administrator.
+# V2.0.00       2018-09-10      DW              - Drop iframe but use <div> for messages container. It
 #                                                 combines all functions and codebase from do_sms.pl
 #                                                 V1.0.06 and load_message.pl V1.0.03. Therefore,
 #                                                 load_message.pl is no longer required. 
@@ -39,10 +39,11 @@
 #                                                 go to top as the panel is activated.
 #                                               - Make page header and footer that they don't hide automatically
 #                                                 as user tap the message page content.
-# V2.0.01       2018-09-16      AY              Implement loading messages on demand. Load last 30 messages as enter
+# V2.0.01       2018-09-16      DW              Implement loading messages on demand. Load last 30 messages as enter
 #                                               a group, then load previous messages as user kick on the 'Read More'
 #                                               button at the top of loaded messages.
-# V2.0.02       2019-03-11      AY              Add a blank line below date separation row as send a new message.  
+# V2.0.02       2019-03-11      DW              Add a blank line below date separation row as send a new message.
+# V2.0.03       2019-03-27      DW              Set animation time of scrolling to 'page_end' object to 500ms on all places. 
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -156,7 +157,7 @@ sub printJavascriptSection {
 
     \$(document).on("pageinit", function() {
       \$(function() {
-        \$('html,body').animate({scrollTop: \$('#page_end').offset().top}, 400);
+        \$('html,body').animate({scrollTop: \$('#page_end').offset().top}, 500);
       })
     });
   
@@ -751,7 +752,7 @@ sub printJavascriptSection {
         \$('#msg_table').append(this_tr).enhanceWithin();
 
         //*-- Seek to last message --*//            
-        \$('html, body').animate({scrollTop: \$('#page_end').offset().top}, 100);
+        \$('html, body').animate({scrollTop: \$('#page_end').offset().top}, 500);
       }      
     }
         

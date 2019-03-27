@@ -5,10 +5,10 @@
 #
 # Ver         Date            Author          Comment
 # =======     ===========     ===========     ==========================================
-# V1.0.00     2018-12-11      AY              Install SMS on Red Hat/Centos 7.
-# V1.0.01     2019-01-08      AY              - Add currently running platform checking
+# V1.0.00     2018-12-11      DW              Install SMS on Red Hat/Centos 7.
+# V1.0.01     2019-01-08      DW              - Add currently running platform checking
 #                                             - Check whether SMS has already been installed
-# V1.0.02     2019-03-11      AY              Install firewall and curl if they haven't been installed.
+# V1.0.02     2019-03-11      DW              Install firewall and curl if they haven't been installed.
 #=========================================================================================================
 
 #-- Don't let screen blank --#

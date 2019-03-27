@@ -18,7 +18,7 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-09-28      AY              Maintain decoy login site and message site.
+# V1.0.00       2018-09-28      DW              Maintain decoy login site and message site.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';

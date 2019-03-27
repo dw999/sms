@@ -18,7 +18,7 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-05-30      AY              Act as decoy page to protect the site.
+# V1.0.00       2018-05-30      DW              Act as decoy page to protect the site.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';

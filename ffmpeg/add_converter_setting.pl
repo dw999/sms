@@ -5,7 +5,7 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-12-27      AY              Configure system setting 'audio_converter' 
+# V1.0.00       2018-12-27      DW              Configure system setting 'audio_converter' 
 #                                               after FFmpeg audio converter is built.
 ##########################################################################################
 

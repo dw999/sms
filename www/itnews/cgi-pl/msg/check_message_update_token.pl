@@ -18,12 +18,12 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-07-08      AY              Get most updated update token of specified group.
-# V1.0.01       2018-08-05      AY              Check also the user current status (on both system 
+# V1.0.00       2018-07-08      DW              Get most updated update token of specified group.
+# V1.0.01       2018-08-05      DW              Check also the user current status (on both system 
 #                                               and message group level). If user is inactive or
 #                                               kicked from the group, inform calling program via
 #                                               value of '$update_token' to take appropriated action.
-# V1.0.02       2018-08-21      AY              If a given user for a group has unread message, renew
+# V1.0.02       2018-08-21      DW              If a given user for a group has unread message, renew
 #                                               message update token again. It would resolve an issue
 #                                               of new message(s) come in as the user sends out message. 
 ##########################################################################################

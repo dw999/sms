@@ -18,10 +18,10 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-10-08      AY              Maintain a list of system settings which
+# V1.0.00       2018-10-08      DW              Maintain a list of system settings which
 #                                               are applied to entire system to control
 #                                               system behavior.
-# V1.0.01       2019-01-29      AY              Add follow up checking as system settings
+# V1.0.01       2019-01-29      DW              Add follow up checking as system settings
 #                                               is added or modified.
 ##########################################################################################
 

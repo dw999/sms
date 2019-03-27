@@ -18,8 +18,8 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     =========================
-# V1.0.00       2018-07-18      AY              Inform offline users who get new messages.
-# V1.0.01       2018-08-24      AY              Inform offline users with new messages via
+# V1.0.00       2018-07-18      DW              Inform offline users who get new messages.
+# V1.0.01       2018-08-24      DW              Inform offline users with new messages via
 #                                               Telegram.
 ##########################################################################################
 

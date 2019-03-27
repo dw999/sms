@@ -18,8 +18,8 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-07-17      AY              Destroy entire system in most dangerous situation.
-# V1.0.01       2019-02-20      AY              Destroy database for decoy site also.
+# V1.0.00       2018-07-17      DW              Destroy entire system in most dangerous situation.
+# V1.0.01       2019-02-20      DW              Destroy database for decoy site also.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';

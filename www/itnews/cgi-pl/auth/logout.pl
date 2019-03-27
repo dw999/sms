@@ -18,9 +18,9 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-06-19      AY              Logout the messaging system.
-# V1.0.01       2018-08-21      AY              Go to login page as logout.
-# V1.0.02       2019-01-21      AY              Go to a arbitrary decoy site as logout. 
+# V1.0.00       2018-06-19      DW              Logout the messaging system.
+# V1.0.01       2018-08-21      DW              Go to login page as logout.
+# V1.0.02       2019-01-21      DW              Go to a arbitrary decoy site as logout. 
 ##########################################################################################
 
 push @INC, '/www/perl_lib';

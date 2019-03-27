@@ -18,13 +18,13 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-08-14      AY              Forward message to another group.
-# V1.0.01       2018-08-21      AY              Let user input additional message as forward
+# V1.0.00       2018-08-14      DW              Forward message to another group.
+# V1.0.01       2018-08-21      DW              Let user input additional message as forward
 #                                               a message.
-# V1.0.02       2018-08-29      AY              If a to-be-forward message with attached file, 
+# V1.0.02       2018-08-29      DW              If a to-be-forward message with attached file, 
 #                                               make a new copy of that file for the forwarded
 #                                               message.
-# V1.0.03       2018-09-21      AY              Take care message loading on demand by passing the ID of
+# V1.0.03       2018-09-21      DW              Take care message loading on demand by passing the ID of
 #                                               the first load message to the calling program. Note: this
 #                                               data is stored on local storage of the web browser.
 ##########################################################################################

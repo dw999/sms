@@ -18,12 +18,12 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-05-18      AY              Login to the system.
-# V1.0.01       2018-10-12      AY              - Hide 'Join Us' link if connection_mode is
+# V1.0.00       2018-05-18      DW              Login to the system.
+# V1.0.01       2018-10-12      DW              - Hide 'Join Us' link if connection_mode is
 #                                                 1.
 #                                               - Redirect user to messaging page if connection_mode
 #                                                 is 1.
-# V1.0.02       2019-01-07      AY              - Hide 'Join Us' link if connection_mode is
+# V1.0.02       2019-01-07      DW              - Hide 'Join Us' link if connection_mode is
 #                                                 1 or 3.
 #                                               - Redirect user to messaging page if connection_mode
 #                                                 is 1 or 2.

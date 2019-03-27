@@ -18,19 +18,19 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-05-17      AY              Library functions used for web application
+# V1.0.00       2018-05-17      DW              Library functions used for web application
 #                                               environment.
-# V1.0.01       2018-08-08      AY              Ensure UTF-8 data has been decoded before
+# V1.0.01       2018-08-08      DW              Ensure UTF-8 data has been decoded before
 #                                               pass to function 'sendOutGmail'.
-# V1.0.02       2018-08-27      AY              Implement CGI file upload related functions.
-# V1.0.03       2018-08-30      AY              Add thumbnail image creation function.
-# V1.0.04       2018-10-12      AY              Modify function sendOutGmail to handle required 
+# V1.0.02       2018-08-27      DW              Implement CGI file upload related functions.
+# V1.0.03       2018-08-30      DW              Add thumbnail image creation function.
+# V1.0.04       2018-10-12      DW              Modify function sendOutGmail to handle required 
 #                                               data missing as connection_mode is 1.
-# V1.0.05       2018-11-23      AY              Fix a bug on function utf8_substring.
-# V1.0.06       2018-12-10      AY              Add function 'printFreeHeader' for those
+# V1.0.05       2018-11-23      DW              Fix a bug on function utf8_substring.
+# V1.0.06       2018-12-10      DW              Add function 'printFreeHeader' for those
 #                                               programs valid login user is not required.
 #                                               For example, function 'request to join'.
-# V1.0.07       2019-02-04      AY              Extend short upload file name to avoid hackers
+# V1.0.07       2019-02-04      DW              Extend short upload file name to avoid hackers
 #                                               guess it easily.
 ##########################################################################################
 

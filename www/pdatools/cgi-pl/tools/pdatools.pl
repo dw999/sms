@@ -18,8 +18,8 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-06-01      AY              Load up the first page of PDA tools.
-# V1.0.01       2018-12-16      AY              Set cookie expiry period and enforce pass via SSL.
+# V1.0.00       2018-06-01      DW              Load up the first page of PDA tools.
+# V1.0.01       2018-12-16      DW              Set cookie expiry period and enforce pass via SSL.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';

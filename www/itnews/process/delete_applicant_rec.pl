@@ -18,7 +18,7 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     =========================
-# V1.0.00       2018-07-23      AY              Remove timeout, rejected, and completed applicant
+# V1.0.00       2018-07-23      DW              Remove timeout, rejected, and completed applicant
 #                                               records.
 ##########################################################################################
 

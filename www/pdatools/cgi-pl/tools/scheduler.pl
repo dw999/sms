@@ -18,7 +18,7 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-10-19      AY              A scheduler.
+# V1.0.00       2018-10-19      DW              A scheduler.
 #
 # Remark: Event reminder is handled by another back-end program 'schedule_reminder.pl'.
 ##########################################################################################

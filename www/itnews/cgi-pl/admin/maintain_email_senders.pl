@@ -18,7 +18,7 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-10-03      AY              Maintain a list of Gmail addresses which are used
+# V1.0.00       2018-10-03      DW              Maintain a list of Gmail addresses which are used
 #                                               to send login link and notification to users.
 ##########################################################################################
 

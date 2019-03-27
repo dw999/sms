@@ -18,10 +18,10 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     =========================
-# V1.0.00       2018-07-23      AY              Remove messages which are sent 14 days before
+# V1.0.00       2018-07-23      DW              Remove messages which are sent 14 days before
 #                                               for common groups and private groups which
 #                                               auto-delete message flag is set to 0.
-# V1.0.01       2019-01-15      AY              Let old messages removal days becomes a variable
+# V1.0.01       2019-01-15      DW              Let old messages removal days becomes a variable
 #                                               and store on system setting 'old_msg_delete_days'. 
 ##########################################################################################
 

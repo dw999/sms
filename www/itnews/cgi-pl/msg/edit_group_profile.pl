@@ -18,12 +18,12 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-07-11      AY              Message group profile maintenance.
-# V1.0.01       2018-08-08      AY              Add auto-deletion setup for private group.
-# V1.0.02       2018-08-21      AY              Only accept alias as add new group member(s).
-# V1.0.03       2018-09-03      AY              Add manual inform option to group administrator.
-# V1.0.04       2018-09-12      AY              Improve manual user inform message sending notification.
-# V1.0.05       2018-09-21      AY              Take care message loading on demand by passing the ID of
+# V1.0.00       2018-07-11      DW              Message group profile maintenance.
+# V1.0.01       2018-08-08      DW              Add auto-deletion setup for private group.
+# V1.0.02       2018-08-21      DW              Only accept alias as add new group member(s).
+# V1.0.03       2018-09-03      DW              Add manual inform option to group administrator.
+# V1.0.04       2018-09-12      DW              Improve manual user inform message sending notification.
+# V1.0.05       2018-09-21      DW              Take care message loading on demand by passing the ID of
 #                                               the first load message to the calling program. Note: this
 #                                               data is stored on local storage of the web browser.
 ##########################################################################################

@@ -18,7 +18,7 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     =========================
-# V1.0.00       2018-07-19      AY              Remove expired web session and login token queue records.
+# V1.0.00       2018-07-19      DW              Remove expired web session and login token queue records.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';

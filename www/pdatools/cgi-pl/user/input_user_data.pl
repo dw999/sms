@@ -18,11 +18,11 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-12-10      AY              With unknown reason, long escaped URI data
+# V1.0.00       2018-12-10      DW              With unknown reason, long escaped URI data
 #                                               (the applicant token) let jQuery Mobile
 #                                               library raise error. So, this program is
 #                                               created to work-around this issue.
-# V1.0.01       2019-01-14      AY              Handle transient status 'S' of selected applicant
+# V1.0.01       2019-01-14      DW              Handle transient status 'S' of selected applicant
 #                                               to ensure correct token must be given, before
 #                                               he/she can go to this web page.
 ##########################################################################################

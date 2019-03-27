@@ -18,7 +18,7 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     =========================
-# V1.0.00       2018-07-18      AY              Remove already read messages for private groups,
+# V1.0.00       2018-07-18      DW              Remove already read messages for private groups,
 #                                               which auto-delete message flag is set to 1.
 ##########################################################################################
 

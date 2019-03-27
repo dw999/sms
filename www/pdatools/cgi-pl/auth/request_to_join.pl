@@ -18,13 +18,13 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-06-02      AY              Request to join the messaging system.
-# V1.0.01       2018-07-31      AY              Fix unrecognised Chinese characters issue
+# V1.0.00       2018-06-02      DW              Request to join the messaging system.
+# V1.0.01       2018-07-31      DW              Fix unrecognised Chinese characters issue
 #                                               on inform email.
-# V1.0.02       2018-08-21      AY              Only system administrator can self register
+# V1.0.02       2018-08-21      DW              Only system administrator can self register
 #                                               new user account.
-# V1.0.03       2018-12-09      AY              Rewrite UI section by using jQuery Mobile.
-# V1.0.04       2019-01-17      AY              Fix hard corded company name issue on 'printRegisteredOkPage'.
+# V1.0.03       2018-12-09      DW              Rewrite UI section by using jQuery Mobile.
+# V1.0.04       2019-01-17      DW              Fix hard corded company name issue on 'printRegisteredOkPage'.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';

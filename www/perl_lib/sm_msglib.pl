@@ -18,11 +18,11 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-06-16      AY              Library functions used for messaging system.
-# V1.0.01       2018-08-30      AY              Add thumbnail for uploaded image files.
-# V1.0.02       2018-09-13      AY              Let functions 'getGroupMessage' and 'getLastSentMessage'
+# V1.0.00       2018-06-16      DW              Library functions used for messaging system.
+# V1.0.01       2018-08-30      DW              Add thumbnail for uploaded image files.
+# V1.0.02       2018-09-13      DW              Let functions 'getGroupMessage' and 'getLastSentMessage'
 #                                               use a common data gathering function '_gatherMessage'.
-# V1.0.03       2019-03-19      AY              Show audio and video file download link for all platforms, 
+# V1.0.03       2019-03-19      DW              Show audio and video file download link for all platforms, 
 #                                               Amended function is '_gatherMessage'.
 ##########################################################################################
 

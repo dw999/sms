@@ -18,9 +18,9 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-06-26      AY              Create messaging group.
-# V1.0.01       2018-07-30      AY              Add group messages periodic clearing option.
-# V1.0.02       2018-08-21      AY              Invite group member by using alias only.
+# V1.0.00       2018-06-26      DW              Create messaging group.
+# V1.0.01       2018-07-30      DW              Add group messages periodic clearing option.
+# V1.0.02       2018-08-21      DW              Invite group member by using alias only.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';

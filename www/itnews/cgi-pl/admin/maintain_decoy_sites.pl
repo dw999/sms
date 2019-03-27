@@ -18,7 +18,7 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-10-05      AY              Maintain a list of decoy sites which are used
+# V1.0.00       2018-10-05      DW              Maintain a list of decoy sites which are used
 #                                               to redirect intruders away from the messaging
 #                                               site.
 ##########################################################################################

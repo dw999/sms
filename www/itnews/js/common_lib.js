@@ -17,9 +17,9 @@
 //
 // Ver           Date            Author          Comment
 // =======       ===========     ===========     ==========================================
-// V1.0.00       2018-06-04      AY              Common Javascript library
-// V1.0.01       2018-09-10      AY              Add non-jQuery scrolling function.
-// V1.0.02       2018-09-19      AY              Add web browser local storage operating functions. Note: It seems that iOS doesn't
+// V1.0.00       2018-06-04      DW              Common Javascript library
+// V1.0.01       2018-09-10      DW              Add non-jQuery scrolling function.
+// V1.0.02       2018-09-19      DW              Add web browser local storage operating functions. Note: It seems that iOS doesn't
 //                                               support local storage as well as other platforms.
 //#################################################################################################################################
 

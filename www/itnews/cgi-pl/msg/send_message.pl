@@ -18,8 +18,8 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-07-06      AY              Send message to specified group.
-# V1.0.01       2018-08-18      AY              Take care message replying. 
+# V1.0.00       2018-07-06      DW              Send message to specified group.
+# V1.0.01       2018-08-18      DW              Take care message replying. 
 ##########################################################################################
 
 push @INC, '/www/perl_lib';

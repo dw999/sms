@@ -18,7 +18,7 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-05-31      AY              The messaging system login helper. 
+# V1.0.00       2018-05-31      DW              The messaging system login helper. 
 ##########################################################################################
 
 push @INC, '/www/perl_lib';

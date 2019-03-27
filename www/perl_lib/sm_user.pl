@@ -18,17 +18,17 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-05-24      AY              Library functions used for user authentication.
-# V1.0.01       2018-08-10      AY              Remove using 'crypt' to encrypt user passwords
+# V1.0.00       2018-05-24      DW              Library functions used for user authentication.
+# V1.0.01       2018-08-10      DW              Remove using 'crypt' to encrypt user passwords
 #                                               due to it's serious limitation (only first 8
 #                                               characters are used for encrypted password).
-# V1.0.02       2018-09-21      AY              Apply another method for encrypted user password
+# V1.0.02       2018-09-21      DW              Apply another method for encrypted user password
 #                                               checking.
-# V1.0.03       2018-11-06      AY              Remove session IP address restriction to let users
+# V1.0.03       2018-11-06      DW              Remove session IP address restriction to let users
 #                                               connect via Tor browser. See function 'sessionAlive'.
-# V1.0.04       2019-01-07      AY              Add connection mode 2 and 3 handling methods on function
+# V1.0.04       2019-01-07      DW              Add connection mode 2 and 3 handling methods on function
 #                                               'authenticateLoginUser'.
-# V1.0.05       2019-01-14      AY              Add function 'setApplicantStatus'.
+# V1.0.05       2019-01-14      DW              Add function 'setApplicantStatus'.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
