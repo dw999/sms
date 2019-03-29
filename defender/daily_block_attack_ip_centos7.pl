@@ -4,14 +4,14 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     =========================
-# V1.0.00       2017-01-30      AY              System attacking monitoring and hacker IP
+# V1.0.00       2017-01-30      DW              System attacking monitoring and hacker IP
 #                                               addresses blocking for Red Hat/CentOS 7.
 #                                               Note: 1. Using built-in firewall is assumed.
 #                                                     2. Firewall and this Perl script is placed
 #                                                        on same machine.
-# V1.0.01       2017-03-03      AY              Add a new attack vector identity "Bad protocol version identification".
-# V1.0.02       2017-04-16      AY              Fix a logical bug for firewall rule update.
-# V1.0.03       2018-12-28      AY              Add a new attack vector identity "Received disconnect from" for sshd.
+# V1.0.01       2017-03-03      DW              Add a new attack vector identity "Bad protocol version identification".
+# V1.0.02       2017-04-16      DW              Fix a logical bug for firewall rule update.
+# V1.0.03       2018-12-28      DW              Add a new attack vector identity "Received disconnect from" for sshd.
 #
 # Remark: Database schema is as follows:
 #         

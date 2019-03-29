@@ -3,7 +3,7 @@
 --
 -- Ver           Date            Author          Comment
 -- =======       ===========     ===========     ==========================================
--- V1.0.00       2018-12-22      AY              Create database for CentOS/RedHat 7 defender.
+-- V1.0.00       2018-12-22      DW              Create database for CentOS/RedHat 7 defender.
 --
 -- Remark: It is part of SMS installation program.
 -----------------------------------------------------------------------------------------------------

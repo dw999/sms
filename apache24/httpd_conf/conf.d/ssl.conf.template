@@ -1,5 +1,5 @@
 #
-# 2019-01-04 AY: Important Notes
+# 2019-01-04 DW: Important Notes
 # ------------------------------
 # Since certbot suddenly don't recongnize some Apache configuration file syntax, so this 
 # configuration template is amended to remove sections which may cause error for certbot

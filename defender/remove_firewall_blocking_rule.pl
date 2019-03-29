@@ -4,7 +4,7 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     =========================
-# V1.0.00       2017-01-30      AY              Remove IP address blocking rules on firewall
+# V1.0.00       2017-01-30      DW              Remove IP address blocking rules on firewall
 #                                               which exceed a pre-defined period.
 ##########################################################################################
 
