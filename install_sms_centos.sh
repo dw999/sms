@@ -9,6 +9,7 @@
 # V1.0.01     2019-01-08      DW              - Add currently running platform checking
 #                                             - Check whether SMS has already been installed
 # V1.0.02     2019-03-11      DW              Install firewall and curl if they haven't been installed.
+# V1.0.03     2019-04-01      DW              Enable http and https protocol before apply SSL certificates.
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -94,7 +95,7 @@ systemctl start ntpd >> /tmp/sms_install.log
 ntpdate -u -s stdtime.gov.hk 0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 3.pool.ntp.org 0.asia.pool.ntp.org 0.us.pool.ntp.org
 systemctl restart ntpd
 hwclock -w
-#-- If firewall is not installed, install and configure it now. --#
+#-- If firewall is not installed, install and configure it now. Otherwise, just configure it. --#
 fw=`yum list installed firewalld | grep firewalld | wc -l`
 if (($fw == 0))
 then
@@ -107,6 +108,15 @@ then
   firewall-cmd --zone=public --permanent --add-service=https
   firewall-cmd --zone=public --permanent --add-icmp-block=echo-request
   firewall-cmd --reload
+else
+  echo "Configure firewall"  
+  systemctl enable firewalld >> /tmp/sms_install.log
+  systemctl restart firewalld >> /tmp/sms_install.log
+  firewall-cmd --zone=public --permanent --add-service=ssh
+  firewall-cmd --zone=public --permanent --add-service=http
+  firewall-cmd --zone=public --permanent --add-service=https
+  firewall-cmd --zone=public --permanent --add-icmp-block=echo-request
+  firewall-cmd --reload  
 fi
 #-- If curl is not installed, install it. --#
 c=`yum list installed curl | grep curl | wc -l`
@@ -322,11 +332,12 @@ echo ""
 echo "=================================================================================="
 echo "Step 8: Configure the Linux system settings"
 echo "=================================================================================="
-echo "Configure firewall for the web sites"
-firewall-cmd --permanent --zone=public --add-service=http
-firewall-cmd --permanent --zone=public --add-service=https
-firewall-cmd --permanent --zone=public --add-icmp-block=echo-request
-firewall-cmd --reload
+# Note: Firewall has been configured in previous section.
+#echo "Configure firewall for the web sites"
+#firewall-cmd --permanent --zone=public --add-service=http
+#firewall-cmd --permanent --zone=public --add-service=https
+#firewall-cmd --permanent --zone=public --add-icmp-block=echo-request
+#firewall-cmd --reload
 
 # Note: SELinux must be disabled to make web sites to function normally. i.e. Modify /etc/sysconfig/selinux to set SELINUX=disabled and then reboot.
 #echo "Configure SELinux"
