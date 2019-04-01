@@ -9,7 +9,7 @@
 # V1.0.01     2019-01-08      DW              - Add currently running platform checking
 #                                             - Check whether SMS has already been installed
 # V1.0.02     2019-03-11      DW              Install firewall and curl if they haven't been installed.
-# V1.0.03     2019-04-01      DW              Enable http and https protocol before apply SSL certificates.
+# V1.0.03     2019-04-01      DW              Enable http and https protocols on firewall before apply SSL certificates.
 #=========================================================================================================
 
 #-- Don't let screen blank --#
