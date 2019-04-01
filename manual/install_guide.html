@@ -85,7 +85,7 @@
     <td>
       If all prerequisites of SMS server installation are fulfilled, you may now install SMS server.<br>
       <br>
-      Login Linux server as super user, open a terminal window, and go to the directory where decompressed SMS server installation<br>
+      Login Linux server as super user, open a terminal window, and go to the directory where decompressed SMS server installation
       packages located, then execute installation script:<br>
       <br>
       # <font color='darkblue'><b>./install_sms_centos.sh</b></font><br>
@@ -146,9 +146,9 @@
   <tr>
     <td></td>
     <td>
-      All applications on step 1 will be installed automatically. However, an application CPAN needs to be configured<br>
-      in this stage, because it is needed in next step. Installation program will instruct you how to configure CPAN,<br>
-      just as Figure 3, 4 and 5 shown. After CPAN has been configured, you need to input 'quit' to exit CPAN in order<br>
+      All applications on step 1 will be installed automatically. However, an application CPAN needs to be configured
+      in this stage, because it is needed in next step. Installation program will instruct you how to configure CPAN,
+      just as Figure 3, 4 and 5 shown. After CPAN has been configured, you need to input 'quit' to exit CPAN in order
       to proceed to next step.
     </td>
   </tr>
@@ -201,7 +201,7 @@
   <tr>
     <td></td>
     <td>
-      After you quit CPAN, step 2 will be started automatically to install all required Perl libraries as Figure 6 shown.<br>
+      After you quit CPAN, step 2 will be started automatically to install all required Perl libraries as Figure 6 shown.
       This stage may need more than 15 minutes to be completed, so please be patient.
     </td>
   </tr>
@@ -246,8 +246,8 @@
   <tr>
     <td></td>
     <td>
-      Once all required javascript libraries are downloaded, it will go to step 4 automatically. In this<br>
-      step, all SMS server programs and required javascript libraries will be moved to pre-defined directories,<br>
+      Once all required javascript libraries are downloaded, it will go to step 4 automatically. In this
+      step, all SMS server programs and required javascript libraries will be moved to pre-defined directories,
       and directories access rights will also be configured.
     </td>
   </tr>
@@ -270,15 +270,15 @@
   <tr>
     <td></td>
     <td>
-      As shown on Figure 8, step 5 is going to prepare (it means configuration) MariaDB database server and<br>
+      As shown on Figure 8, step 5 is going to prepare (it means configuration) MariaDB database server and
       create required databases used by SMS server.<br>
       <br>
-      When you prepare the MariaDB database server, you need to create password for the database server administrator<br>
-      (also called 'root', but it is not the same 'root' of CentOS Linux 7), and accept default configuration settings<br>
+      When you prepare the MariaDB database server, you need to create password for the database server administrator
+      (also called 'root', but it is not the same 'root' of CentOS Linux 7), and accept default configuration settings
       to harden database server's security (Figure 9).<br>
       <br>
-      When MariaDB database server has been configured, screen like Figure 10 will show up. You need to press enter to<br>
-      proceed to create databases for SMS server, and you will be asked to input database server administrator password<br>
+      When MariaDB database server has been configured, screen like Figure 10 will show up. You need to press enter to
+      proceed to create databases for SMS server, and you will be asked to input database server administrator password
       you have just created.
     </td>
   </tr>
@@ -316,15 +316,15 @@
   <tr>
     <td></td>
     <td>
-      Step 6 is very important, in here you need to give the system seven essential data for your SMS server.<br>
-      They are SMS connection mode, DNS name of the decoy site, DNS name of the messaging site, email address of<br>
-      the SMS server administrator, worker Gmail address for SMS operations, the worker Gmail login username and<br>
+      Step 6 is very important, in here you need to give the system seven essential data for your SMS server.
+      They are SMS connection mode, DNS name of the decoy site, DNS name of the messaging site, email address of
+      the SMS server administrator, worker Gmail address for SMS operations, the worker Gmail login username and
       it's password. Any incorrect input data will let SMS server malfunction.<br>
       <br>
-      Please also note that you MUST put '<b>https://</b>' in front of your DNS names of the decoy site and messaging<br>
+      Please also note that you MUST put '<b>https://</b>' in front of your DNS names of the decoy site and messaging
       site, just as Figure 11 shown.<br>
       <br>
-      After you input all these data, you require to verify and confirm them. If all input data are correct, press<br>
+      After you input all these data, you require to verify and confirm them. If all input data are correct, press
       'Y' and then enter to save them. Otherwise, press 'N' to input them again.
     </td>
   </tr>
@@ -347,23 +347,23 @@
   <tr>
     <td></td>
     <td>
-      Step 7 will generate SSL certificates in accordance with DNS names of your decoy site and messaging site you input<br>
-      previously. In this step, you will be asked to input your email address (just use the same email for the SMS administrator),<br>
+      Step 7 will generate SSL certificates in accordance with DNS names of your decoy site and messaging site you input
+      previously. In this step, you will be asked to input your email address (just use the same email for the SMS administrator),
       and three questions. Figure 12 provides you an example.<br>
       <br>
       <b>Note:</b><br>
-      This step may sometimes fail (Figure 13), but don't worry, you can repeat this process later after installation by running<br>
+      This step may sometimes fail (Figure 13), but don't worry, you can repeat this process later after installation by running
       the below command to subscribe SSL certificates again:<br>
       <br>
       # <font color='darkblue'><b>certbot --apache</b></font><br>
       <br>
-      Please also note that SSL certificates are used to provide the secrecy of your online communication, which is the most<br>
-      important part of the SMS server. Therefore, you must ensure your SSL certificates installation successful before using<br>
+      Please also note that SSL certificates are used to provide the secrecy of your online communication, which is the most
+      important part of the SMS server. Therefore, you must ensure your SSL certificates installation successful before using
       SMS server. You could check how secure of your web sites by using testing site https://www.ssllabs.com:<br>
       <br>
       e.g.) https://www.ssllabs.com/ssltest/analyze.html?d=argogo.mywire.org<br>
       <br>
-      It will give security ratings for your site (similar to Figure 14). If grade of overall rating is below A, that means something<br>
+      It will give security ratings for your site (similar to Figure 14). If grade of overall rating is below A, that means something
       is wrong on security of your sites, please fix all the issues before using SMS server for your messaging operation.
     </td>
   </tr>
@@ -418,11 +418,11 @@
   <tr>
     <td></td>
     <td>
-      After running step 8 to configure some Linux system settings, you will process to optional step 9. You will be asked<br>
-      to build audio file converter FFmpeg. FFmpeg is used to convert some common audio input file formats used by Android<br>
-      to OGG audio file format, which is widely supported by HTML5 multimedia objects in many platforms (except iOS). If you<br>
-      don't have it, your audio input file will be treated by SMS server as file attachment. You must download it to your<br>
-      phone or computer to play, and can't play it on your web browser directly. Therefore, for a better user experience,<br>
+      After running step 8 to configure some Linux system settings, you will process to optional step 9. You will be asked
+      to build audio file converter FFmpeg. FFmpeg is used to convert some common audio input file formats used by Android
+      to OGG audio file format, which is widely supported by HTML5 multimedia objects in many platforms (except iOS). If you
+      don't have it, your audio input file will be treated by SMS server as file attachment. You must download it to your
+      phone or computer to play, and can't play it on your web browser directly. Therefore, for a better user experience,
       it is worth to spend some time to build FFmpeg.
     </td>
   </tr>
@@ -445,9 +445,9 @@
   <tr>
     <td></td>
     <td>
-      The next optional installation item is system defender. It is not the necessary component to drive SMS<br>
-      server, but it will provide minimum protection to your SMS server from cyber criminals. So, it is better<br>
-      to have it. The installation program needs to create database for system defender, you will be asked to<br>
+      The next optional installation item is system defender. It is not the necessary component to drive SMS
+      server, but it will provide minimum protection to your SMS server from cyber criminals. So, it is better
+      to have it. The installation program needs to create database for system defender, you will be asked to
       input the database server administrator password here.
     </td>
   </tr>
@@ -500,7 +500,7 @@
   <tr>
     <td></td>
     <td>
-      If SSL certificates generation is failure in step 7, you may do it again as Figure 17 shown. If everything is OK, screen<br>
+      If SSL certificates generation is failure in step 7, you may do it again as Figure 17 shown. If everything is OK, screen
       similar to Figure 18 will be seem.  
     </td>
   </tr>

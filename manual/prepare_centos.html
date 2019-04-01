@@ -67,7 +67,7 @@
   <tr>
     <td></td>
     <td>
-      After select your desired language, then setup page 'INSTALLATION SUMMARY' will be displayed. You should cast your<br>
+      After select your desired language, then setup page 'INSTALLATION SUMMARY' will be displayed. You should cast your
       server here by selecting system time zone, input network connection parameters, configure hard disk partitions, etc. 
     </td>
   </tr>
@@ -90,8 +90,8 @@
   <tr>
     <td></td>
     <td>
-      Configure network settings, select 'NETWORK & HOST NAME'. Then click 'Configure...' button, and then <br>
-      select 'IPv4 Settings' and click 'Add' button. Input network settings of your server, and turn on the network<br>
+      Configure network settings, select 'NETWORK & HOST NAME'. Then click 'Configure...' button, and then 
+      select 'IPv4 Settings' and click 'Add' button. Input network settings of your server, and turn on the network
       connection afterward.
     </td>
   </tr>
@@ -114,9 +114,9 @@
   <tr>
     <td></td>
     <td>
-      Configure your server's time zone, and turn on network time auto-adjustment. Note: SMS is a<br>
-      single time zone application, and time zone is very important for it's operation. For example,<br>
-      if you want to provide SMS service for users in Hong Kong, you must set your server to Hong Kong<br>
+      Configure your server's time zone, and turn on network time auto-adjustment. Note: SMS is a
+      single time zone application, and time zone is very important for it's operation. For example,
+      if you want to provide SMS service for users in Hong Kong, you must set your server to Hong Kong
       time zone, even it is not located in Hong Kong physically.
     </td>
   </tr>
@@ -139,9 +139,9 @@
   <tr>
     <td></td>
     <td>
-      Select the installation destination and configure your partitions manually like Figure 6 shown.<br>
-      Although you may let CentOS configure disk partitions for you automatically, CentOS will assign<br>
-      half disk space to 'home' partition, which SMS will not use it. i.e. About half of disk space<br>
+      Select the installation destination and configure your partitions manually like Figure 6 shown.
+      Although you may let CentOS configure disk partitions for you automatically, CentOS will assign
+      half disk space to 'home' partition, which SMS will not use it. i.e. About half of disk space
       will be wasted. 
     </td>
   </tr>
@@ -179,11 +179,11 @@
   <tr>
     <td></td>
     <td>
-      Security policy is varied between different CentOS 7 builds, and you should select standard or default policy<br>
-      for SMS server installation. Now, button 'Begin Installation' on figure 2 should be activated and you could<br>
-      click on it to install CentOS 7. During CentOS 7 installation, two more tasks you should do: (1) Assign root<br>
-      password (blank password for root is totally unacceptable), and (2) Create another administrative user. Just<br>
-      click on 'ROOT PASSWORD' and 'USER CREATION', new screen will be displayed and follow the instructions<br>
+      Security policy is varied between different CentOS 7 builds, and you should select standard or default policy
+      for SMS server installation. Now, button 'Begin Installation' on figure 2 should be activated and you could
+      click on it to install CentOS 7. During CentOS 7 installation, two more tasks you should do: (1) Assign root
+      password (blank password for root is totally unacceptable), and (2) Create another administrative user. Just
+      click on 'ROOT PASSWORD' and 'USER CREATION', new screen will be displayed and follow the instructions
       to create root password and a new administrative user. (Figure 8)
     </td>
   </tr>
@@ -221,10 +221,10 @@
   <tr>
     <td></td>
     <td>
-      After CentOS 7 installation is completed, reboot the system. Then two things must be done immediately to<br>
+      After CentOS 7 installation is completed, reboot the system. Then two things must be done immediately to
       harden the system security: (1) disable root login via ssh, (2) patch the system to the most updated level.<br>
       <br>
-      For (1), modify the ssh configuration file "/etc/ssh/sshd_config", and uncomment the option "PermitRootLogin yes"<br>
+      For (1), modify the ssh configuration file "/etc/ssh/sshd_config", and uncomment the option "PermitRootLogin yes"
       and change it to "PermitRootLogin no". Then, save the change and restart the sshd service:<br>
       <br>
       <b>systemctl restart sshd.service</b><br>
@@ -233,9 +233,11 @@
       <br>
       <b>yum update</b><br>
       <br>
-      Now, the system is well prepared for SMS installation. Reboot the system to ensure all most updated patches loaded.<br>
+      Now, the system is well prepared for SMS installation. Reboot the system to ensure all most updated patches loaded.
     </td>
-  </tr>  
+  </tr>
+  
+  <tr><td colspan=2>&nbsp;</td></tr>  
   </table>
 </body>
 </html>
