@@ -25,6 +25,6 @@ How to installation SMS
 1. Prepare a CentOS 7 server (please refer to SMS server documents for details)
 2. Download and decompress SMS installation package, and run 'install_sms_centos.sh' in super user mode.
 
-Documentation of SMS server
----------------------------
+Documentation of SMS
+--------------------
 Read index.html on manual directory of the SMS installation package.
