@@ -5,6 +5,10 @@ Since it is a web application, any platform with HTML5 supported web browser can
 and desktop computers. In additional, you totally control both client and server side of SMS, it means that you need to install and manage your SMS
 server yourself.
 
+What license SMS uses
+---------------------
+SMS uses Apache license 2.0
+
 What platform SMS server support
 --------------------------------
 Now, it supports x86_64 CentOS 7 only.
@@ -18,7 +22,7 @@ Prerequisites of SMS server installation
 
 How to installation of SMS server
 ---------------------------------
-1. Prepare a CentOS 7 server (please refer SMS server documents for details)
+1. Prepare a CentOS 7 server (please refer to SMS server documents for details)
 2. Download and decompress SMS server installation package, and run 'install_sms_centos.sh' in super user mode.
 
 Documentation of SMS server
