@@ -7,11 +7,11 @@ server yourself.
 
 What license SMS uses
 ---------------------
-SMS uses Apache license 2.0
+Apache license 2.0
 
 What platform SMS support
 -------------------------
-Now, it supports x86_64 CentOS 7 only.
+Currently, it supports x86_64 CentOS 7 only.
 
 Prerequisites of SMS installation
 ---------------------------------
@@ -25,6 +25,6 @@ How to installation SMS
 1. Prepare a CentOS 7 server (please refer to SMS server documents for details)
 2. Download and decompress SMS installation package, and run 'install_sms_centos.sh' in super user mode.
 
-Documentation of SMS
---------------------
+SMS Documents
+-------------
 Read index.html on manual directory of the SMS installation package.
