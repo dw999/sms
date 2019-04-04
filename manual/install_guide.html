@@ -20,17 +20,19 @@
   <tr>
     <td></td>
     <td>
-      - Decompress SMS server installation package: <b><font color='darkblue'>tar -xzvf sms_server_1_0.tgz</font></b>
+      <table width=100% class=table cellspacing=1 cellpadding=1>
+      <tr>
+        <td valign=top> - </td>
+        <td>Decompress SMS server installation package: <b><font color='darkblue'>tar -xzvf sms_server_1_0.tgz</font></b></td>
+      </tr>
+      <tr>
+        <td valign=top> - </td>
+        <td>Make sure all installation shell scripts are executable: <b><font color='darkblue'>chmod +x *.sh</font></b> and <b><font color='darkblue'>chmod +x ffmpeg/*.sh</font></b></td>
+      </tr>      
+      </table>  
     </td>
   </tr>
    
-  <tr>
-    <td></td>
-    <td>
-      - Make sure all installation shell scripts are executable: <b><font color='darkblue'>chmod +x *.sh</font></b> and <b><font color='darkblue'>chmod +x ffmpeg/*.sh</font></b>
-    </td>
-  </tr>
-
   <tr><td colspan=2>&nbsp;</td></tr>
 
   <tr>
@@ -41,38 +43,31 @@
   <tr>
     <td></td>
     <td>
-      - You are root or root equivalent user, i.e. You must be super user.
+      <table width=100% class=table cellspacing=1 cellpadding=1>
+      <tr>
+        <td valign=top> - </td>
+        <td>You are root or root equivalent user, i.e. You must be super user.</td>
+      </tr>
+      <tr>
+        <td valign=top> - </td>
+        <td>Network connection of your CentOS Linux server is well configured and fast enough (> 1Mb/s).</td>
+      </tr>
+      <tr>
+        <td valign=top> - </td>
+        <td>You have registered two domain names for the decoy site and messaging site, and they have already been pointed to your server's public IP address.</td>
+      </tr>
+      <tr>
+        <td valign=top> - </td>
+        <td>You have an email address for the default SMS administrator. (Note: It should not link to your true identity)</td>
+      </tr>
+      <tr>
+        <td valign=top> - </td>
+        <td>You have registered at least one Gmail account for SMS operations. (Note: It MUST be Gmail account) However, if Gmail is blocked by your local government, see Figure 11 for work-around.</td>
+      </tr>      
+      </table>
     </td>
   </tr>
- 
-  <tr>
-    <td></td>
-    <td>
-      - Network connection of your CentOS Linux server is well configured and fast enough (> 1Mb/s).
-    </td>
-  </tr>
-
-  <tr>
-    <td></td>
-    <td>
-      - You have registered two domain names for the decoy site and messaging site, and they have already been pointed to your server's public IP address.
-    </td>
-  </tr>
- 
-  <tr>
-    <td></td>
-    <td>
-      - You have an email address for the SMS administrator. (Note: It should not link to your true identity)
-    </td>
-  </tr>
- 
-  <tr>
-    <td></td>
-    <td>
-      - You have registered at least one Gmail account for SMS operations. (Note: It MUST be Gmail account) However, if Gmail is blocked by local government, see Figure 11 for work-around.
-    </td>
-  </tr>
- 
+    
   <tr><td colspan=2>&nbsp;</td></tr>
 
   <tr>
@@ -100,7 +95,7 @@
       <table class=table>
       <tr>
         <td align=center>
-          <a href="start_install.png"><img src='start_install.png' width=850></a><br>Figure 1    
+          <a href="start_install.png"><img src='start_install.png' width=870></a><br>Figure 1    
         </td>
       </tr>  
       </table>
@@ -113,16 +108,48 @@
     <td></td>
     <td>
       Installation process is divided into 10 steps, they are:<br>
-      Step 1: Install required applications<br>
-      Step 2: Install required Perl libraries<br>
-      Step 3: Get required Javascript libraries<br>
-      Step 4: Copy program files and Javascript libraries to pre-defined directories<br>
-      Step 5: Prepare database server and create databases<br>
-      Step 6. Input essential data to SMS<br>
-      Step 7: Install SSL certificates to the sites<br>
-      Step 8: Configure the Linux system settings<br>
-      Step 9: Build audio file converter FFmpeg (optional)<br>
-      Step 10: Install system defender (optional)<br>
+      <table width=100% class=table cellspacing=1 cellpadding=1>
+      <tr>
+        <td valign=top nowrap>Step 1: </td>
+        <td>Install required applications</td>
+      </tr>
+      <tr>
+        <td valign=top nowrap>Step 2: </td>
+        <td>Install required Perl libraries</td>
+      </tr>
+      <tr>
+        <td valign=top nowrap>Step 3: </td>
+        <td>Get required Javascript libraries</td>
+      </tr>
+      <tr>
+        <td valign=top nowrap>Step 4: </td>
+        <td>Copy program files and Javascript libraries to pre-defined directories</td>
+      </tr>
+      <tr>
+        <td valign=top nowrap>Step 5: </td>
+        <td>Prepare database server and create databases</td>
+      </tr>
+      <tr>
+        <td valign=top nowrap>Step 6: </td>
+        <td>Input essential data to SMS</td>
+      </tr>
+      <tr>
+        <td valign=top nowrap>Step 7: </td>
+        <td>Install SSL certificates to the sites</td>
+      </tr>
+      <tr>
+        <td valign=top nowrap>Step 8: </td>
+        <td>Configure the Linux system settings</td>
+      </tr>
+      <tr>
+        <td valign=top nowrap>Step 9: </td>
+        <td>Build audio file converter FFmpeg (optional)</td>
+      </tr>
+      <tr>
+        <td valign=top nowrap>Step 10: </td>
+        <td>Install system defender (optional)</td>
+      </tr>      
+      </table>
       <br>
       After you press the enter, step 1 will proceed, and screen like Figure 2 will be seem.
     </td>
@@ -134,7 +161,7 @@
       <table class=table>
       <tr>
         <td align=center>
-          <a href="step_1_install_req_apps.png"><img src='step_1_install_req_apps.png' width=850></a><br>Figure 2    
+          <a href="step_1_install_req_apps.png"><img src='step_1_install_req_apps.png' width=870></a><br>Figure 2    
         </td>
       </tr>  
       </table>
@@ -146,8 +173,8 @@
   <tr>
     <td></td>
     <td>
-      All applications on step 1 will be installed automatically. However, an application CPAN needs to be configured
-      in this stage, because it is needed in next step. Installation program will instruct you how to configure CPAN,
+      All applications on step 1 will be installed automatically. However, application CPAN is needed to be configured
+      in this stage, because it is required in next step. Installation program will instruct you how to configure CPAN,
       just as Figure 3, 4 and 5 shown. After CPAN has been configured, you need to input 'quit' to exit CPAN in order
       to proceed to next step.
     </td>
@@ -159,7 +186,7 @@
       <table class=table>
       <tr>
         <td align=center>
-          <a href="step_1_config_cpan.png"><img src='step_1_config_cpan.png' width=850></a><br>Figure 3    
+          <a href="step_1_config_cpan.png"><img src='step_1_config_cpan.png' width=870></a><br>Figure 3    
         </td>
       </tr>  
       </table>
@@ -174,7 +201,7 @@
       <table class=table>
       <tr>
         <td align=center>
-          <a href="step_1_config_cpan_2.png"><img src='step_1_config_cpan_2.png' width=850></a><br>Figure 4    
+          <a href="step_1_config_cpan_2.png"><img src='step_1_config_cpan_2.png' width=870></a><br>Figure 4    
         </td>
       </tr>  
       </table>
@@ -189,7 +216,7 @@
       <table class=table>
       <tr>
         <td align=center>
-          <a href="step_1_config_cpan_3.png"><img src='step_1_config_cpan_3.png' width=850></a><br>Figure 5    
+          <a href="step_1_config_cpan_3.png"><img src='step_1_config_cpan_3.png' width=870></a><br>Figure 5    
         </td>
       </tr>  
       </table>
@@ -212,7 +239,7 @@
       <table class=table>
       <tr>
         <td align=center>
-          <a href="step_2_install_perl_lib.png"><img src='step_2_install_perl_lib.png' width=850></a><br>Figure 6
+          <a href="step_2_install_perl_lib.png"><img src='step_2_install_perl_lib.png' width=870></a><br>Figure 6
         </td>
       </tr>  
       </table>
@@ -234,7 +261,7 @@
       <table class=table>
       <tr>
         <td align=center>
-          <a href="step_3_install_js_lib.png"><img src='step_3_install_js_lib.png' width=850></a><br>Figure 7
+          <a href="step_3_install_js_lib.png"><img src='step_3_install_js_lib.png' width=870></a><br>Figure 7
         </td>
       </tr>  
       </table>
@@ -247,8 +274,7 @@
     <td></td>
     <td>
       Once all required javascript libraries are downloaded, it will go to step 4 automatically. In this
-      step, all SMS server programs and required javascript libraries will be moved to pre-defined directories,
-      and directories access rights will also be configured.
+      step, all SMS server programs and required javascript libraries will be moved to pre-defined directories.
     </td>
   </tr>
   
@@ -258,7 +284,7 @@
       <table class=table>
       <tr>
         <td align=center>
-          <a href="step_4_copy_programs.png"><img src='step_4_copy_programs.png' width=850></a><br>Figure 8
+          <a href="step_4_copy_programs.png"><img src='step_4_copy_programs.png' width=870></a><br>Figure 8
         </td>
       </tr>  
       </table>
@@ -273,13 +299,12 @@
       As shown on Figure 8, step 5 is going to prepare (it means configuration) MariaDB database server and
       create required databases used by SMS server.<br>
       <br>
-      When you prepare the MariaDB database server, you need to create password for the database server administrator
-      (also called 'root', but it is not the same 'root' of CentOS Linux 7), and accept default configuration settings
-      to harden database server's security (Figure 9).<br>
+      When you prepare the MariaDB database server, you need to create password for the database server administrator,
+      and accept default configuration settings to harden database server's security (Figure 9).<br>
       <br>
-      When MariaDB database server has been configured, screen like Figure 10 will show up. You need to press enter to
+      After MariaDB database server has been configured, screen like Figure 10 will show up. You need to press enter to
       proceed to create databases for SMS server, and you will be asked to input database server administrator password
-      you have just created.
+      you just created.
     </td>
   </tr>
 
@@ -289,7 +314,7 @@
       <table class=table>
       <tr>
         <td align=center>
-          <a href="step_5_config_db_server.png"><img src='step_5_config_db_server.png' width=850></a><br>Figure 9
+          <a href="step_5_config_db_server.png"><img src='step_5_config_db_server.png' width=870></a><br>Figure 9
         </td>
       </tr>  
       </table>
@@ -304,7 +329,7 @@
       <table class=table>
       <tr>
         <td align=center>
-          <a href="step_5_install_databases.png"><img src='step_5_install_databases.png' width=850></a><br>Figure 10
+          <a href="step_5_install_databases.png"><img src='step_5_install_databases.png' width=870></a><br>Figure 10
         </td>
       </tr>  
       </table>
@@ -316,10 +341,10 @@
   <tr>
     <td></td>
     <td>
-      Step 6 is very important, in here you need to give the system seven essential data for your SMS server.
-      They are SMS connection mode, DNS name of the decoy site, DNS name of the messaging site, email address of
-      the SMS server administrator, worker Gmail address for SMS operations, the worker Gmail login username and
-      it's password. Any incorrect input data will let SMS server malfunction.<br>
+      Step 6 is very important, you need to give the system seven essential data for your SMS server. They are SMS
+      connection mode, DNS name of the decoy site, DNS name of the messaging site, email address of the SMS server
+      administrator, Gmail address for SMS operations, the Gmail account login username and it's password. Any incorrect
+      input data will let SMS server malfunction.<br>
       <br>
       Please also note that you MUST put '<b>https://</b>' in front of your DNS names of the decoy site and messaging
       site, just as Figure 11 shown.<br>
@@ -335,7 +360,7 @@
       <table class=table>
       <tr>
         <td align=center>
-          <a href="step_6_input_essential_data.png"><img src='step_6_input_essential_data.png' width=850></a><br>Figure 11
+          <a href="step_6_input_essential_data.png"><img src='step_6_input_essential_data.png' width=870></a><br>Figure 11
         </td>
       </tr>  
       </table>
@@ -347,8 +372,8 @@
   <tr>
     <td></td>
     <td>
-      Step 7 will generate SSL certificates in accordance with DNS names of your decoy site and messaging site you input
-      previously. In this step, you will be asked to input your email address (just use the same email for the SMS administrator),
+      Step 7 will generate SSL certificates in accordance with DNS names of your decoy site and messaging site you input in step
+      6. In this step, you will be asked to input your email address (just use the same email for the default SMS administrator),
       and three questions. Figure 12 provides you an example.<br>
       <br>
       <b>Note:</b><br>
@@ -357,14 +382,16 @@
       <br>
       # <font color='darkblue'><b>certbot --apache</b></font><br>
       <br>
-      Please also note that SSL certificates are used to provide the secrecy of your online communication, which is the most
-      important part of the SMS server. Therefore, you must ensure your SSL certificates installation successful before using
-      SMS server. You could check how secure of your web sites by using testing site https://www.ssllabs.com:<br>
+      SSL certificates are used to provide the secrecy of your online communication, which is the most important part of the SMS
+      server. Therefore, you must ensure your SSL certificates installation successful before using SMS server. You could check
+      how secure of your web sites by using testing site https://www.ssllabs.com:<br>
+      <br>
+      The general format is https://www.ssllabs.com/ssltest/analyze.html?d={your_web_site_dns_name}<br>
       <br>
       e.g.) https://www.ssllabs.com/ssltest/analyze.html?d=argogo.mywire.org<br>
       <br>
       It will give security ratings for your site (similar to Figure 14). If grade of overall rating is below A, that means something
-      is wrong on security of your sites, please fix all the issues before using SMS server for your messaging operation.
+      is wrong of your sites, please fix all the issues before using SMS server for your messaging operation.
     </td>
   </tr>
   
@@ -374,7 +401,7 @@
       <table class=table>
       <tr>
         <td align=center>
-          <a href="step_7_install_ssl_cert_3.png"><img src='step_7_install_ssl_cert_3.png' width=850></a><br>Figure 12
+          <a href="step_7_install_ssl_cert_3.png"><img src='step_7_install_ssl_cert_3.png' width=870></a><br>Figure 12
         </td>
       </tr>  
       </table>
@@ -389,7 +416,7 @@
       <table class=table>
       <tr>
         <td align=center>
-          <a href="step_7_install_ssl_cert_4.png"><img src='step_7_install_ssl_cert_4.png' width=850></a><br>Figure 13
+          <a href="step_7_install_ssl_cert_4.png"><img src='step_7_install_ssl_cert_4.png' width=870></a><br>Figure 13
         </td>
       </tr>  
       </table>
@@ -406,7 +433,7 @@
       <table class=table>
       <tr>
         <td align=center>
-          <a href="web_site_rating.png"><img src='web_site_rating.png' width=850></a><br>Figure 14
+          <a href="web_site_rating.png"><img src='web_site_rating.png' width=870></a><br>Figure 14
         </td>
       </tr>  
       </table>
@@ -419,11 +446,11 @@
     <td></td>
     <td>
       After running step 8 to configure some Linux system settings, you will process to optional step 9. You will be asked
-      to build audio file converter FFmpeg. FFmpeg is used to convert some common audio input file formats used by Android
+      to build multimedia file converter FFmpeg, it is used to convert some common audio input file formats used by Android
       to OGG audio file format, which is widely supported by HTML5 multimedia objects in many platforms (except iOS). If you
-      don't have it, your audio input file will be treated by SMS server as file attachment. You must download it to your
-      phone or computer to play, and can't play it on your web browser directly. Therefore, for a better user experience,
-      it is worth to spend some time to build FFmpeg.
+      don't have it, your audio input files will be treated by SMS server as file attachment. You must download them to your
+      phone or computer to play their content, but can't play on your web browser directly. Therefore, for a better user
+      experience, it is worth to spend some time to build FFmpeg.
     </td>
   </tr>
   
@@ -433,7 +460,7 @@
       <table class=table>
       <tr>
         <td align=center>
-          <a href="step_9_build_ffmpeg.png"><img src='step_9_build_ffmpeg.png' width=850></a><br>Figure 15
+          <a href="step_9_build_ffmpeg.png"><img src='step_9_build_ffmpeg.png' width=870></a><br>Figure 15
         </td>
       </tr>  
       </table>
@@ -446,7 +473,7 @@
     <td></td>
     <td>
       The next optional installation item is system defender. It is not the necessary component to drive SMS
-      server, but it will provide minimum protection to your SMS server from cyber criminals. So, it is better
+      server, but it provides minimum protection to your SMS server from cyber criminals. So, it is better
       to have it. The installation program needs to create database for system defender, you will be asked to
       input the database server administrator password here.
     </td>
@@ -458,7 +485,7 @@
       <table class=table>
       <tr>
         <td align=center>
-          <a href="step_10_install_defender.png"><img src='step_10_install_defender.png' width=850></a><br>Figure 16
+          <a href="step_10_install_defender.png"><img src='step_10_install_defender.png' width=870></a><br>Figure 16
         </td>
       </tr>  
       </table>
@@ -480,7 +507,7 @@
       <table class=table>
       <tr>
         <td align=center>
-          <a href="final_step_reboot.png"><img src='final_step_reboot.png' width=850></a><br>Figure 16
+          <a href="final_step_reboot.png"><img src='final_step_reboot.png' width=870></a><br>Figure 16
         </td>
       </tr>  
       </table>
@@ -511,7 +538,7 @@
       <table class=table>
       <tr>
         <td align=center>
-          <a href="apply_ssl_cert.png"><img src='apply_ssl_cert.png' width=850></a><br>Figure 17
+          <a href="apply_ssl_cert.png"><img src='apply_ssl_cert.png' width=870></a><br>Figure 17
         </td>
       </tr>  
       </table>
@@ -526,7 +553,7 @@
       <table class=table>
       <tr>
         <td align=center>
-          <a href="apply_ssl_cert_3.png"><img src='apply_ssl_cert_3.png' width=850></a><br>Figure 18
+          <a href="apply_ssl_cert_3.png"><img src='apply_ssl_cert_3.png' width=870></a><br>Figure 18
         </td>
       </tr>  
       </table>

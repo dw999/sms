@@ -29,7 +29,7 @@
   <tr>
     <td class=content>
       Before create a message group, I need to tell you that there are two types of user in a message group: Group administrator and group member. Every SMS
-      user has right to create message group to become group administrator, include common SMS user. So, it has two levels of user rights, one for system-wise,
+      user has right to create message group and become group administrator, include common SMS user. So, it has two levels of user rights, one for system-wise,
       and the other on message groups.<br> 
       <br>
       To create a new message group, click item 'Add Group' on the main menu. Screen like figure 3.1.1 will be shown.
@@ -50,7 +50,7 @@
     <td class=content>
       In there, you need to input:<br>
       <table class=table cellspacing=1 cellpadding=1>
-      <tr>
+      <tr>        
         <td width=15px valign=top class=content>- </td>
         <td class=content>Group name</td>
       </tr>
@@ -61,9 +61,11 @@
         <td width=15px valign=top class=content>- </td>
         <td class=content>
           Decide whether group messages should be deleted automatically in a pre-defined period (in days). Default value is 'On', that means 'Yes'.
-          However, if you set it 'Off', all messages will be preserved until they are deleted manually by group members (Note: Only message sender can
-          delete his/her messages). The length of pre-defined period is control by system setting 'old_msg_delete_days', please refer to section 4.5.5
-          for details. Please note this setting can't be changed after message group is created.
+          However, if you set it 'Off', all messages will be preserved forever until they are deleted manually by message senders (Note: Only message
+          sender can delete his/her messages).<br>
+          <br>
+          The length of pre-defined period is control by system setting 'old_msg_delete_days', please refer to section 4.5.5 for details. Please note
+          this setting can't be changed after message group is created.
         </td>
       </tr>
       
@@ -90,8 +92,8 @@
         <td width=15px valign=top class=content>- </td>
         <td class=content>
           Who creates a message group, then he/she will be administrator of that message group, and he/she has full power to do all group administrative
-          tasks, include delete the entire message group belogns to him/her. However, his/her administrative power is limited on group level only, unless
-          he/she is system administrator otherwise.
+          tasks, include delete those message groups which are belongs to him/her. However, his/her administrative power is limited on group level only,
+          unless he/she is system administrator otherwise.
         </td>
       </tr>
 
