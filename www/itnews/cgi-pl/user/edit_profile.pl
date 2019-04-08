@@ -23,7 +23,8 @@
 #                                               due to it's serious limitation (only first 8
 #                                               characters are used for encrypted password).
 # V1.0.02       2018-08-23      DW              Add Telegram ID maintenance.
-# V1.0.03       2018-09-21      DW              Use new encryption method to protect user passwords. 
+# V1.0.03       2018-09-21      DW              Use new encryption method to protect user passwords.
+# V1.0.04       2019-04-09      DW              Clear a typo.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -428,7 +429,7 @@ __HTML
   }
   elsif ($op == 4) {  # Unhappy password
     $html .= <<__HTML;
-    <label for="unhappy_passwd">New Unappy Password (8 characters or more):</label>
+    <label for="unhappy_passwd">New Unhappy Password (8 characters or more):</label>
     <input type="password" id="unhappy_passwd" name="unhappy_passwd" maxlength=256>
     <label for="unhappy_passwd_rt">Retype New Unhappy Password:</label>
     <input type="password" id="unhappy_passwd_rt" name="unhappy_passwd_rt" maxlength=256>    
