@@ -3,7 +3,7 @@
 --
 -- Ver           Date            Author          Comment
 -- =======       ===========     ===========     ==========================================
--- V1.0.00       2018-12-12      AY              Create databases for SMS, and put in essential data.
+-- V1.0.00       2018-12-12      DW              Create databases for SMS, and put in essential data.
 --
 -- Remark: It is part of SMS installation program.
 -----------------------------------------------------------------------------------------------------
