@@ -1,12 +1,31 @@
 #!/usr/bin/perl
 
+###
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#      http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+###
+
 ##########################################################################################
 # Program: generate_ssl_conf.pl
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
 # V1.0.00       2018-12-20      DW              Generate the ssl.conf for Apache web server
-#                                               by using user given data in previous step. 
+#                                               by using user given data in previous step.
+# V1.0.01       2019-04-17      DW              - Apache configuration files directory for
+#                                                 CentOS 7 is changed from './apache24' to
+#                                                 './apache24/centos7'.
+#                                               - Handle Apache configuration files for Ubuntu
+#                                                 18.04.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -17,12 +36,15 @@ require "sm_db.pl";
 
 our $COOKIE_MSG;                    # Defined on sm_webenv.pl
 
-my $template = './apache24/httpd_conf/conf.d/ssl.conf.template';
-my $ssl_conf = './apache24/httpd_conf/conf.d/ssl.conf';
+my $template = '';
+my $ssl_conf = '';
 my $decoy_site_server_name = '';
 my $msg_site_server_name = '';
 my $ok = 1;
 my $msg = '';
+
+#-- 2019-04-17: Possible values are 'centos7' and 'ubuntu18' --#
+my $os = (scalar(@ARGV) > 0)? lc(allTrim($ARGV[0])) : '';
 
 my $dbh = dbconnect($COOKIE_MSG);   # Defined on sm_db.pl
 
@@ -30,24 +52,70 @@ if ($dbh) {
   ($ok, $msg, $decoy_site_server_name, $msg_site_server_name) = getSitesDomainName($dbh);
   
   if ($ok) {
-    open(SSL_CONF, "> $ssl_conf") or die "Unable to create ssl.conf.\n"; 
-    
-    open(TEMPLATE, "< $template") or die "Unable to open ssl.conf template.\n";
-    while (<TEMPLATE>) {
-      my $this_line = $_;
+    if ($os eq 'centos7') {
+      $template = './apache24/centos7/httpd_conf/conf.d/ssl.conf.template';
+      $ssl_conf = './apache24/centos7/httpd_conf/conf.d/ssl.conf';
       
-      if ($this_line =~ /{decoy_site_server_name}/) {
-        $this_line =~ s/{decoy_site_server_name}/$decoy_site_server_name/g;
-      }
-      elsif ($this_line =~ /{msg_site_server_name}/) {
-        $this_line =~ s/{msg_site_server_name}/$msg_site_server_name/g;
-      }
+      open(SSL_CONF, "> $ssl_conf") or die "Unable to create ssl.conf.\n";     
+      open(TEMPLATE, "< $template") or die "Unable to open ssl.conf template.\n";
+      while (<TEMPLATE>) {
+        my $this_line = $_;
       
-      print SSL_CONF $this_line;
-    }
+        if ($this_line =~ /{decoy_site_server_name}/) {
+          $this_line =~ s/{decoy_site_server_name}/$decoy_site_server_name/g;
+        }
+        elsif ($this_line =~ /{msg_site_server_name}/) {
+          $this_line =~ s/{msg_site_server_name}/$msg_site_server_name/g;
+        }
+      
+        print SSL_CONF $this_line;
+      }
    
-    close(TEMPLATE);
-    close(SSL_CONF);
+      close(TEMPLATE);
+      close(SSL_CONF);
+    }
+    elsif ($os eq 'ubuntu18') {
+      #-- Step 1: Generate decoy site SSL virtual host configuration file --#
+      $template = './apache24/ubuntu18/httpd_conf/sites-available/ssl-decoy-site.conf.template';
+      $ssl_conf = './apache24/ubuntu18/httpd_conf/sites-available/ssl-decoy-site.conf';
+      
+      open(SSL_CONF, "> $ssl_conf") or die "Unable to create decoy site ssl-decoy-site.conf.\n";     
+      open(TEMPLATE, "< $template") or die "Unable to open decoy site ssl-decoy-site.conf template.\n";
+      while (<TEMPLATE>) {
+        my $this_line = $_;
+      
+        if ($this_line =~ /{decoy_site_server_name}/) {
+          $this_line =~ s/{decoy_site_server_name}/$decoy_site_server_name/g;
+        }
+      
+        print SSL_CONF $this_line;
+      }
+   
+      close(TEMPLATE);
+      close(SSL_CONF);
+      
+      #-- Step 2: Generate messaging site SSL virtual host configuration file --#
+      $template = './apache24/ubuntu18/httpd_conf/sites-available/ssl-message-site.conf.template';
+      $ssl_conf = './apache24/ubuntu18/httpd_conf/sites-available/ssl-message-site.conf';
+      
+      open(SSL_CONF, "> $ssl_conf") or die "Unable to create messaging site ssl-message-site.conf.\n";     
+      open(TEMPLATE, "< $template") or die "Unable to open messaging site ssl-message-site.conf template.\n";
+      while (<TEMPLATE>) {
+        my $this_line = $_;
+      
+        if ($this_line =~ /{msg_site_server_name}/) {
+          $this_line =~ s/{msg_site_server_name}/$msg_site_server_name/g;
+        }
+        
+        print SSL_CONF $this_line;
+      }
+   
+      close(TEMPLATE);
+      close(SSL_CONF);   
+    }
+    else {
+      print "Error: Invalid platform is given or missing.\n";
+    }
   }
   else {
     print "Unable to get sites domain name. Error: $msg\n";

@@ -5,16 +5,14 @@ Since it is a web application, any platform with HTML5 supported web browser can
 and desktop computers. In additional, you totally control both client and server side of SMS, it means that you need to install and manage your SMS
 server yourself.
 
-
 What license SMS uses
 ---------------------
 Apache license 2.0
 
-
 What platform SMS support
 -------------------------
-Currently, it supports x86_64 CentOS 7 only.
-
+2019-04-08  Currently, it supports x86_64 CentOS 7 only.
+2019-04-24  Support x86_64 Ubuntu 18.04
 
 Prerequisites of SMS installation
 ---------------------------------
@@ -23,12 +21,10 @@ Prerequisites of SMS installation
 - You have an email address for the SMS administrator. (Note: It should not link to your true identity)
 - You have registered at least one Gmail account for SMS server operations.
 
-
 How to installation SMS
 -----------------------
-1. Prepare a CentOS 7 server (please refer to SMS server documents for details)
-2. Download and decompress SMS installation package, and run 'install_sms_centos.sh' in super user mode.
-
+1. Prepare a CentOS 7 or Ubuntu 18.04 server (please refer to SMS documents for details)
+2. Download and decompress SMS installation package, and run 'install_sms.sh' in super user mode.
 
 SMS Documents
 -------------

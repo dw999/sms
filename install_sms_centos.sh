@@ -1,15 +1,33 @@
-#!/usr/bin/sh
+#!/bin/bash
+
+###
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#      http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+###
 
 #=========================================================================================================
 # Program: install_sms_centos.sh
 #
-# Ver         Date            Author          Comment
+# Ver         Date            Author          Comment    
 # =======     ===========     ===========     ==========================================
-# V1.0.00     2018-12-11      DW              Install SMS on Red Hat/Centos 7.
+# V1.0.00     2018-12-11      DW              Install SMS on CentOS 7.
 # V1.0.01     2019-01-08      DW              - Add currently running platform checking
 #                                             - Check whether SMS has already been installed
 # V1.0.02     2019-03-11      DW              Install firewall and curl if they haven't been installed.
 # V1.0.03     2019-04-01      DW              Enable http and https protocols on firewall before apply SSL certificates.
+# V1.0.04     2019-04-17      DW              - Handle Apache configuration template location amendment.
+#                                             - Specify O/S parameter to generate_ssl_conf.pl.
+#                                             - Specify to use Bourne shell explicitly to avoid compatibility
+#                                               issue across different Linux/Unix systems.
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -19,7 +37,7 @@ clear
 
 #-- Check currently running operating system and it's version --#
 v=`hostnamectl | grep "CentOS Linux 7" | wc -l`
-if (test $v = 0)
+if [[ "$v" -eq 0 ]]
 then
   echo "Currently Running" `hostnamectl | grep "Operating System"`
   echo ""
@@ -60,7 +78,7 @@ then
   echo "It seems that the server setting is needed to be modified for SMS installation"
   read -p "Press enter to modify system setting..."
   cp -f /etc/selinux/config /etc/selinux/config.bkup
-  cp -f ./sys/config /etc/selinux/config
+  cp -f ./sys/centos7/config /etc/selinux/config
   echo ""
   echo "It is done. You need to reboot the server and run the installation program again."
   read -p "Press enter to reboot the server..."
@@ -97,34 +115,23 @@ systemctl restart ntpd
 hwclock -w
 #-- If firewall is not installed, install and configure it now. Otherwise, just configure it. --#
 fw=`yum list installed firewalld | grep firewalld | wc -l`
-if (($fw == 0))
+if [[ "$fw" -eq 0 ]]
 then
-  echo "Install and configure firewall"
+  echo "Install firewall"
   yum -y install firewalld >> /tmp/sms_install.log
-  systemctl enable firewalld >> /tmp/sms_install.log
-  systemctl start firewalld >> /tmp/sms_install.log
-  firewall-cmd --zone=public --permanent --add-service=ssh
-  firewall-cmd --zone=public --permanent --add-service=http
-  firewall-cmd --zone=public --permanent --add-service=https
-  firewall-cmd --zone=public --permanent --add-icmp-block=echo-request
-  firewall-cmd --reload
-else
-  echo "Configure firewall"  
-  systemctl enable firewalld >> /tmp/sms_install.log
-  systemctl restart firewalld >> /tmp/sms_install.log
-  firewall-cmd --zone=public --permanent --add-service=ssh
-  firewall-cmd --zone=public --permanent --add-service=http
-  firewall-cmd --zone=public --permanent --add-service=https
-  firewall-cmd --zone=public --permanent --add-icmp-block=echo-request
-  firewall-cmd --reload  
 fi
-#-- If curl is not installed, install it. --#
-c=`yum list installed curl | grep curl | wc -l`
-if (($c == 0))
-then
-  echo "Install curl"
-  yum -y install curl.x86_64 >> /tmp/sms_install.log
-fi
+echo "Configure firewall"  
+systemctl enable firewalld >> /tmp/sms_install.log
+systemctl restart firewalld >> /tmp/sms_install.log
+firewall-cmd --zone=public --permanent --add-service=ssh
+firewall-cmd --zone=public --permanent --add-service=http
+firewall-cmd --zone=public --permanent --add-service=https
+firewall-cmd --zone=public --permanent --add-icmp-block=echo-request
+firewall-cmd --reload
+echo "Install curl"
+yum -y install curl.x86_64 >> /tmp/sms_install.log
+echo "Install unzip"
+yum -y install unzip.x86_64 >> /tmp/sms_install.log
 echo "Install MariaDB"
 yum -y install mariadb.x86_64 >> /tmp/sms_install.log
 yum -y install mariadb-server.x86_64 >> /tmp/sms_install.log
@@ -303,11 +310,11 @@ read -p "Press enter to start..."
 # 1. Change 'ServerName' of decoy site and messaging site on ssl.conf
 # 2. Copy all Apache configuration files (include a specially crafted welcome.conf), pre-load SSL certificates and private key files to locations defined on ssl.conf
 # 3. Run 'certbot --apache' to get new SSL certificate and private key from "Let’s Encrypt"
-perl generate_ssl_conf.pl
-cp -f apache24/httpd_conf/conf/*.conf /etc/httpd/conf
-cp -f apache24/httpd_conf/conf.d/*.conf /etc/httpd/conf.d
-cp -f apache24/ssl_cert_and_key/cert/* /etc/pki/tls/certs
-cp -f apache24/ssl_cert_and_key/key/* /etc/pki/tls/private
+perl generate_ssl_conf.pl centos7 >> /tmp/sms_install.log
+cp -f apache24/centos7/httpd_conf/conf/*.conf /etc/httpd/conf
+cp -f apache24/centos7/httpd_conf/conf.d/*.conf /etc/httpd/conf.d
+cp -f apache24/centos7/ssl_cert_and_key/cert/* /etc/pki/tls/certs
+cp -f apache24/centos7/ssl_cert_and_key/key/* /etc/pki/tls/private
 systemctl enable httpd.service >> /tmp/sms_install.log
 systemctl start httpd.service >> /tmp/sms_install.log
 #-- Note: 1. Apache must be up and running as execute 'certbot'.                                                             --#
@@ -315,7 +322,7 @@ systemctl start httpd.service >> /tmp/sms_install.log
 #--          below command.                                                                                                  --# 
 certbot --apache
 y=`cat /etc/httpd/conf.d/ssl.conf | grep "letsencrypt" | wc -l`
-if (test $y = 0)
+if [[ "$y" -eq 0 ]]
 then
   echo ""
   echo "******************************************************************************"
@@ -332,24 +339,11 @@ echo ""
 echo "=================================================================================="
 echo "Step 8: Configure the Linux system settings"
 echo "=================================================================================="
-# Note: Firewall has been configured in previous section.
-#echo "Configure firewall for the web sites"
-#firewall-cmd --permanent --zone=public --add-service=http
-#firewall-cmd --permanent --zone=public --add-service=https
-#firewall-cmd --permanent --zone=public --add-icmp-block=echo-request
-#firewall-cmd --reload
-
-# Note: SELinux must be disabled to make web sites to function normally. i.e. Modify /etc/sysconfig/selinux to set SELINUX=disabled and then reboot.
-#echo "Configure SELinux"
-#cp -f /etc/selinux/config /etc/selinux/config.bkup
-#cp -f sys/config /etc/selinux/config
-
 echo "Configure scheduled tasks"
 cp -f /etc/crontab /etc/crontab.bkup
-cp -f sys/crontab.sms_only /etc/crontab
-
+cp -f ./sys/centos7/crontab.sms_only /etc/crontab
 echo "Configure system log rotation"
-cp -f sys/syslog /etc/logrotate.d
+cp -f ./sys/centos7/syslog /etc/logrotate.d
 systemctl restart crond
 
 echo ""
@@ -365,6 +359,7 @@ then
   #-- Note: Audio converter setting should be added to SMS automatically, after FFmpeg is built and deployed. --#
   dir=`pwd`;
   cd ./ffmpeg
+  chmod +x ./build_ffmpeg.sh
   source ./build_ffmpeg.sh
   cd $dir
 else
@@ -390,10 +385,10 @@ if (test ${choice} = 'y' || test ${choice} = 'Y')
 then
   echo ""
   mysql --user=root -p < defender/create_defender_db.sql
-  mkdir /batch
-  cp -f defender/*.pl /batch
+  mkdir -p /batch
+  cp -f ./defender/centos7/*.pl /batch
   chmod +x /batch/*.pl
-  cp -f ./sys/crontab.sms_plus_defender /etc/crontab
+  cp -f ./sys/centos7/crontab.sms_plus_defender /etc/crontab
   systemctl restart crond
 fi  
 
