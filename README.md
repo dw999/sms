@@ -11,8 +11,8 @@ Apache license 2.0
 
 What platform SMS support
 -------------------------
-2019-04-08  Currently, it supports x86_64 CentOS 7 only.
-2019-04-24  Support x86_64 Ubuntu 18.04
+- 2019-04-08  Currently, it supports x86_64 CentOS 7 only.
+- 2019-04-24  Support x86_64 Ubuntu 18.04
 
 Prerequisites of SMS installation
 ---------------------------------
