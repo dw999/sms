@@ -9,20 +9,20 @@ What license SMS uses
 ---------------------
 Apache license 2.0
 
-What platform SMS support
--------------------------
+What platform SMS server support
+--------------------------------
 - 2019-04-08  Currently, it supports x86_64 CentOS 7 only.
 - 2019-04-24  Support x86_64 Ubuntu 18.04
 
-Prerequisites of SMS installation
----------------------------------
-- Network connection of your CentOS Linux server is well configured and fast enough (> 1Mb/s).
+Prerequisites of SMS server installation
+----------------------------------------
+- Network connection of your server is well configured and fast enough (> 1Mb/s).
 - You have registered two domain names for the decoy site and messaging site, and they have already been pointed to your server's public IP address.
 - You have an email address for the SMS administrator. (Note: It should not link to your true identity)
 - You have registered at least one Gmail account for SMS server operations.
 
-How to installation SMS
------------------------
+How to installation SMS server
+------------------------------
 1. Prepare a CentOS 7 or Ubuntu 18.04 server (please refer to SMS documents for details)
 2. Download and decompress SMS installation package, and run 'install_sms.sh' in super user mode.
 
