@@ -21,6 +21,7 @@
 # =======     ===========     ===========     ==========================================
 # V1.0.00     2019-04-24      DW              Determine currently running platform and switch to corresponding
 #                                             SMS installation script.
+# V1.0.01     2019-04-25      DW              Include Debian Linux 9 as SMS supported platform.
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -41,6 +42,14 @@ if [[ "$v" -eq 1 ]]
 then
   chmod +x ./install_sms_ubuntu.sh
   source ./install_sms_ubuntu.sh
+  exit 0
+fi
+
+v=`hostnamectl | grep "Debian GNU/Linux 9" | wc -l`
+if [[ "$v" -eq 1 ]]
+then
+  chmod +x ./install_sms_debian.sh
+  source ./install_sms_debian.sh
   exit 0
 fi
 

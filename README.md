@@ -13,17 +13,18 @@ What platform SMS server support
 --------------------------------
 - 2019-04-08  Currently, it supports x86_64 CentOS 7 only.
 - 2019-04-24  Support x86_64 Ubuntu 18.04
+- 2019-04-25  Support x86_64 Debian Linux 9
 
 Prerequisites of SMS server installation
 ----------------------------------------
-- Network connection of your server is well configured and fast enough (> 1Mb/s).
+- Network connection of your Linux server is well configured and fast enough (> 1Mb/s).
 - You have registered two domain names for the decoy site and messaging site, and they have already been pointed to your server's public IP address.
 - You have an email address for the SMS administrator. (Note: It should not link to your true identity)
 - You have registered at least one Gmail account for SMS server operations.
 
 How to installation SMS server
 ------------------------------
-1. Prepare a CentOS 7 or Ubuntu 18.04 server (please refer to SMS documents for details)
+1. Prepare a supported Linux server (please refer to SMS documents for details)
 2. Download and decompress SMS installation package, and run 'install_sms.sh' in super user mode.
 
 SMS Documents

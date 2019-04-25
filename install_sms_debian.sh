@@ -15,11 +15,11 @@
 ###
 
 #=========================================================================================================
-# Program: install_sms_ubuntu.sh
+# Program: install_sms_debian.sh
 #
 # Ver         Date            Author          Comment
 # =======     ===========     ===========     ==========================================
-# V1.0.00     2019-01-12      DW              Install SMS on Ubuntu 18.04.
+# V1.0.00     2019-04-25      DW              Install SMS on Debian Linux 9.
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -28,12 +28,12 @@ setterm -blank 0
 clear
 
 #-- Check currently running operating system and it's version --#
-v=`hostnamectl | grep "Ubuntu 18.04" | wc -l`
+v=`hostnamectl | grep "Debian GNU/Linux 9" | wc -l`
 if [[ "$v" -eq 0 ]]
 then
   echo "Currently Running" `hostnamectl | grep "Operating System"`
   echo ""
-  echo "This SMS installation program is specified for Ubuntu 18.04 or Debian Linux 9 only, running on other Linux distro is"
+  echo "This SMS installation program is specified for Debian Linux 9 only, running on other Linux distro is"
   echo "likely to fail."
   echo ""
   read -p "Do you want to continue (Y/N)? " TOGO
@@ -79,6 +79,8 @@ echo "==========================================================================
 echo "Step 1: Install required applications"
 echo "=================================================================================="
 echo "Refresh software repository..."
+#-- Create CertBot packages repository for Debian 9 --#
+echo "deb http://deb.debian.org/debian stretch-backports main" > /etc/apt/sources.list.d/certbot.list
 apt-get update >> /tmp/sms_install.log
 echo "Install and configure internet time utilities"
 apt-get -y install ntp ntpdate > /tmp/sms_install.log
@@ -123,12 +125,7 @@ apt-get -y install build-essential >> /tmp/sms_install.log
 echo "Install Git version control system"
 apt-get -y install git >> /tmp/sms_install.log
 echo "Install free DNS certificates auto renew utility"
-apt-get -y install software-properties-common >> /tmp/sms_install.log
-add-apt-repository -y universe >> /tmp/sms_install.log
-add-apt-repository -y ppa:certbot/certbot >> /tmp/sms_install.log
-apt-get update >> /tmp/sms_install.log
-apt-get -y install python-certbot-apache >> /tmp/sms_install.log
-
+apt-get -y install certbot python-certbot-apache -t stretch-backports >> /tmp/sms_install.log
 echo ""
 echo "----------------------------------------------------------------------------------"
 echo "Now, you need to configure CPAN which will be used in next step, please accept ALL default values during setup."
