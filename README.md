@@ -22,8 +22,8 @@ Prerequisites of SMS server installation
 - You have an email address for the SMS administrator. (Note: It should not link to your true identity)
 - You have registered at least one Gmail account for SMS server operations.
 
-How to installation SMS server
-------------------------------
+How to install SMS server
+-------------------------
 1. Prepare a supported Linux server (please refer to SMS documents for details)
 2. Download and decompress SMS installation package, and run 'install_sms.sh' in super user mode.
 
