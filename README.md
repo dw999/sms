@@ -30,3 +30,5 @@ How to install SMS server
 SMS Documents
 -------------
 Read index.html on manual directory of the SMS installation package.
+<a href="manual/index.html">Manual</a>
+
