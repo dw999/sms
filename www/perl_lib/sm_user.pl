@@ -29,6 +29,7 @@
 # V1.0.04       2019-01-07      DW              Add connection mode 2 and 3 handling methods on function
 #                                               'authenticateLoginUser'.
 # V1.0.05       2019-01-14      DW              Add function 'setApplicantStatus'.
+# V1.0.06       2019-04-26      DW              Fix a security hole on function 'authenticateLoginUser'.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -49,14 +50,15 @@ our $COOKIE_MSG;
 
 sub authenticateLoginUser {
   my ($user, $pass, $latitude, $longitude) = @_;
-  my ($dbh, $sth, $sql, $login_status, $message, $happy_ppr, $unhappy_ppr, $connection_mode, $redirect_url, @data);
+  my ($dbh, $dbp, $sth, $sql, $login_status, $message, $happy_ppr, $unhappy_ppr, $connection_mode, $redirect_url, @data);
 
   $login_status = 0;
   $message = '';
   
   $dbh = dbconnect($COOKIE_MSG);
+  $dbp = dbconnect($COOKIE_PDA);
   
-  if ($dbh) {
+  if ($dbh && $dbp) {
     $sql = <<__SQL;
     SELECT user_id, happy_passwd, unhappy_passwd, email, status
       FROM user_list
@@ -81,8 +83,14 @@ __SQL
         if ($status eq 'A') {
           if ($connection_mode == 0) {
             #-- Login in via email --#
-            ($login_status, $message) = _sendMessageAccessLinkMail($dbh, $user_id, $email);            
-            $redirect_url = "/cgi-pl/tools/pdatools.pl?user=$user";
+            ($login_status, $message) = _sendMessageAccessLinkMail($dbh, $user_id, $email);
+            if ($login_status == 1) {
+              my ($ok, $msg, $sess_code) = createSessionRecord($dbp, $user_id);       # Defined on sm_webenv.pl
+              $redirect_url = "/cgi-pl/tools/pdatools.pl?user=$user&sess_code=$sess_code";
+            }
+            else {
+              $redirect_url = "/cgi-pl/tools/pdatools.pl?user=$user&sess_code=";;
+            }
           }
           elsif ($connection_mode == 1) {
             #-- Login directly --#
@@ -94,8 +102,14 @@ __SQL
           }
           elsif ($connection_mode == 3) {
             #-- Login in via email --#
-            ($login_status, $message) = _sendMessageAccessLinkMail($dbh, $user_id, $email);            
-            $redirect_url = "/cgi-pl/tools/pdatools.pl?user=$user";            
+            ($login_status, $message) = _sendMessageAccessLinkMail($dbh, $user_id, $email);
+            if ($login_status == 1) {
+              my ($ok, $msg, $sess_code) = createSessionRecord($dbp, $user_id);       # Defined on sm_webenv.pl
+              $redirect_url = "/cgi-pl/tools/pdatools.pl?user=$user&sess_code=$sess_code";
+            }
+            else {
+              $redirect_url = "/cgi-pl/tools/pdatools.pl?user=$user&sess_code=";
+            }
           }
           else {
             #-- Misc. system setting 'connection_mode' has invalid value --#
@@ -120,7 +134,8 @@ __SQL
           }          
           _logUnhappyLoginTime($dbh, $user_id, $latitude, $longitude);
           $login_status = 1;
-          $redirect_url = "/cgi-pl/tools/pdatools.pl?user=$user";
+          my ($ok, $msg, $sess_code) = createSessionRecord($dbp, $user_id);       # Defined on sm_webenv.pl
+          $redirect_url = "/cgi-pl/tools/pdatools.pl?user=$user&sess_code=$sess_code";
         }
         else {
           #-- System has problem --#
@@ -148,7 +163,8 @@ __SQL
         }
         _logUnhappyLoginTime($dbh, $user_id, $latitude, $longitude);
         $login_status = 1;
-        $redirect_url = "/cgi-pl/tools/pdatools.pl?user=$user";
+        my ($ok, $msg, $sess_code) = createSessionRecord($dbp, $user_id);       # Defined on sm_webenv.pl
+        $redirect_url = "/cgi-pl/tools/pdatools.pl?user=$user&sess_code=$sess_code";
       }
       else {
         #-- Invalid password --#
@@ -164,7 +180,8 @@ __SQL
       $login_status = 0;
     }
 
-    dbclose($dbh);     
+    dbclose($dbh);
+    dbclose($dbp);
   }
   else {
     #-- Unable to connect the database --#

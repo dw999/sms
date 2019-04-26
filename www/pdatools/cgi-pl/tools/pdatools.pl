@@ -20,6 +20,7 @@
 # =======       ===========     ===========     ==========================================
 # V1.0.00       2018-06-01      DW              Load up the first page of PDA tools.
 # V1.0.01       2018-12-16      DW              Set cookie expiry period and enforce pass via SSL.
+# V1.0.02       2019-04-26      DW              Fix a security hole.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -35,6 +36,7 @@ our $COOKIE_PDA;
 our $PRINTHEAD;
 
 my $user = allTrim(paramAntiXSS('user'));                  # User name
+my $sess_code = allTrim(paramAntiXSS('sess_code'));        # Session code
 
 my $dbh = dbconnect($COOKIE_MSG);
 my $dbp = dbconnect($COOKIE_PDA);
@@ -43,7 +45,7 @@ my $user_id = 0;
 if ($dbh && $dbp) {
   $user_id = getUserIdByName($dbh, $user);          # Defined on sm_user.pl
   if ($user_id > 0) {
-    showPdaTools($user_id);
+    showPdaTools($user_id, $sess_code);
   }
   else {
     print header(-type=>'text/html', -charset=>'utf-8');
@@ -62,11 +64,10 @@ dbclose($dbp);
 
 
 sub showPdaTools {
-  my ($user_id) = @_;
-  my ($ok, $msg, $sess_code, $user_cookie, %user_info);
+  my ($user_id, $sess_code) = @_;
+  my ($ok, $msg, $user_cookie, %user_info);
 
-  ($ok, $msg, $sess_code) = createSessionRecord($dbp, $user_id);      # Defined on sm_webenv.pl
-  if ($ok) {
+  if ($sess_code ne '') {
     #-- Set cookie for logon user --#
     $user_info{'SESS_CODE'} = $sess_code;
     $user_cookie = cookie(-name => $COOKIE_PDA, -value => \%user_info, -path => '/', -expires => '+2d', -secure => 1);  
@@ -77,6 +78,7 @@ sub showPdaTools {
     redirectTo("/cgi-pl/tools/select_tools.pl");        
   }
   else {
+    print header(-type=>'text/html', -charset=>'utf-8');
     alert("Unable to create session, please login again");
     redirectTo("/cgi-pl/index.pl");
   }
