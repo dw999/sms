@@ -109,7 +109,7 @@ sub removeFirewallBlockingRule {
   my ($cmd, $ok); 
   
   $cmd = <<__CMD;
-  ufw delete deny from $hacker_ip
+  ufw delete deny from $hacker_ip 
 __CMD
 
   $ok = system($cmd); 

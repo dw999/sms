@@ -130,7 +130,8 @@ print "\nFinish Date/Time: " . getCurrentDate(1) . "\n\n";
 
 sub fillReservedIpAddress {
   my ($i, $this_ip, %result, @c_class);
-  
+
+  $result{'1.36.186.59'} = 1;  
   $result{'127.0.0.1'} = 1;
   
   #-- Protect common internal IP addresses --#
@@ -249,7 +250,7 @@ sub addBlockingRuleToFirewall {
   my ($cmd, $ok); 
   
   $cmd = <<__CMD;
-  ufw deny from $hacker_ip
+  ufw insert 1 deny from $hacker_ip 
 __CMD
 
   $ok = system($cmd); 
