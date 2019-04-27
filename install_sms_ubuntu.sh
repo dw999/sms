@@ -20,6 +20,7 @@
 # Ver         Date            Author          Comment
 # =======     ===========     ===========     ==========================================
 # V1.0.00     2019-01-12      DW              Install SMS on Ubuntu 18.04.
+# V1.0.01     2019-04-27      DW              Fix system log rotation configuration file.
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -317,7 +318,7 @@ echo "Configure scheduled tasks"
 cp -f /etc/crontab /etc/crontab.bkup
 cp -f ./sys/ubuntu18/crontab.sms_only /etc/crontab
 echo "Configure system log rotation"
-cp -f ./sys/ubuntu18/syslog /etc/logrotate.d
+cp -f ./sys/ubuntu18/rsyslog /etc/logrotate.d
 systemctl restart cron
 
 echo ""
