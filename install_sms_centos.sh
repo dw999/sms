@@ -62,7 +62,7 @@ then
   echo "'itnews' or 'perl_lib' has/have already existed on directory '/www'."
   echo ""
   echo "If SMS installation is failure and you need to try again, you have to delete those sub-directories on '/www'"
-  echo "manually and re-run installation script 'install_sms_centos.sh'."
+  echo "manually and re-run installation script 'install_sms.sh'."
   echo ""
   echo "Note: Re-run installation script in a production SMS server will damage all messages on it."
   echo ""

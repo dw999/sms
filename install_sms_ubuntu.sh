@@ -53,7 +53,7 @@ if [ -d "/www/pdatools" ] || [ -d "/www/itnews" ] || [ -d "/www/perl_lib" ]
 then
   echo "It seems that SMS has been installed (at least it has been tried before). Therefore, directory '/www'"
   echo "has already existed. If SMS installation with error and you need to try again, you have to delete '/www'"
-  echo "manually and re-run installation script 'install_sms_ubuntu.sh'."
+  echo "manually and re-run installation script 'install_sms.sh'."
   echo ""
   echo "Note: Re-run installation script in a production SMS server will damage all messages on it."
   echo ""
