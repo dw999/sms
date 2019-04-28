@@ -32,6 +32,7 @@
 #                                               For example, function 'request to join'.
 # V1.0.07       2019-02-04      DW              Extend short upload file name to avoid hackers
 #                                               guess it easily.
+# V1.0.08       2019-04-28      DW              Add new function 'sessionExist'.
 ##########################################################################################
 
 use strict;
@@ -954,6 +955,36 @@ __SQL
   }
 
   return $sess_code;  
+}
+
+
+sub sessionExist {
+  my ($dbx, $user_id, $sess_code) = @_;
+  my ($sql, $sth, $cnt, $result);
+  
+  if ($dbx) {
+    $sql = <<__SQL;
+    SELECT COUNT(*) AS cnt
+      FROM web_session
+        WHERE user_id = ?
+          AND sess_code = ?
+          AND status = 'A'
+__SQL
+
+    $sth = $dbx->prepare($sql);
+    if ($sth->execute($user_id, $sess_code)) {
+      ($cnt) = $sth->fetchrow_array();
+      $result = ($cnt > 0)? 1 : 0;
+    }
+    else {
+      $result = 0;
+    }
+  }
+  else {
+    $result = 0;
+  }
+  
+  return $result;
 }
 
 

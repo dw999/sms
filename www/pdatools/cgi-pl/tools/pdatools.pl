@@ -21,6 +21,7 @@
 # V1.0.00       2018-06-01      DW              Load up the first page of PDA tools.
 # V1.0.01       2018-12-16      DW              Set cookie expiry period and enforce pass via SSL.
 # V1.0.02       2019-04-26      DW              Fix a security hole.
+# V1.0.03       2019-04-28      DW              Further harden the fixed security hole.  
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -67,7 +68,7 @@ sub showPdaTools {
   my ($user_id, $sess_code) = @_;
   my ($ok, $msg, $user_cookie, %user_info);
 
-  if ($sess_code ne '') {
+  if (sessionExist($dbp, $user_id, $sess_code)) {       # Defined on sm_webenv.pl
     #-- Set cookie for logon user --#
     $user_info{'SESS_CODE'} = $sess_code;
     $user_cookie = cookie(-name => $COOKIE_PDA, -value => \%user_info, -path => '/', -expires => '+2d', -secure => 1);  
