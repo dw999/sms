@@ -2,8 +2,8 @@ What is SMS
 -----------
 SMS stands for Secret Messaging System, which is a pure web based instant messaging system, it can run on all modern web browsers which support HTML5.
 Since it is a web application, any platform with HTML5 supported web browser can be used to access SMS, such as smartphones, tablets, laptop computers
-and desktop computers. In additional, you totally control both client and server side of SMS, it means that you need to install and manage your SMS
-server yourself.
+and desktop computers. In additional, you totally control both client and server side of SMS, it means that you need to install and manage SMS server
+yourself.
 
 What license SMS uses
 ---------------------
@@ -30,4 +30,3 @@ How to install SMS server
 SMS Documents
 -------------
 Read index.html on manual directory of the SMS installation package.
-
