@@ -24,7 +24,10 @@
 #                                                     2. Firewall and this Perl script is placed
 #                                                        on same machine.
 #                                                     3. It is based on daily_block_attack_ip_centos7.pl,
-#                                                        but firewall control commands.
+#                                                        but not firewall control commands.
+#
+# V1.0.01       2019-05-03      DW              Check UFW user defined rules file '/etc/ufw/user.rules' to
+#                                               ensure blocking rule is added successfully.
 #
 # Remark: Database schema is as follows:
 #         
@@ -47,6 +50,7 @@ use strict;
 use DBI;
 
 my $workfile = "/tmp/secure" . allTrim(sprintf("%.0f", rand(2000))) . ".txt";
+my $ufw_rules = "/etc/ufw/user.rules";
 my $dsn;                # Database configuration.  
 my $dbh;                # Database connection handle. 
 my $database = 'defendb';  # Database for the table to store hackers' IP addresses.
@@ -254,6 +258,35 @@ sub addBlockingRuleToFirewall {
 __CMD
 
   $ok = system($cmd); 
+
+  if ($ok != -1) {
+    $ok = checkFirewallRules($ufw_rules, $hacker_ip);
+  }
+  
+  return $ok;
+}
+
+
+sub checkFirewallRules {
+  my ($ufw_rules, $hacker_ip) = @_;
+  my ($ok);
+
+  if (-f $ufw_rules) {
+    $ok = -1;
+    open RULES, "<", $ufw_rules or die("Unable to open the file $ufw_rules \n");
+    while (<RULES>) {
+      my $this_line = $_;
+      if ($this_line =~ /$hacker_ip -j DROP/) {
+        $ok = 0;
+        last;
+      }
+    }
+    close(RULES);
+  }
+  else {
+    #-- If a user defined rule has been added successfully, this file must exist. --#
+    $ok = -1;
+  }
   
   return $ok;
 }
