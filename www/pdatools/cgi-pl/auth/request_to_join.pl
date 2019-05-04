@@ -79,19 +79,13 @@ if ($oper_mode eq 'S') {
   else {
     printStyleSection();
     printJavascriptSection();
-#    printCSS($COOKIE_PDA);
-#    printPageHeader("Welcome to Join");                # Defined on sm_webenv.pl  
     printRegistedOkPage($name);
-#    printPageFooter();                                 # Defined on sm_webenv.pl      
   }
 }
 else {
   printStyleSection();
   printJavascriptSection();
-#  printCSS($COOKIE_PDA);
-#  printPageHeader("Welcome to Join");                # Defined on sm_webenv.pl
   printInputForm();
-#  printPageFooter();                                 # Defined on sm_webenv.pl
 }
 
 dbclose($dbh);
