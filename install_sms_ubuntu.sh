@@ -103,6 +103,7 @@ fi
 fw=`dpkg -l | grep firewalld | wc -l`
 if [[ "$fw" -eq 0 ]]
 then
+  echo "Install firewall"
   apt-get -y install firewalld >> /tmp/sms_install.log 
 fi
 #-- Now configure firewall --#
