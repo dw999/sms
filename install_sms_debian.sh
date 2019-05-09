@@ -21,6 +21,7 @@
 # =======     ===========     ===========     ==========================================
 # V1.0.00     2019-04-25      DW              Install SMS on Debian Linux 9.
 # V1.0.01     2019-04-27      DW              Fix system log rotation configuration file.
+# V1.0.02     2019-05-09      DW              Unify firewall application used on supported platforms, and then the SMS system defender. 
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -94,21 +95,27 @@ ntpdate -u -s stdtime.gov.hk 0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 3.pool
 systemctl restart ntp 
 hwclock -w
 #-- If firewall is not installed, install and configure it now. Otherwise, just configure it. --#
+#-- Disable default firewall UFW, if it is installed --# 
 fw=`dpkg -l | grep ufw | wc -l`
+if [[ "$fw" -eq 1 ]]
+then
+  systemctl disable ufw >> /tmp/sms_install.log
+fi
+#-- Unify firewall usage by using 'firewalld' --#
+fw=`dpkg -l | grep firewalld | wc -l`
 if [[ "$fw" -eq 0 ]]
 then
-  echo "Install Firewall"
-  apt-get -y install ufw >> /tmp/sms_install.log
-fi  
+  apt-get -y install firewalld >> /tmp/sms_install.log 
+fi
 #-- Now configure firewall --#
 echo "Configure firewall"
-ufw disable
-ufw default deny incoming
-ufw default allow outgoing
-ufw allow 22
-ufw allow 80
-ufw allow 443
-ufw enable
+systemctl enable firewalld >> /tmp/sms_install.log
+systemctl restart firewalld >> /tmp/sms_install.log
+firewall-cmd --zone=public --permanent --add-service=ssh
+firewall-cmd --zone=public --permanent --add-service=http
+firewall-cmd --zone=public --permanent --add-service=https
+firewall-cmd --zone=public --permanent --add-icmp-block=echo-request
+firewall-cmd --reload
 echo "Install unzip"
 apt-get -y install unzip >> /tmp/sms_install.log
 echo "Install curl"
@@ -358,7 +365,7 @@ then
   echo ""
   mysql --user=root -p < defender/create_defender_db.sql
   mkdir -p /batch
-  cp -f ./defender/ubuntu18/*.pl /batch
+  cp -f ./defender/*.pl /batch
   chmod +x /batch/*.pl
   cp -f ./sys/ubuntu18/crontab.sms_plus_defender /etc/crontab
   systemctl restart cron

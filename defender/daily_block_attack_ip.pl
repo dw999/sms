@@ -14,7 +14,7 @@
 ###
 
 ##########################################################################################
-# Program: daily_block_attack_ip_centos7.pl
+# Program: daily_block_attack_ip.pl
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     =========================
@@ -26,6 +26,10 @@
 # V1.0.01       2017-03-03      DW              Add a new attack vector identity "Bad protocol version identification".
 # V1.0.02       2017-04-16      DW              Fix a logical bug for firewall rule update.
 # V1.0.03       2018-12-28      DW              Add a new attack vector identity "Received disconnect from" for sshd.
+# V1.0.04       2019-05-09      DW              1. Rename to daily_block_attack_ip.pl and serve for all SMS supported 
+#                                                  platforms, and assume firewalld as used firewall.
+#                                               2. Use command line parameter to identify running platform, in order to
+#                                                  open corresponding user authentication log file.
 #
 # Remark: Database schema is as follows:
 #         
@@ -62,7 +66,9 @@ my %reserved_ip;        # Reserved IP list that would not considered as attacker
 
 print "Start Date/Time: " . getCurrentDate(1) . "\n\n";
 
-my $ok = system('cp /var/log/secure ' . $workfile);
+my $os = (scalar(@ARGV) > 0)? lc(allTrim($ARGV[0])) : '';   # Possible values are 'centos7' and 'ubuntu18'
+my $cmd = "cp /var/log/" . (($os eq 'centos7')? 'secure' : 'auth.log') . " $workfile";
+my $ok = system($cmd);
 
 if ($ok != -1) {
   %reserved_ip = fillReservedIpAddress();

@@ -28,6 +28,7 @@
 #                                             - Specify O/S parameter to generate_ssl_conf.pl.
 #                                             - Specify to use Bourne shell explicitly to avoid compatibility
 #                                               issue across different Linux/Unix systems.
+# V1.0.05     2019-05-09      DW              Unify firewall application used on supported platforms, and then the SMS system defender. 
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -386,7 +387,7 @@ then
   echo ""
   mysql --user=root -p < defender/create_defender_db.sql
   mkdir -p /batch
-  cp -f ./defender/centos7/*.pl /batch
+  cp -f ./defender/*.pl /batch
   chmod +x /batch/*.pl
   cp -f ./sys/centos7/crontab.sms_plus_defender /etc/crontab
   systemctl restart crond
