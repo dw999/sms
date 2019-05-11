@@ -28,7 +28,8 @@
 #                                             - Specify O/S parameter to generate_ssl_conf.pl.
 #                                             - Specify to use Bourne shell explicitly to avoid compatibility
 #                                               issue across different Linux/Unix systems.
-# V1.0.05     2019-05-09      DW              Unify firewall application used on supported platforms, and then the SMS system defender. 
+# V1.0.05     2019-05-09      DW              Unify firewall application used on supported platforms, and then the SMS system defender.
+# V1.0.06     2019-05-11      DW              Add Perl library Proc::ProcessTable installation for SMS defender.
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -202,6 +203,8 @@ yum -y install ImageMagick-devel.x86_64 >> /tmp/sms_install.log
 yum -y install ImageMagick-c++.x86_64 >> /tmp/sms_install.log
 echo "install perl-Authen-Passphrase.noarch"
 yum -y install perl-Authen-Passphrase.noarch >> /tmp/sms_install.log
+echo "Install perl-Proc-ProcessTable.x86_64"
+yum -y install perl-Proc-ProcessTable.x86_64 >> /tmp/sms_install.log
 echo "install perl-www-telegram-botapi"
 git clone https://github.com/Robertof/perl-www-telegram-botapi.git >> /tmp/sms_install.log
 mkdir -p /usr/share/perl5/vendor_perl/WWW/Telegram

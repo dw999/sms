@@ -30,6 +30,8 @@
 #                                                  platforms, and assume firewalld as used firewall.
 #                                               2. Use command line parameter to identify running platform, in order to
 #                                                  open corresponding user authentication log file.
+# V1.0.05       2019-05-11      DW              Quit process if 'remove_firewall_blocking_rule.pl' is running, in order
+#                                               to avoid firewalld rules configuration file updating racing situation.
 #
 # Remark: Database schema is as follows:
 #         
@@ -49,6 +51,7 @@
 ##########################################################################################
 
 use strict;
+use Proc::ProcessTable;
 use DBI;
 
 my $workfile = "/tmp/secure" . allTrim(sprintf("%.0f", rand(2000))) . ".txt";
@@ -63,6 +66,11 @@ my $error = 0;          # Error flag.
 my $err_msg = '';       # Error message.
 my %reserved_ip;        # Reserved IP list that would not considered as attacker.
 
+#-- Check whether process 'remove_firewall_blocking_rule.pl' is running or not. If it is running, abort process. --#
+if (firewallRuleRemoverIsRunning()) {
+  print "Firewall rules remover is running, process is aborted.\n";
+  exit;
+}
 
 print "Start Date/Time: " . getCurrentDate(1) . "\n\n";
 
@@ -85,24 +93,31 @@ if ($ok != -1) {
       my $this_hacker_ip = getHackerIpAddress($this_line);
       my $this_reserved_ip = $reserved_ip{$this_hacker_ip} + 0;
     
-      if (allTrim($this_hacker_ip) ne '' && $this_reserved_ip != 1) {
+      if (allTrim($this_hacker_ip) ne '' && $this_reserved_ip != 1) {        
         if (!isActiveHackerIpExist($this_hacker_ip)) {
-          my $add_firewall_rule_ok = addBlockingRuleToFirewall($this_hacker_ip);
+          if (!firewallRuleRemoverIsRunning()) {
+            my $add_firewall_rule_ok = addBlockingRuleToFirewall($this_hacker_ip);
 
-          if ($add_firewall_rule_ok != -1) {
-            if (isHackerIpExist($this_hacker_ip)) {
-              updateAttackDate($this_hacker_ip);
-            }
-            else {
-              saveHackerIp($this_hacker_ip);      
-            }
+            if ($add_firewall_rule_ok != -1) {
+              if (isHackerIpExist($this_hacker_ip)) {
+                updateAttackDate($this_hacker_ip);
+              }
+              else {
+                saveHackerIp($this_hacker_ip);      
+              }
             
-            $cnt++;  
-          }  
+              $cnt++;  
+            }  
+            else {
+              $err_msg .= "Error 1: Unable to add blocking rule of hacker IP address $this_hacker_ip, check for it.\n";
+              $error = 1; 
+            }
+          }
           else {
-            $err_msg .= "Error 1: Unable to add blocking rule of hacker IP address $this_hacker_ip, check for it.\n";
-            $error = 1; 
-          }                
+            #-- If firewall rules remover is running, skip new hacker IP address blocking to avoid firewall rules update racing. --#
+            $err_msg .= "Error 3: Since firewall rules remover is running, hacker IP address $this_hacker_ip blocking is skipped.\n";
+            $error = 1;
+          }
         }    
         else {
           updateAttackDate($this_hacker_ip);
@@ -112,14 +127,19 @@ if ($ok != -1) {
   }
   
   if ($cnt > 0) {
-    my $reload_ok = reloadFirewall();
+    if (!$error) {         # If error is found, don't refresh firewall rules even $cnt > 0.
+      my $reload_ok = reloadFirewall();
     
-    if ($reload_ok == -1) {
-      $err_msg .= "Error 2: Unable to refresh firewall rules, check for it.\n";
-      $error = 1;     
+      if ($reload_ok == -1) {
+        $err_msg .= "Error 2: Unable to refresh firewall rules, check for it.\n";
+        $error = 1;     
+      }
+      else {
+        print "$cnt hacker IP address(es) is/are added.\n";
+      }
     }
     else {
-      print "$cnt hacker IP address(es) is/are added.\n";
+      print "Although $cnt hacker IP address(es) is/are added, firewall rules cannot be reloaded due to error is found.\n";
     }
   }
   else {
@@ -141,6 +161,19 @@ if ($error == 1) {
 
 print "\nFinish Date/Time: " . getCurrentDate(1) . "\n\n";
 #-- End Main Section --#
+
+
+sub firewallRuleRemoverIsRunning {
+  my ($pt, $is_running, $result);
+  
+  #-- Check whether process 'remove_firewall_blocking_rule.pl' is running or not. --#
+  $pt = Proc::ProcessTable->new;
+  $is_running = grep {$_->cmndline =~ /remove_firewall_blocking_rule/} @{$pt->table};
+  $is_running += 0;
+  $result = ($is_running > 0)? 1 : 0;
+  
+  return $result;  
+}
 
 
 sub fillReservedIpAddress {

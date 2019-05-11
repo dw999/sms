@@ -21,7 +21,8 @@
 # =======     ===========     ===========     ==========================================
 # V1.0.00     2019-01-12      DW              Install SMS on Ubuntu 18.04.
 # V1.0.01     2019-04-27      DW              Fix system log rotation configuration file.
-# V1.0.02     2019-05-09      DW              Unify firewall application used on supported platforms, and then the SMS system defender. 
+# V1.0.02     2019-05-09      DW              Unify firewall application used on supported platforms, and then the SMS system defender.
+# V1.0.03     2019-05-11      DW              Add Perl library Proc::ProcessTable installation for SMS defender.
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -174,6 +175,8 @@ echo "install ImageMagick"
 apt-get -y install imagemagick imagemagick-doc libimage-magick-perl libmagick++-dev >> /tmp/sms_install.log
 echo "install libauthen-passphrase-perl"
 apt-get -y install libauthen-passphrase-perl >> /tmp/sms_install.log
+echo "Install libproc-processtable-perl"
+apt-get -y install libproc-processtable-perl >> /tmp/sms_install.log
 echo "install perl-www-telegram-botapi"
 git clone https://github.com/Robertof/perl-www-telegram-botapi.git >> /tmp/sms_install.log
 mkdir -p /usr/share/perl5/WWW/Telegram >> /tmp/sms_install.log 
