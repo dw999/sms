@@ -32,6 +32,7 @@
 #                                                  open corresponding user authentication log file.
 # V1.0.05       2019-05-11      DW              Quit process if 'remove_firewall_blocking_rule.pl' is running, in order
 #                                               to avoid firewalld rules configuration file updating racing situation.
+# V1.0.06       2019-05-12      DW              Quit process if another copy of 'daily_block_attack_ip.pl' is running.
 #
 # Remark: Database schema is as follows:
 #         
@@ -69,6 +70,12 @@ my %reserved_ip;        # Reserved IP list that would not considered as attacker
 #-- Check whether process 'remove_firewall_blocking_rule.pl' is running or not. If it is running, abort process. --#
 if (firewallRuleRemoverIsRunning()) {
   print "Firewall rules remover is running, process is aborted.\n";
+  exit;
+}
+
+#-- If another copy of daily_block_attack_ip.pl is running, abort process. --#
+if (otherHackerBlockerIsRunning()) {
+  print "Another hacker blocking instant is running, process is aborted.\n";
   exit;
 }
 
@@ -166,7 +173,7 @@ print "\nFinish Date/Time: " . getCurrentDate(1) . "\n\n";
 sub firewallRuleRemoverIsRunning {
   my ($pt, $is_running, $result);
   
-  #-- Check whether process 'remove_firewall_blocking_rule.pl' is running or not. --#
+  #-- Check whether process 'remove_firewall_blocking_rule.pl' is running or not. If it is running, abort process. --#
   $pt = Proc::ProcessTable->new;
   $is_running = grep {$_->cmndline =~ /remove_firewall_blocking_rule/} @{$pt->table};
   $is_running += 0;
@@ -176,10 +183,24 @@ sub firewallRuleRemoverIsRunning {
 }
 
 
+sub otherHackerBlockerIsRunning {
+  my ($pt, $run_cnt, $result);
+
+  #-- Check whether other instant of 'daily_block_attack_ip.pl' is running or not. If another instant exists, abort process. --#
+  $pt = Proc::ProcessTable->new;
+  $run_cnt = grep {$_->cmndline =~ /daily_block_attack_ip/} @{$pt->table};
+  $run_cnt += 0;
+  $result = ($run_cnt > 2)? 1 : 0;
+
+  return $result;
+}
+
+
 sub fillReservedIpAddress {
   my ($i, $this_ip, %result, @c_class);
   
   $result{'127.0.0.1'} = 1;
+  $result{'1.36.186.59'} = 1;
   
   #-- Protect common internal IP addresses --#
   for ($i = 0; $i <= 254; $i++) {

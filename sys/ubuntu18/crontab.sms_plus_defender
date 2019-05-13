@@ -31,8 +31,6 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
 # System defender
 * * * * * root /batch/daily_block_attack_ip.pl ubuntu18 >/batch/attack.log 2>&1
-* * * * * root sleep 20; /batch/daily_block_attack_ip.pl ubuntu18 >/batch/attack.log 2>&1
-* * * * * root sleep 40; /batch/daily_block_attack_ip.pl ubuntu18 >/batch/attack.log 2>&1
 0 0 * * * root /batch/remove_firewall_blocking_rule.pl >/batch/remove_fw_rule.log 2>&1
 
 # Renew SSL certificates
