@@ -200,7 +200,6 @@ sub fillReservedIpAddress {
   my ($i, $this_ip, %result, @c_class);
   
   $result{'127.0.0.1'} = 1;
-  $result{'1.36.186.59'} = 1;
   
   #-- Protect common internal IP addresses --#
   for ($i = 0; $i <= 254; $i++) {
