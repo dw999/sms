@@ -1,0 +1,6 @@
+Progression Log of SMS
+----------------------
+- 2019-04-18 SMS 1.0 is released, it supports CentOS 7 Linux only.
+- 2019-04-24 SMS supports Ubuntu Linux 18.04
+- 2019-04-25 SMS supports Debian Linux 9
+- 2019-05-17 SMS is added Nginx as one of web server selection options on CentOS 7 Linux.

@@ -283,7 +283,7 @@ echo "==========================================================================
 echo "You need to generate two SSL certificates for the sites, I should find their domain names for you, please input SMS"
 echo "administrator email in this step, and select the choice to generate SSL certificates for BOTH sites."
 read -p "Press enter to start..." dummy
-perl generate_ssl_conf.pl ubuntu18 >> /tmp/sms_install.log
+perl generate_ssl_conf.pl os=ubuntu18 ws=apache >> /tmp/sms_install.log
 cp -Rf apache24/ubuntu18/httpd_conf/* /etc/apache2
 cp -f apache24/ubuntu18/ssl_cert_and_key/cert/* /etc/ssl/certs
 cp -f apache24/ubuntu18/ssl_cert_and_key/key/* /etc/ssl/private

@@ -15,14 +15,11 @@
 ###
 
 #=========================================================================================================
-# Program: install_sms_debian.sh
+# Program: install_sms_cto_nginx.sh
 #
-# Ver         Date            Author          Comment
+# Ver         Date            Author          Comment    
 # =======     ===========     ===========     ==========================================
-# V1.0.00     2019-04-25      DW              Install SMS on Debian Linux 9.
-# V1.0.01     2019-04-27      DW              Fix system log rotation configuration file.
-# V1.0.02     2019-05-09      DW              Unify firewall application used on supported platforms, and then the SMS system defender.
-# V1.0.03     2019-05-11      DW              Add Perl library Proc::ProcessTable installation for SMS defender.
+# V1.0.00     2019-05-06      DW              Install SMS server on CentOS 7 by using Nginx as web server.
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -31,12 +28,12 @@ setterm -blank 0
 clear
 
 #-- Check currently running operating system and it's version --#
-v=`hostnamectl | grep "Debian GNU/Linux 9" | wc -l`
+v=`hostnamectl | grep "CentOS Linux 7" | wc -l`
 if [[ "$v" -eq 0 ]]
 then
   echo "Currently Running" `hostnamectl | grep "Operating System"`
   echo ""
-  echo "This SMS installation program is specified for Debian Linux 9 only, running on other Linux distro is"
+  echo "This SMS installation program is specified for CentOS Linux 7 only, running on other Linux distro is"
   echo "likely to fail."
   echo ""
   read -p "Do you want to continue (Y/N)? " TOGO
@@ -53,15 +50,32 @@ fi
 #-- Check whether SMS has already been installed. If it is, stop proceed. --#
 if [ -d "/www/pdatools" ] || [ -d "/www/itnews" ] || [ -d "/www/perl_lib" ]
 then
-  echo "It seems that SMS has been installed (at least it has been tried before). Therefore, directory '/www'"
-  echo "has already existed. If SMS installation with error and you need to try again, you have to delete '/www'"
+  echo "It seems that SMS has been installed (at least it has been tried before). Therefore, sub-directories 'pdatools', "
+  echo "'itnews' or 'perl_lib' has/have already existed on directory '/www'."
+  echo ""
+  echo "If SMS installation is failure and you need to try again, you have to delete those sub-directories on '/www'"
   echo "manually and re-run installation script 'install_sms.sh'."
   echo ""
   echo "Note: Re-run installation script in a production SMS server will damage all messages on it."
   echo ""
-  read -p "Press enter to exit..." dummy
+  read -p "Press enter to exit..."
   exit 1
 fi
+
+#-- Check whether SELinux is enforced. If it is, disable it and reboot the server before installation. --#
+#-- Note: SELinux makes many normal operations of SMS failure during installation and operation.       --#
+x=`cat /etc/selinux/config | grep "SELINUX=enforcing" | wc -l`
+if (($x > 0))
+then
+  echo "It seems that the server setting is needed to be modified for SMS installation"
+  read -p "Press enter to modify system setting..."
+  cp -f /etc/selinux/config /etc/selinux/config.bkup
+  cp -f ./sys/centos7/config /etc/selinux/config
+  echo ""
+  echo "It is done. You need to reboot the server and run the installation program again."
+  read -p "Press enter to reboot the server..."
+  shutdown -r now
+fi  
 
 #-- Define variables --#
 export BUILD_PRELOAD=N
@@ -75,42 +89,30 @@ echo "3. You have registered two domain names for the decoy site and messaging s
 echo "4. You have an email address for the SMS administrator. (Note: It should not link to your true identity)"
 echo "5. You have registered at least one Gmail account for SMS operations. (Note: It MUST be Gmail account)"
 echo ""
-read -p "If you don't fulfil the above requirements, please press CTRL-C to abort. Otherwise, you may press enter to start the installation..." wait_here
+read -p "If you don't fulfil the above requirements, please press CTRL-C to abort. Otherwise, you may press enter to start the installation..."
 
 echo ""
 echo "=================================================================================="
 echo "Step 1: Install required applications"
 echo "=================================================================================="
-echo "Refresh software repository..."
-#-- Create CertBot packages repository for Debian 9 --#
-echo "deb http://deb.debian.org/debian stretch-backports main" > /etc/apt/sources.list.d/certbot.list
-apt-get update >> /tmp/sms_install.log
 echo "Install and configure internet time utilities"
-apt-get -y install ntp ntpdate > /tmp/sms_install.log
+yum -y install ntp ntpdate > /tmp/sms_install.log
 #-- Ensure ntpd is stopped. Otherwise, the next step will fail. --#
-systemctl stop ntp >> /tmp/sms_install.log
+systemctl stop ntpd >> /tmp/sms_install.log
 ntpdate stdtime.gov.hk >> /tmp/sms_install.log
-systemctl enable ntp >> /tmp/sms_install.log
-systemctl start ntp >> /tmp/sms_install.log
+systemctl enable ntpd >> /tmp/sms_install.log
+systemctl start ntpd >> /tmp/sms_install.log
 ntpdate -u -s stdtime.gov.hk 0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 3.pool.ntp.org 0.asia.pool.ntp.org 0.us.pool.ntp.org
-systemctl restart ntp 
+systemctl restart ntpd
 hwclock -w
 #-- If firewall is not installed, install and configure it now. Otherwise, just configure it. --#
-#-- Disable default firewall UFW, if it is installed --# 
-fw=`dpkg -l | grep ufw | wc -l`
-if [[ "$fw" -eq 1 ]]
-then
-  systemctl disable ufw >> /tmp/sms_install.log
-fi
-#-- Unify firewall usage by using 'firewalld' --#
-fw=`dpkg -l | grep firewalld | wc -l`
+fw=`yum list installed firewalld | grep firewalld | wc -l`
 if [[ "$fw" -eq 0 ]]
 then
   echo "Install firewall"
-  apt-get -y install firewalld >> /tmp/sms_install.log 
+  yum -y install firewalld >> /tmp/sms_install.log
 fi
-#-- Now configure firewall --#
-echo "Configure firewall"
+echo "Configure firewall"  
 systemctl enable firewalld >> /tmp/sms_install.log
 systemctl restart firewalld >> /tmp/sms_install.log
 firewall-cmd --zone=public --permanent --add-service=ssh
@@ -118,29 +120,43 @@ firewall-cmd --zone=public --permanent --add-service=http
 firewall-cmd --zone=public --permanent --add-service=https
 firewall-cmd --zone=public --permanent --add-icmp-block=echo-request
 firewall-cmd --reload
-echo "Install unzip"
-apt-get -y install unzip >> /tmp/sms_install.log
 echo "Install curl"
-apt-get -y install curl >> /tmp/sms_install.log
-echo "Install MariaDB" 
-apt-get -y install mariadb-server mariadb-client >> /tmp/sms_install.log
-echo "Install Apache HTTP server"
-apt-get -y install apache2 >> /tmp/sms_install.log
+yum -y install curl.x86_64 >> /tmp/sms_install.log
+echo "Install unzip"
+yum -y install unzip.x86_64 >> /tmp/sms_install.log
+echo "Install MariaDB"
+yum -y install mariadb.x86_64 >> /tmp/sms_install.log
+yum -y install mariadb-server.x86_64 >> /tmp/sms_install.log
 echo "Install logrotate"
-apt-get -y install logrotate >> /tmp/sms_install.log
+yum -y install logrotate >> /tmp/sms_install.log
+echo "Install additional enterprise packages repository"
+yum -y install epel-release >> /tmp/sms_install.log
+#-- Note: Nginx and related packages are belongs to epel, so that they must be installed after epel installation. --#
+echo "Install Nginx web server"
+yum -y install nginx.x86_64 >> /tmp/sms_install.log
+echo "Install Simple FastCGI wrapper for CGI scripts"
+yum -y install fcgiwrap.x86_64 spawn-fcgi.x86_64 >> /tmp/sms_install.log
+echo "Configure FastCGI wrapper"
+cp -f ./sys/centos7/spawn-fcgi /etc/sysconfig/spawn-fcgi
+systemctl enable spawn-fcgi >> /tmp/sms_install.log
+systemctl start spawn-fcgi >> /tmp/sms_install.log
 echo "Install Perl"
-apt-get -y install perl >> /tmp/sms_install.log
+yum -y install perl.x86_64 >> /tmp/sms_install.log
 echo "Install development tools"
-apt-get -y install build-essential >> /tmp/sms_install.log
+yum -y groupinstall "Development Tools" >> /tmp/sms_install.log
 echo "Install Git version control system"
-apt-get -y install git >> /tmp/sms_install.log
+yum -y install git.x86_64 >> /tmp/sms_install.log
 echo "Install free DNS certificates auto renew utility"
-apt-get -y install certbot python-certbot-apache -t stretch-backports >> /tmp/sms_install.log
+yum -y install certbot python2-certbot-nginx >> /tmp/sms_install.log
+echo "Install CPAN"
+yum -y install perl-IO-Socket-SSL.noarch >> /tmp/sms_install.log
+yum -y install perl-CPAN.noarch >> /tmp/sms_install.log
+
 echo ""
 echo "----------------------------------------------------------------------------------"
 echo "Now, you need to configure CPAN which will be used in next step, please accept ALL default values during setup."
 echo "After CPAN setup complete, you will stop on command prompt 'cpan', and you should enter 'quit' to exit and continue the installation process."
-read -p "Press enter to start ..." dummy
+read -p "Press enter to start ..."
 cpan
 
 #-- Step 2: Install required Perl libraries --#
@@ -148,37 +164,49 @@ echo ""
 echo "=================================================================================="
 echo "Step 2: Install required Perl libraries, it may take more than 15 minutes, please wait..."
 echo "=================================================================================="
-echo "install libcrypt-cbc-perl"
-apt-get -y install libcrypt-cbc-perl >> /tmp/sms_install.log
-echo "install libcrypt-eksblowfish-perl"
-apt-get -y install libcrypt-eksblowfish-perl >> /tmp/sms_install.log
-echo "install libcrypt-rijndael-perl"
-apt-get -y install libcrypt-rijndael-perl >> /tmp/sms_install.log
-echo "install libpath-class-perl"
-apt-get -y install libpath-class-perl >> /tmp/sms_install.log
-echo "install libemail-sender-perl"
-apt-get -y install libemail-sender-perl >> /tmp/sms_install.log
-echo "install libemail-mime-perl"
-apt-get -y install libemail-mime-perl >> /tmp/sms_install.log
-echo "install libhttp-browserdetect-perl"
-apt-get -y install libhttp-browserdetect-perl >> /tmp/sms_install.log
-echo "install libjson-perl"
-apt-get -y install libjson-perl >> /tmp/sms_install.log
-echo "install libjson-maybexs-perl"
-apt-get -y install libjson-maybexs-perl >> /tmp/sms_install.log
-echo "install liblwp-protocol-https-perl"
-apt-get -y install liblwp-protocol-https-perl >> /tmp/sms_install.log
-echo "install ImageMagick" 
-apt-get -y install imagemagick imagemagick-doc libimage-magick-perl libmagick++-dev >> /tmp/sms_install.log
-echo "install libauthen-passphrase-perl"
-apt-get -y install libauthen-passphrase-perl >> /tmp/sms_install.log
-echo "Install libproc-processtable-perl"
-apt-get -y install libproc-processtable-perl >> /tmp/sms_install.log
+echo "install perl-CGI.noarch"
+yum -y install perl-CGI.noarch >> /tmp/sms_install.log
+echo "install perl-DBI.x86_64"
+yum -y install perl-DBI.x86_64 >> /tmp/sms_install.log
+echo "install perl-URI-1.60-9.el7.noarch"
+yum -y install perl-URI-1.60-9.el7.noarch >> /tmp/sms_install.log
+echo "install perl-Crypt-CBC.noarch"
+yum -y install perl-Crypt-CBC.noarch >> /tmp/sms_install.log
+echo "install perl-Crypt-Eksblowfish.x86_64"
+yum -y install perl-Crypt-Eksblowfish.x86_64 >> /tmp/sms_install.log
+echo "install perl-Crypt-Rijndael.x86_64"
+yum -y install perl-Crypt-Rijndael.x86_64 >> /tmp/sms_install.log
+echo "install perl-Path-Class-0.33-1.el7.noarch"
+yum -y install perl-Path-Class-0.33-1.el7.noarch >> /tmp/sms_install.log
+echo "install perl-Encode.x86_64"
+yum -y install perl-Encode.x86_64 >> /tmp/sms_install.log
+echo "install perl-Email-Sender.noarch"
+yum -y install perl-Email-Sender.noarch >> /tmp/sms_install.log
+echo "install perl-Email-MIME.noarch"
+yum -y install perl-Email-MIME.noarch >> /tmp/sms_install.log
+echo "install perl-HTTP-BrowserDetect.noarch"
+yum -y install perl-HTTP-BrowserDetect.noarch >> /tmp/sms_install.log
+echo "install perl-JSON.noarch"
+yum -y install perl-JSON.noarch >> /tmp/sms_install.log
+echo "install perl-JSON-MaybeXS.noarch"
+yum -y install perl-JSON-MaybeXS.noarch >> /tmp/sms_install.log
+echo "install perl-LWP-Protocol-https.noarch"
+yum -y install perl-LWP-Protocol-https.noarch >> /tmp/sms_install.log
+echo "install ImageMagick"
+yum -y install ImageMagick.x86_64 >> /tmp/sms_install.log
+yum -y install ImageMagick-perl.x86_64 >> /tmp/sms_install.log
+yum -y install ImageMagick-doc.x86_64 >> /tmp/sms_install.log
+yum -y install ImageMagick-devel.x86_64 >> /tmp/sms_install.log
+yum -y install ImageMagick-c++.x86_64 >> /tmp/sms_install.log
+echo "install perl-Authen-Passphrase.noarch"
+yum -y install perl-Authen-Passphrase.noarch >> /tmp/sms_install.log
+echo "Install perl-Proc-ProcessTable.x86_64"
+yum -y install perl-Proc-ProcessTable.x86_64 >> /tmp/sms_install.log
 echo "install perl-www-telegram-botapi"
 git clone https://github.com/Robertof/perl-www-telegram-botapi.git >> /tmp/sms_install.log
-mkdir -p /usr/share/perl5/WWW/Telegram >> /tmp/sms_install.log 
-cp perl-www-telegram-botapi/lib/WWW/Telegram/BotAPI.pm /usr/share/perl5/WWW/Telegram >> /tmp/sms_install.log
-rm -rf perl-www-telegram-botapi >> /tmp/sms_install.log
+mkdir -p /usr/share/perl5/vendor_perl/WWW/Telegram
+cp perl-www-telegram-botapi/lib/WWW/Telegram/BotAPI.pm /usr/share/perl5/vendor_perl/WWW/Telegram
+rm -rf perl-www-telegram-botapi
 echo "install Email::Sender::Transport::SMTP::TLS"
 cpan Email::Sender::Transport::SMTP::TLS >> /tmp/sms_install.log
 
@@ -252,7 +280,7 @@ echo "Note: The administrative account password of database server is now blank,
 echo "      just press enter as you are asked for it in next question. However, you must"
 echo "      choose to setup your database server administrative passowrd in this stage."
 echo ""
-read -p "Press enter to start..." dummy
+read -p "Press enter to start..."
 systemctl enable mariadb.service >> /tmp/sms_install.log
 systemctl start mariadb.service >> /tmp/sms_install.log
 mysql_secure_installation
@@ -261,7 +289,7 @@ echo "--------------------------------------------------------------------------
 echo "After the database server has been configured, I can now install the required databases for you."
 echo "You need to input the database administrative password you just created in this stage."
 echo ""
-read -p "Press enter to start..." dummy
+read -p "Press enter to start..."
 echo ""
 mysql --user=root -p < db/create_db.sql
 
@@ -279,32 +307,18 @@ echo "Step 7: Install SSL certificates to the sites"
 echo "=================================================================================="
 echo "You need to generate two SSL certificates for the sites, I should find their domain names for you, please input SMS"
 echo "administrator email in this step, and select the choice to generate SSL certificates for BOTH sites."
-read -p "Press enter to start..." dummy
-perl generate_ssl_conf.pl os=ubuntu18 ws=apache >> /tmp/sms_install.log
-cp -Rf apache24/ubuntu18/httpd_conf/* /etc/apache2
-cp -f apache24/ubuntu18/ssl_cert_and_key/cert/* /etc/ssl/certs
-cp -f apache24/ubuntu18/ssl_cert_and_key/key/* /etc/ssl/private
-rm -f /etc/apache2/sites-available/*.template
-rm -f /etc/apache2/sites-enabled/*
-#-- Activate Apache modules --#
-a2enmod rewrite >> /tmp/sms_install.log
-a2enmod cgi >> /tmp/sms_install.log
-a2enmod ssl >> /tmp/sms_install.log
-a2enmod negotiation >> /tmp/sms_install.log
-a2enmod include >> /tmp/sms_install.log
-a2enmod alias >> /tmp/sms_install.log
-a2enmod headers >> /tmp/sms_install.log
-#-- Activate sites --#
-a2ensite non-ssl >> /tmp/sms_install.log
-a2ensite ssl-decoy-site >> /tmp/sms_install.log
-a2ensite ssl-message-site >> /tmp/sms_install.log
-systemctl enable apache2 >> /tmp/sms_install.log
-systemctl restart apache2 >> /tmp/sms_install.log
-#-- Note: 1. Apache must be up and running as execute 'certbot'.                                                             --#
+read -p "Press enter to start..."
+perl generate_ssl_conf.pl os=centos7 ws=nginx >> /tmp/sms_install.log
+cp -f ./nginx/centos7/nginx.conf /etc/nginx
+cp -f ./nginx/centos7/ssl_cert_and_key/cert/* /etc/pki/tls/certs
+cp -f ./nginx/centos7/ssl_cert_and_key/key/* /etc/pki/tls/private
+systemctl enable nginx.service >> /tmp/sms_install.log
+systemctl start nginx.service >> /tmp/sms_install.log
+#-- Note: 1. Nginx must be up and running before execute 'certbot'.                                                             --#
 #--       2. SSL certificates getting process often fail in this stage. If it is the case, just login as root and re-run the --#
 #--          below command.                                                                                                  --# 
-certbot --apache
-y=`cat /etc/apache2/sites-available/ssl-decoy-site.conf | grep "letsencrypt" | wc -l`
+certbot --nginx
+y=`cat /etc/nginx/nginx.conf | grep "letsencrypt" | wc -l`
 if [[ "$y" -eq 0 ]]
 then
   echo ""
@@ -312,22 +326,23 @@ then
   echo "SSL certificate generation process is failure, but don't worry, you may re-run"
   echo "the following command after SMS installation to fix this problem:"
   echo ""
-  echo "certbot --apache"
+  echo "certbot --nginx"
   echo "******************************************************************************"
   echo ""
-  read -p "Press enter to continue..." dummy
+  read -p "Press enter to continue..."
 fi  
-
+  
 echo ""
 echo "=================================================================================="
 echo "Step 8: Configure the Linux system settings"
 echo "=================================================================================="
 echo "Configure scheduled tasks"
 cp -f /etc/crontab /etc/crontab.bkup
-cp -f ./sys/ubuntu18/crontab.sms_only /etc/crontab
+cp -f ./sys/centos7/crontab.sms_only /etc/crontab
 echo "Configure system log rotation"
-cp -f ./sys/ubuntu18/rsyslog /etc/logrotate.d
-systemctl restart cron
+cp -f ./sys/centos7/syslog /etc/logrotate.d
+cp -f ./sys/centos7/nginx /etc/logrotate.d
+systemctl restart crond
 
 echo ""
 echo "=================================================================================="
@@ -352,7 +367,7 @@ else
   echo "run them directly on web page. You may install it later by using the shell script 'build_ffmpeg.sh' on"
   echo "directory 'ffmpeg' of the installation package."
   echo ""
-  read -p "Press enter to continue..." dummy
+  read -p "Press enter to continue..."
 fi
 
 echo ""
@@ -371,8 +386,8 @@ then
   mkdir -p /batch
   cp -f ./defender/*.pl /batch
   chmod +x /batch/*.pl
-  cp -f ./sys/ubuntu18/crontab.sms_plus_defender /etc/crontab
-  systemctl restart cron
+  cp -f ./sys/centos7/crontab.sms_plus_defender /etc/crontab
+  systemctl restart crond
 fi  
 
 echo ""
@@ -388,5 +403,8 @@ echo "Unhappy password: iamunhappy"
 echo ""
 echo "Now, the server is needed to reboot to complete the installation process."
 echo ""
-read -p "Press the enter to reboot..." dummy
+read -p "Press the enter to reboot..."
 shutdown -r now
+
+
+

@@ -314,7 +314,7 @@ read -p "Press enter to start..."
 # 1. Change 'ServerName' of decoy site and messaging site on ssl.conf
 # 2. Copy all Apache configuration files (include a specially crafted welcome.conf), pre-load SSL certificates and private key files to locations defined on ssl.conf
 # 3. Run 'certbot --apache' to get new SSL certificate and private key from "Let’s Encrypt"
-perl generate_ssl_conf.pl centos7 >> /tmp/sms_install.log
+perl generate_ssl_conf.pl os=centos7 ws=apache >> /tmp/sms_install.log
 cp -f apache24/centos7/httpd_conf/conf/*.conf /etc/httpd/conf
 cp -f apache24/centos7/httpd_conf/conf.d/*.conf /etc/httpd/conf.d
 cp -f apache24/centos7/ssl_cert_and_key/cert/* /etc/pki/tls/certs

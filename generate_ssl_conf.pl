@@ -26,6 +26,12 @@
 #                                                 './apache24/centos7'.
 #                                               - Handle Apache configuration files for Ubuntu
 #                                                 18.04.
+# V1.0.02       2019-05-16      DW              Generate Nginx configuration file for CentOS 7.
+#                                               Therefore, it needs to handle two command line
+#                                               passed parameters: os (operation system) and
+#                                               ws (web server). Possible values of os are
+#                                               'centos7' and 'ubuntu18', and possible values of
+#                                               ws are 'apache' and 'nginx'. 
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -42,9 +48,25 @@ my $decoy_site_server_name = '';
 my $msg_site_server_name = '';
 my $ok = 1;
 my $msg = '';
+my $os = '';                        # Operating system for SMS server.
+my $ws = '';                        # Web server will be used by SMS server.
 
-#-- 2019-04-17: Possible values are 'centos7' and 'ubuntu18' --#
-my $os = (scalar(@ARGV) > 0)? lc(allTrim($ARGV[0])) : '';
+#-- 2019-04-17: Possible values of 'os' are 'centos7' and 'ubuntu18' --#
+#-- 2019-05-16: Possible values of 'ws' are 'apache' and 'nginx' --#
+foreach my $this_param (@ARGV) {
+  my @data = split('=', $this_param);
+  if (scalar(@data) >= 2) {
+    my $token = lc(allTrim($data[0]));
+    my $value = lc(allTrim($data[1]));
+    
+    if ($token eq 'os') {
+      $os = $value;
+    }
+    elsif ($token eq 'ws') {
+      $ws = $value;
+    }
+  }
+}
 
 my $dbh = dbconnect($COOKIE_MSG);   # Defined on sm_db.pl
 
@@ -53,65 +75,97 @@ if ($dbh) {
   
   if ($ok) {
     if ($os eq 'centos7') {
-      $template = './apache24/centos7/httpd_conf/conf.d/ssl.conf.template';
-      $ssl_conf = './apache24/centos7/httpd_conf/conf.d/ssl.conf';
+      if ($ws eq 'apache') {
+        $template = './apache24/centos7/httpd_conf/conf.d/ssl.conf.template';
+        $ssl_conf = './apache24/centos7/httpd_conf/conf.d/ssl.conf';
       
-      open(SSL_CONF, "> $ssl_conf") or die "Unable to create ssl.conf.\n";     
-      open(TEMPLATE, "< $template") or die "Unable to open ssl.conf template.\n";
-      while (<TEMPLATE>) {
-        my $this_line = $_;
+        open(SSL_CONF, "> $ssl_conf") or die "Unable to create ssl.conf.\n";     
+        open(TEMPLATE, "< $template") or die "Unable to open ssl.conf template.\n";
+        while (<TEMPLATE>) {
+          my $this_line = $_;
       
-        if ($this_line =~ /{decoy_site_server_name}/) {
-          $this_line =~ s/{decoy_site_server_name}/$decoy_site_server_name/g;
+          if ($this_line =~ /{decoy_site_server_name}/) {
+            $this_line =~ s/{decoy_site_server_name}/$decoy_site_server_name/g;
+          }
+          elsif ($this_line =~ /{msg_site_server_name}/) {
+            $this_line =~ s/{msg_site_server_name}/$msg_site_server_name/g;
+          }
+      
+          print SSL_CONF $this_line;
         }
-        elsif ($this_line =~ /{msg_site_server_name}/) {
-          $this_line =~ s/{msg_site_server_name}/$msg_site_server_name/g;
-        }
-      
-        print SSL_CONF $this_line;
-      }
    
-      close(TEMPLATE);
-      close(SSL_CONF);
+        close(TEMPLATE);
+        close(SSL_CONF);
+      }
+      elsif ($ws eq 'nginx') {
+        $template = './nginx/centos7/nginx.conf.template';
+        $ssl_conf = './nginx/centos7/nginx.conf';
+      
+        open(SSL_CONF, "> $ssl_conf") or die "Unable to create nginx.conf.\n";     
+        open(TEMPLATE, "< $template") or die "Unable to open nginx.conf template.\n";
+        while (<TEMPLATE>) {
+          my $this_line = $_;
+      
+          if ($this_line =~ /{decoy_site_server_name}/) {
+            $this_line =~ s/{decoy_site_server_name}/$decoy_site_server_name/g;
+          }
+          elsif ($this_line =~ /{msg_site_server_name}/) {
+            $this_line =~ s/{msg_site_server_name}/$msg_site_server_name/g;
+          }
+      
+          print SSL_CONF $this_line;
+        }
+   
+        close(TEMPLATE);
+        close(SSL_CONF);        
+      }
+      else {
+        print "Error: Invalid web server option is given or missing for CentOS 7.\n";  
+      }
     }
     elsif ($os eq 'ubuntu18') {
-      #-- Step 1: Generate decoy site SSL virtual host configuration file --#
-      $template = './apache24/ubuntu18/httpd_conf/sites-available/ssl-decoy-site.conf.template';
-      $ssl_conf = './apache24/ubuntu18/httpd_conf/sites-available/ssl-decoy-site.conf';
+      if ($ws eq 'apache') {
+        #-- Step 1: Generate decoy site SSL virtual host configuration file --#
+        $template = './apache24/ubuntu18/httpd_conf/sites-available/ssl-decoy-site.conf.template';
+        $ssl_conf = './apache24/ubuntu18/httpd_conf/sites-available/ssl-decoy-site.conf';
       
-      open(SSL_CONF, "> $ssl_conf") or die "Unable to create decoy site ssl-decoy-site.conf.\n";     
-      open(TEMPLATE, "< $template") or die "Unable to open decoy site ssl-decoy-site.conf template.\n";
-      while (<TEMPLATE>) {
-        my $this_line = $_;
+        open(SSL_CONF, "> $ssl_conf") or die "Unable to create decoy site ssl-decoy-site.conf.\n";     
+        open(TEMPLATE, "< $template") or die "Unable to open decoy site ssl-decoy-site.conf template.\n";
+        while (<TEMPLATE>) {
+          my $this_line = $_;
       
-        if ($this_line =~ /{decoy_site_server_name}/) {
-          $this_line =~ s/{decoy_site_server_name}/$decoy_site_server_name/g;
+          if ($this_line =~ /{decoy_site_server_name}/) {
+            $this_line =~ s/{decoy_site_server_name}/$decoy_site_server_name/g;
+          }
+      
+          print SSL_CONF $this_line;
         }
-      
-        print SSL_CONF $this_line;
-      }
    
-      close(TEMPLATE);
-      close(SSL_CONF);
+        close(TEMPLATE);
+        close(SSL_CONF);
       
-      #-- Step 2: Generate messaging site SSL virtual host configuration file --#
-      $template = './apache24/ubuntu18/httpd_conf/sites-available/ssl-message-site.conf.template';
-      $ssl_conf = './apache24/ubuntu18/httpd_conf/sites-available/ssl-message-site.conf';
+        #-- Step 2: Generate messaging site SSL virtual host configuration file --#
+        $template = './apache24/ubuntu18/httpd_conf/sites-available/ssl-message-site.conf.template';
+        $ssl_conf = './apache24/ubuntu18/httpd_conf/sites-available/ssl-message-site.conf';
       
-      open(SSL_CONF, "> $ssl_conf") or die "Unable to create messaging site ssl-message-site.conf.\n";     
-      open(TEMPLATE, "< $template") or die "Unable to open messaging site ssl-message-site.conf template.\n";
-      while (<TEMPLATE>) {
-        my $this_line = $_;
+        open(SSL_CONF, "> $ssl_conf") or die "Unable to create messaging site ssl-message-site.conf.\n";     
+        open(TEMPLATE, "< $template") or die "Unable to open messaging site ssl-message-site.conf template.\n";
+        while (<TEMPLATE>) {
+          my $this_line = $_;
       
-        if ($this_line =~ /{msg_site_server_name}/) {
-          $this_line =~ s/{msg_site_server_name}/$msg_site_server_name/g;
-        }
+          if ($this_line =~ /{msg_site_server_name}/) {
+            $this_line =~ s/{msg_site_server_name}/$msg_site_server_name/g;
+          }
         
-        print SSL_CONF $this_line;
-      }
+          print SSL_CONF $this_line;
+        }
    
-      close(TEMPLATE);
-      close(SSL_CONF);   
+        close(TEMPLATE);
+        close(SSL_CONF);
+      }
+      else {
+        print "Error: Invalid web server option is given or missing for Debian 9 or Ubuntu 18.\n";
+      }
     }
     else {
       print "Error: Invalid platform is given or missing.\n";
@@ -122,7 +176,7 @@ if ($dbh) {
   }
 }
 else {
-  print "Error: Unable to connect to msgdb, Apache server configuration file generation failure.\n";
+  print "Error: Unable to connect to msgdb, Web server configuration file generation failure.\n";
 }
 
 dbclose($dbh);

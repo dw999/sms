@@ -1,0 +1,156 @@
+# For more information on configuration, see:
+#   * Official English Documentation: http://nginx.org/en/docs/
+#   * Official Russian Documentation: http://nginx.org/ru/docs/
+
+#-------------------------------------------------------------------------------------------
+# Note: Since the limitation of CertBot, file format of this template must be kept in ASCII.
+#-------------------------------------------------------------------------------------------
+
+user nginx;
+worker_processes auto;
+error_log /var/log/nginx/error.log;
+pid /run/nginx.pid;
+
+# Load dynamic modules. See /usr/share/nginx/README.dynamic.
+include /usr/share/nginx/modules/*.conf;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    sendfile            on;
+    tcp_nopush          on;
+    tcp_nodelay         on;
+    keepalive_timeout   65;
+    types_hash_max_size 2048;
+    # Fix the maximum upload file size to 256MB
+    client_max_body_size 256M;    
+    # Don't show the Nginx version number (in error pages / headers)
+    server_tokens       off;
+
+    include             /etc/nginx/mime.types;
+    default_type        application/octet-stream;
+    charset             UTF-8;
+
+    # Load modular configuration files from the /etc/nginx/conf.d directory.
+    # See http://nginx.org/en/docs/ngx_core_module.html#include
+    # for more information.
+    include /etc/nginx/conf.d/*.conf;
+
+    server {
+        listen       80 default_server;
+        server_name  {decoy_site_server_name};
+        return 301 https://{decoy_site_server_name}$request_uri;
+    }
+    
+    server {
+        listen       80;
+        server_name  {msg_site_server_name};
+        return 301 https://{msg_site_server_name}$request_uri;
+    }
+    
+    server {
+        listen       443 ssl http2 default_server;
+        server_name  {decoy_site_server_name};
+        root         /www/pdatools;
+        index        index.html;
+        access_log   /var/log/nginx/decoy-access.log  main;
+        
+        ssl_certificate "/etc/pki/tls/certs/decoy-site.crt";
+        ssl_certificate_key "/etc/pki/tls/private/decoy-site.key";
+        ssl_session_cache shared:SSL:1m;
+        ssl_session_timeout  10m;
+        ssl_ciphers HIGH:!aNULL:!MD5:!SEED:!IDEA:!3DES;
+        ssl_prefer_server_ciphers on;
+
+        # Load configuration files for the default server block.
+        include /etc/nginx/default.d/*.conf;
+
+        location / {
+            alias /www/pdatools;
+            autoindex on;
+        }
+        
+        location /js/ {
+            alias /www/pdatools/js/;
+        }
+        
+        location /images/ {
+            alias /www/pdatools/images/;
+        }
+
+        location /data/ {
+            alias /www/pdatools/data/;
+        }
+        
+        location /cgi-pl/ {
+            gzip off;
+            alias /www/pdatools/cgi-pl/;
+            fastcgi_pass unix:/var/run/fcgiwrap.socket;
+            include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME $request_filename;
+        }
+
+        error_page 404 /custom-404.html;
+        location = /custom-404.html {
+        }        
+    }
+
+    server {
+        listen       443 ssl http2;
+        server_name  {msg_site_server_name};
+        root         /www/itnews;
+        index        index.html;        
+        access_log   /var/log/nginx/msg-access.log  main;
+        
+        ssl_certificate "/etc/pki/tls/certs/message-site.crt";
+        ssl_certificate_key "/etc/pki/tls/private/message-site.key";
+        ssl_session_cache shared:SSL:1m;
+        ssl_session_timeout  10m;
+        ssl_ciphers HIGH:!aNULL:!MD5:!SEED:!IDEA:!3DES;
+        ssl_prefer_server_ciphers on;
+
+        # Load configuration files for the default server block.
+        include /etc/nginx/default.d/*.conf;
+
+        location / {
+            alias /www/itnews;
+            autoindex on;            
+        }
+
+        location /js/ {
+            alias /www/itnews/js/;
+        }
+        
+        location /images/ {
+            alias /www/itnews/images/;
+        }
+
+        location /data/ {
+            alias /www/itnews/data/;
+        }
+
+        location /cgi-pl/ {
+            gzip off;
+            alias /www/itnews/cgi-pl/;
+            fastcgi_pass unix:/var/run/fcgiwrap.socket;
+            include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME $request_filename;            
+        }
+
+        #-- Redirect all illegal resource request to an arbitrary decoy web site --#
+        error_page 403 /index.html;
+        location = /index.html {
+        }
+
+        error_page 404 /custom-404.html;
+        location = /custom-404.html {
+        }        
+    }
+}
+

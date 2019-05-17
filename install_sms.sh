@@ -22,6 +22,7 @@
 # V1.0.00     2019-04-24      DW              Determine currently running platform and switch to corresponding
 #                                             SMS installation script.
 # V1.0.01     2019-04-25      DW              Include Debian Linux 9 as SMS supported platform.
+# V1.0.02     2019-05-17      DW              Let user select desired web server for SMS installation on CentOS 7.
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -32,8 +33,22 @@ clear
 v=`hostnamectl | grep "CentOS Linux 7" | wc -l`
 if [[ "$v" -eq 1 ]]
 then
-  chmod +x ./install_sms_centos.sh
-  source ./install_sms_centos.sh
+  echo "Please select web server for SMS installation:"
+  echo ""
+  echo "1. Nginx web server"
+  echo "2. Apache web server"
+  echo ""
+  echo "Note: If you don't know how to choose, select Nginx web server."
+  echo ""
+  read -p "Your choice (1 or 2): " choice
+  if (test ${choice} = '2')
+  then  
+    chmod +x ./install_sms_centos.sh
+    source ./install_sms_centos.sh
+  else
+    chmod +x ./install_sms_cto_nginx.sh
+    source ./install_sms_cto_nginx.sh
+  fi  
   exit 0
 fi
 
