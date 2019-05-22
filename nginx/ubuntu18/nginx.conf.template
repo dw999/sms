@@ -6,7 +6,8 @@
 # Note: Since the limitation of CertBot, file format of this template must be kept in ASCII.
 #-------------------------------------------------------------------------------------------
 
-user nginx;
+# 2019-05-22 DW: Below line is frozen due to it cause error on Ubuntu Linux 18.04. 
+#user nginx;       
 worker_processes auto;
 error_log /var/log/nginx/error.log;
 pid /run/nginx.pid;
@@ -61,13 +62,13 @@ http {
         index        index.html;
         access_log   /var/log/nginx/decoy-access.log  main;
         
-        ssl_certificate "/etc/pki/tls/certs/decoy-site.crt";
-        ssl_certificate_key "/etc/pki/tls/private/decoy-site.key";
+        ssl_certificate "/etc/ssl/certs/decoy-site.crt";
+        ssl_certificate_key "/etc/ssl/private/decoy-site.key";
         ssl_session_cache shared:SSL:1m;
         ssl_session_timeout  10m;
         ssl_ciphers HIGH:!aNULL:!MD5:!SEED:!IDEA:!3DES;
         ssl_prefer_server_ciphers on;
-
+        
         # Configuring HSTS in Nginx
         add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
@@ -111,8 +112,8 @@ http {
         index        index.html;        
         access_log   /var/log/nginx/msg-access.log  main;
         
-        ssl_certificate "/etc/pki/tls/certs/message-site.crt";
-        ssl_certificate_key "/etc/pki/tls/private/message-site.key";
+        ssl_certificate "/etc/ssl/certs/message-site.crt";
+        ssl_certificate_key "/etc/ssl/private/message-site.key";
         ssl_session_cache shared:SSL:1m;
         ssl_session_timeout  10m;
         ssl_ciphers HIGH:!aNULL:!MD5:!SEED:!IDEA:!3DES;

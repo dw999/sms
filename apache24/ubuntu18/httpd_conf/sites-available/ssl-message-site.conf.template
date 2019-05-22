@@ -11,6 +11,9 @@
 		#LogLevel info ssl:warn
 		LogLevel warn 
 
+		# Configure HSTS
+		Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains;"
+
 		ErrorLog ${APACHE_LOG_DIR}/error.log
 		CustomLog "|/usr/bin/rotatelogs ${APACHE_LOG_DIR}/msg-access_%Y%m%d 86400" common
 

@@ -23,6 +23,7 @@
 #                                             SMS installation script.
 # V1.0.01     2019-04-25      DW              Include Debian Linux 9 as SMS supported platform.
 # V1.0.02     2019-05-17      DW              Let user select desired web server for SMS installation on CentOS 7.
+# V1.0.03     2019-05-21      DW              Let user select desired web server for SMS installation on Debian 9 and Ubuntu 18.04.
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -55,16 +56,44 @@ fi
 v=`hostnamectl | grep "Ubuntu 18.04" | wc -l`
 if [[ "$v" -eq 1 ]]
 then
-  chmod +x ./install_sms_ubuntu.sh
-  source ./install_sms_ubuntu.sh
+  echo "Please select web server for SMS installation:"
+  echo ""
+  echo "1. Nginx web server"
+  echo "2. Apache web server"
+  echo ""
+  echo "Note: If you don't know how to choose, select Nginx web server."
+  echo ""
+  read -p "Your choice (1 or 2): " choice
+  if (test ${choice} = '2')
+  then
+    chmod +x ./install_sms_ubuntu.sh
+    source ./install_sms_ubuntu.sh
+  else
+    chmod +x ./install_sms_ubt_nginx.sh
+    source ./install_sms_ubt_nginx.sh
+  fi    
   exit 0
 fi
 
 v=`hostnamectl | grep "Debian GNU/Linux 9" | wc -l`
 if [[ "$v" -eq 1 ]]
 then
-  chmod +x ./install_sms_debian.sh
-  source ./install_sms_debian.sh
+  echo "Please select web server for SMS installation:"
+  echo ""
+  echo "1. Nginx web server"
+  echo "2. Apache web server"
+  echo ""
+  echo "Note: If you don't know how to choose, select Nginx web server."
+  echo ""
+  read -p "Your choice (1 or 2): " choice
+  if (test ${choice} = '2')
+  then
+    chmod +x ./install_sms_debian.sh
+    source ./install_sms_debian.sh
+  else  
+    chmod +x ./install_sms_dbn_nginx.sh
+    source ./install_sms_dbn_nginx.sh
+  fi
   exit 0
 fi
 

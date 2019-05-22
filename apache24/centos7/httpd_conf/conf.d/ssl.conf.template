@@ -76,6 +76,9 @@ ErrorLog logs/error_log
 CustomLog "|/usr/sbin/rotatelogs logs/decoy_access_%Y%m%d 86400" common
 LogLevel warn
 
+# Configure HSTS
+Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains;"
+
 #   SSL Engine Switch:
 #   Enable/Disable SSL for this virtual host.
 SSLEngine on
@@ -222,6 +225,9 @@ SSLCACertificateFile /etc/pki/tls/certs/decoy_site_ca_bundle.crt
   ErrorLog logs/error_log
   CustomLog "|/usr/sbin/rotatelogs logs/msg_access_%Y%m%d 86400" common 
   LogLevel warn
+
+  # Configure HSTS
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains;"
     
   SSLEngine on
   SSLProtocol all -SSLv2 -SSLv3 -TLSv1 -TLSv1.1 

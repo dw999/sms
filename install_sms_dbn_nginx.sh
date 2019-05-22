@@ -15,14 +15,11 @@
 ###
 
 #=========================================================================================================
-# Program: install_sms_ubuntu.sh
+# Program: install_sms_debian.sh
 #
 # Ver         Date            Author          Comment
 # =======     ===========     ===========     ==========================================
-# V1.0.00     2019-01-12      DW              Install SMS on Ubuntu 18.04.
-# V1.0.01     2019-04-27      DW              Fix system log rotation configuration file.
-# V1.0.02     2019-05-09      DW              Unify firewall application used on supported platforms, and then the SMS system defender.
-# V1.0.03     2019-05-11      DW              Add Perl library Proc::ProcessTable installation for SMS defender.
+# V1.0.00     2019-05-20      DW              Install SMS on Debian Linux 9 with Nginx as web server.
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -31,12 +28,12 @@ setterm -blank 0
 clear
 
 #-- Check currently running operating system and it's version --#
-v=`hostnamectl | grep "Ubuntu 18.04" | wc -l`
+v=`hostnamectl | grep "Debian GNU/Linux 9" | wc -l`
 if [[ "$v" -eq 0 ]]
 then
   echo "Currently Running" `hostnamectl | grep "Operating System"`
   echo ""
-  echo "This SMS installation program is specified for Ubuntu 18.04 only, running on other Linux distro is"
+  echo "This SMS installation program is specified for Debian Linux 9 only, running on other Linux distro is"
   echo "likely to fail."
   echo ""
   read -p "Do you want to continue (Y/N)? " TOGO
@@ -82,9 +79,16 @@ echo "==========================================================================
 echo "Step 1: Install required applications"
 echo "=================================================================================="
 echo "Refresh software repository..."
+#-- Create CertBot packages repository for Debian 9 --#
+echo "deb http://deb.debian.org/debian stretch-backports main" > /etc/apt/sources.list.d/certbot.list
+#-- Create Nginx packages repository for Debian 9 and configure for Nginx installation later --#
+apt-get -y install curl gnupg2 ca-certificates lsb-release > /tmp/sms_install.log
+echo "deb http://nginx.org/packages/debian `lsb_release -cs` nginx" | tee /etc/apt/sources.list.d/nginx.list
+curl -fsSL https://nginx.org/keys/nginx_signing.key | apt-key add -
+#-- Refresh software package repository --#
 apt-get update >> /tmp/sms_install.log
 echo "Install and configure internet time utilities"
-apt-get -y install ntp ntpdate > /tmp/sms_install.log
+apt-get -y install ntp ntpdate >> /tmp/sms_install.log
 #-- Ensure ntpd is stopped. Otherwise, the next step will fail. --#
 systemctl stop ntp >> /tmp/sms_install.log
 ntpdate stdtime.gov.hk >> /tmp/sms_install.log
@@ -118,12 +122,16 @@ firewall-cmd --zone=public --permanent --add-icmp-block=echo-request
 firewall-cmd --reload
 echo "Install unzip"
 apt-get -y install unzip >> /tmp/sms_install.log
-echo "Install curl"
-apt-get -y install curl >> /tmp/sms_install.log
 echo "Install MariaDB" 
 apt-get -y install mariadb-server mariadb-client >> /tmp/sms_install.log
-echo "Install Apache HTTP server"
-apt-get -y install apache2 >> /tmp/sms_install.log
+echo "Install Nginx web server"
+apt-get -y install nginx >> /tmp/sms_install.log
+echo "Install CGI wrapper"
+apt-get -y install fcgiwrap spawn-fcgi >> /tmp/sms_install.log
+echo "Configure CGI wrapper"
+cp -f ./nginx/ubuntu18/init.d/spawn-fcgi /etc/init.d >> /tmp/sms_install.log
+chmod +x /etc/init.d/spawn-fcgi >> /tmp/sms_install.log
+update-rc.d spawn-fcgi defaults >> /tmp/sms_install.log
 echo "Install logrotate"
 apt-get -y install logrotate >> /tmp/sms_install.log
 echo "Install Perl"
@@ -133,12 +141,7 @@ apt-get -y install build-essential >> /tmp/sms_install.log
 echo "Install Git version control system"
 apt-get -y install git >> /tmp/sms_install.log
 echo "Install free DNS certificates auto renew utility"
-apt-get -y install software-properties-common >> /tmp/sms_install.log
-add-apt-repository -y universe >> /tmp/sms_install.log
-add-apt-repository -y ppa:certbot/certbot >> /tmp/sms_install.log
-apt-get update >> /tmp/sms_install.log
-apt-get -y install python-certbot-apache >> /tmp/sms_install.log
-
+apt-get -y install certbot python-certbot-nginx -t stretch-backports >> /tmp/sms_install.log
 echo ""
 echo "----------------------------------------------------------------------------------"
 echo "Now, you need to configure CPAN which will be used in next step, please accept ALL default values during setup."
@@ -283,31 +286,17 @@ echo "==========================================================================
 echo "You need to generate two SSL certificates for the sites, I should find their domain names for you, please input SMS"
 echo "administrator email in this step, and select the choice to generate SSL certificates for BOTH sites."
 read -p "Press enter to start..." dummy
-perl generate_ssl_conf.pl os=ubuntu18 ws=apache >> /tmp/sms_install.log
-cp -Rf apache24/ubuntu18/httpd_conf/* /etc/apache2
-cp -f apache24/ubuntu18/ssl_cert_and_key/cert/* /etc/ssl/certs
-cp -f apache24/ubuntu18/ssl_cert_and_key/key/* /etc/ssl/private
-rm -f /etc/apache2/sites-available/*.template
-rm -f /etc/apache2/sites-enabled/*
-#-- Activate Apache modules --#
-a2enmod rewrite >> /tmp/sms_install.log
-a2enmod cgi >> /tmp/sms_install.log
-a2enmod ssl >> /tmp/sms_install.log
-a2enmod negotiation >> /tmp/sms_install.log
-a2enmod include >> /tmp/sms_install.log
-a2enmod alias >> /tmp/sms_install.log
-a2enmod headers >> /tmp/sms_install.log
-#-- Activate sites --#
-a2ensite non-ssl >> /tmp/sms_install.log
-a2ensite ssl-decoy-site >> /tmp/sms_install.log
-a2ensite ssl-message-site >> /tmp/sms_install.log
-systemctl enable apache2 >> /tmp/sms_install.log
-systemctl restart apache2 >> /tmp/sms_install.log
-#-- Note: 1. Apache must be up and running as execute 'certbot'.                                                             --#
+perl generate_ssl_conf.pl os=ubuntu18 ws=nginx >> /tmp/sms_install.log
+cp -f ./nginx/ubuntu18/nginx.conf /etc/nginx
+cp -f ./nginx/ubuntu18/ssl_cert_and_key/cert/* /etc/ssl/certs
+cp -f ./nginx/ubuntu18/ssl_cert_and_key/key/* /etc/ssl/private
+systemctl enable nginx >> /tmp/sms_install.log
+systemctl restart nginx >> /tmp/sms_install.log
+#-- Note: 1. Nginx must be up and running as execute 'certbot'.                                                             --#
 #--       2. SSL certificates getting process often fail in this stage. If it is the case, just login as root and re-run the --#
 #--          below command.                                                                                                  --# 
-certbot --apache
-y=`cat /etc/apache2/sites-available/ssl-decoy-site.conf | grep "letsencrypt" | wc -l`
+certbot --nginx
+y=`cat /etc/nginx/nginx.conf | grep "letsencrypt" | wc -l`
 if [[ "$y" -eq 0 ]]
 then
   echo ""
@@ -315,7 +304,7 @@ then
   echo "SSL certificate generation process is failure, but don't worry, you may re-run"
   echo "the following command after SMS installation to fix this problem:"
   echo ""
-  echo "certbot --apache"
+  echo "certbot --nginx"
   echo "******************************************************************************"
   echo ""
   read -p "Press enter to continue..." dummy
@@ -330,6 +319,7 @@ cp -f /etc/crontab /etc/crontab.bkup
 cp -f ./sys/ubuntu18/crontab.sms_only /etc/crontab
 echo "Configure system log rotation"
 cp -f ./sys/ubuntu18/rsyslog /etc/logrotate.d
+cp -f ./sys/ubuntu18/nginx /etc/logrotate.d
 systemctl restart cron
 
 echo ""

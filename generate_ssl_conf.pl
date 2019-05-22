@@ -31,7 +31,9 @@
 #                                               passed parameters: os (operation system) and
 #                                               ws (web server). Possible values of os are
 #                                               'centos7' and 'ubuntu18', and possible values of
-#                                               ws are 'apache' and 'nginx'. 
+#                                               ws are 'apache' and 'nginx'.
+# V1.0.03       2019-05-20      DW              Take care Nginx configuration file for Debian 9
+#                                               and Ubuntu 18.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -100,9 +102,9 @@ if ($dbh) {
       elsif ($ws eq 'nginx') {
         $template = './nginx/centos7/nginx.conf.template';
         $ssl_conf = './nginx/centos7/nginx.conf';
-      
-        open(SSL_CONF, "> $ssl_conf") or die "Unable to create nginx.conf.\n";     
-        open(TEMPLATE, "< $template") or die "Unable to open nginx.conf template.\n";
+
+        open(SSL_CONF, "> $ssl_conf") or die "Unable to create nginx.conf $ssl_conf.\n";     
+        open(TEMPLATE, "< $template") or die "Unable to open nginx.conf template $template.\n";
         while (<TEMPLATE>) {
           my $this_line = $_;
       
@@ -162,6 +164,28 @@ if ($dbh) {
    
         close(TEMPLATE);
         close(SSL_CONF);
+      }
+      elsif ($ws eq 'nginx') {
+        $template = './nginx/ubuntu18/nginx.conf.template';
+        $ssl_conf = './nginx/ubuntu18/nginx.conf';
+      
+        open(SSL_CONF, "> $ssl_conf") or die "Unable to create nginx.conf $ssl_conf.\n";     
+        open(TEMPLATE, "< $template") or die "Unable to open nginx.conf template $template.\n";
+        while (<TEMPLATE>) {
+          my $this_line = $_;
+      
+          if ($this_line =~ /{decoy_site_server_name}/) {
+            $this_line =~ s/{decoy_site_server_name}/$decoy_site_server_name/g;
+          }
+          elsif ($this_line =~ /{msg_site_server_name}/) {
+            $this_line =~ s/{msg_site_server_name}/$msg_site_server_name/g;
+          }
+      
+          print SSL_CONF $this_line;
+        }
+   
+        close(TEMPLATE);
+        close(SSL_CONF);                
       }
       else {
         print "Error: Invalid web server option is given or missing for Debian 9 or Ubuntu 18.\n";
