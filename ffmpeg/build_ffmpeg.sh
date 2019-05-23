@@ -21,16 +21,33 @@
 # =======     ===========     ===========     ==========================================
 # V1.0.00     2018-12-27      DW              Build multimedia file converter 'FFmpeg' for SMS.
 # V1.0.01     2019-04-23      DW              Specify to use Bourne shell explicitly to avoid compatibility
-#                                             issue across different Linux/Unix systems. 
+#                                             issue across different Linux/Unix systems.
+# V1.0.02     2019-05-23      DW              Install pre-requisites utilities on all supported platforms
 #=========================================================================================================
 
 echo ""
 echo "Build FFmpeg..."
 echo ""
 
-#-- Ensure required utilities have already installed --#
-echo "check required utilities"
-yum -y install bzip2.x86_64 > /tmp/build_ffmpeg.log
+#-- Ensure required utilities have installed before build FFmpeg --#
+echo "Install required utilities"
+v=`hostnamectl | grep "CentOS Linux 7" | wc -l`
+if [[ "$v" -eq 1 ]]
+then
+  yum -y install bzip2.x86_64 > /tmp/build_ffmpeg.log
+else
+  v=`hostnamectl | grep "Debian GNU/Linux 9" | wc -l`
+  if [[ "$v" -eq 1 ]]
+  then
+    apt-get -y install bzip2 > /tmp/build_ffmpeg.log
+  else
+    v=`hostnamectl | grep "Ubuntu 18.04" | wc -l`
+    if [[ "$v" -eq 1 ]]
+    then
+      apt-get -y install bzip2 > /tmp/build_ffmpeg.log
+    fi
+  fi
+fi  
 
 #-- Remember the FFmpeg stored 'home' --#
 export FF_HOME=`pwd`
