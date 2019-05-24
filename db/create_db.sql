@@ -1,9 +1,24 @@
+----
+-- Licensed under the Apache License, Version 2.0 (the "License");
+-- you may not use this file except in compliance with the License.
+-- You may obtain a copy of the License at
+-- 
+--      http://www.apache.org/licenses/LICENSE-2.0
+-- 
+-- Unless required by applicable law or agreed to in writing, software
+-- distributed under the License is distributed on an "AS IS" BASIS,
+-- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-- See the License for the specific language governing permissions and
+-- limitations under the License.
+----
+
 -----------------------------------------------------------------------------------------------------
 -- Name: create_db.sql
 --
 -- Ver           Date            Author          Comment
 -- =======       ===========     ===========     ==========================================
 -- V1.0.00       2018-12-12      DW              Create databases for SMS, and put in essential data.
+-- V1.0.01       2019-05-24      DW              Define indexes for all database tables.
 --
 -- Remark: It is part of SMS installation program.
 -----------------------------------------------------------------------------------------------------
@@ -38,6 +53,9 @@ CREATE TABLE user_list
   inform_new_msg int,
   PRIMARY KEY (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX idx_usr_name ON user_list(user_name);
+CREATE INDEX idx_usr_role_status ON user_list(user_role, status);
 
 LOCK TABLES `user_list` WRITE;
 ALTER TABLE `user_list` DISABLE KEYS;
@@ -77,6 +95,8 @@ CREATE TABLE login_token_queue
   user_id bigint
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE INDEX idx_token ON login_token_queue(token);
+
 CREATE TABLE web_session
 (
   sess_code varchar(128),
@@ -89,6 +109,8 @@ CREATE TABLE web_session
   PRIMARY KEY (sess_code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE INDEX idx_usr_id ON web_session(user_id);
+
 CREATE TABLE hack_history
 (
   ipv4_addr varchar(20),
@@ -98,6 +120,8 @@ CREATE TABLE hack_history
   hack_cnt int,
   ip_blocked int 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX idx_usr_id_ipv4 ON hack_history(user_id, ipv4_addr); 
 
 CREATE TABLE msg_group
 (
@@ -119,6 +143,9 @@ CREATE TABLE group_member
   group_role varchar(1)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE INDEX idx_grp_id_usr_id ON group_member(group_id, user_id);
+CREATE INDEX idx_grp_id ON group_member(group_id);
+
 CREATE TABLE message
 (
   msg_id bigint unsigned not null auto_increment,
@@ -134,6 +161,8 @@ CREATE TABLE message
   PRIMARY KEY (msg_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE INDEX idx_grp_id_msg_id ON message(group_id, msg_id);
+
 CREATE TABLE msg_tx
 (
   msg_id bigint unsigned,
@@ -143,6 +172,9 @@ CREATE TABLE msg_tx
   PRIMARY KEY (msg_id, receiver_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE INDEX idx_msg_id ON msg_tx(msg_id);
+CREATE INDEX idx_rev_id_msg_id ON msg_tx(receiver_id, msg_id);
+
 CREATE TABLE new_msg_inform
 (
   user_id bigint unsigned,
@@ -150,6 +182,8 @@ CREATE TABLE new_msg_inform
   status varchar(2),
   try_cnt int
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX idx_usr_id_status ON new_msg_inform(user_id, status); 
 
 CREATE TABLE unhappy_login_history
 (
@@ -161,6 +195,8 @@ CREATE TABLE unhappy_login_history
   browser_signature varchar(512),
   PRIMARY KEY (log_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX idx_usr_id ON unhappy_login_history(user_id);
 
 CREATE TABLE decoy_sites
 (
@@ -254,6 +290,8 @@ CREATE TABLE web_session
   PRIMARY KEY (sess_code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE INDEX idx_usr_id ON web_session(user_id);
+
 CREATE TABLE feature_store
 (
   feature_id bigint unsigned not null auto_increment,
@@ -288,6 +326,8 @@ CREATE TABLE schedule_event
   ev_end datetime,
   PRIMARY KEY (event_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX idx_usr_id_ev_start ON schedule_event(user_id, ev_start); 
 
 CREATE TABLE schedule_reminder
 (
