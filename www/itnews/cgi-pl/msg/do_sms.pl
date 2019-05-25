@@ -79,7 +79,7 @@ my @message = getGroupMessage($dbh, $group_id, $user_id, \%m_params);  # Defined
 
 #-- Let message and identation width percentage be two variables to simplify program maintenance. --# 
 my $msg_width = 90;                                        # Message width percentage.            
-my $identation = 100 - $msg_width;                         # Identation width percentage.
+my $indentation = 100 - $msg_width;                        # Indentation width percentage.
 
 printStyleSection();
 printJavascriptSection();
@@ -731,7 +731,7 @@ sub printJavascriptSection {
                     "  <td width='100%'>" +
                     "    <table width='100%' cellspacing=0 cellpadding=0 style='table-layout:fixed;'>" +
                     "    <tr>" +
-                    "      <td width='$identation%'></td>" +
+                    "      <td width='$indentation%'></td>" +
                     "      <td width='$msg_width%' style='background-color:#F4F7CE; word-wrap:break-word;'>" + fw_header + re_header + this_file_link + this_message + "<br>" + this_msg_time + " $spaces " + delete_link + " $space3 " + reply_link + " $space3 " + forward_link + "</td>" +
                     "    </tr>" +
                     "    </table>" +
@@ -748,7 +748,7 @@ sub printJavascriptSection {
                     "    <table width='100%' cellspacing=0 cellpadding=0 style='table-layout:fixed;'>" +
                     "    <tr>" + 
                     "      <td width='$msg_width%' style='background-color:#E0F8F7; word-wrap:break-word;'>" + this_sender + "<br>" + fw_header + re_header + this_file_link + this_message + "<br>" + this_msg_time + " $spaces " + reply_link + " $space3 " + forward_link + "</td>" +
-                    "      <td width='$identation%'></td>" +
+                    "      <td width='$indentation%'></td>" +
                     "    </tr>" +
                     "    </table>" +
                     "  </td>" +
@@ -899,7 +899,7 @@ sub printJavascriptSection {
                       "  <td width='100%'>" +
                       "    <table width='100%' cellspacing=0 cellpadding=0 style='table-layout:fixed;'>" +
                       "    <tr>" +
-                      "      <td width='$identation%'></td>" +
+                      "      <td width='$indentation%'></td>" +
                       "      <td width='$msg_width%' style='background-color:#F4F7CE; word-wrap:break-word;'>" + fw_header + re_header + this_file_link + this_message + "<br>" + this_msg_time + " $spaces " + delete_link + " $space3 " + reply_link + " $space3 " + forward_link + "</td>" +
                       "    </tr>" +
                       "    </table>" +
@@ -916,7 +916,7 @@ sub printJavascriptSection {
                       "    <table width='100%' cellspacing=0 cellpadding=0 style='table-layout:fixed;'>" +
                       "    <tr>" + 
                       "      <td width='$msg_width%' style='background-color:#E0F8F7; word-wrap:break-word;'>" + this_sender + "<br>" + fw_header + re_header + this_file_link + this_message + "<br>" + this_msg_time + " $spaces " + reply_link + " $space3 " + forward_link + "</td>" +
-                      "      <td width='$identation%'></td>" +
+                      "      <td width='$indentation%'></td>" +
                       "    </tr>" +
                       "    </table>" +
                       "  </td>" +
@@ -1115,7 +1115,7 @@ __HTML
         <td width="100%">
           <table width="100%" cellspacing=0 cellpadding=0 style="table-layout:fixed;">
           <tr>
-            <td width="$identation%"></td>
+            <td width="$indentation%"></td>
             <td width="$msg_width%" style="background-color:#F4F7CE; word-wrap:break-word;">$fw_header$re_header$this_file_link$this_message<br>$this_msg_time $spaces $delete_link $space3 $reply_link $space3 $forward_link</td>
           </tr>
           </table>
@@ -1134,7 +1134,7 @@ __HTML
           <table width="100%" cellspacing=0 cellpadding=0 style="table-layout:fixed;">
           <tr>
             <td width="$msg_width%" style="background-color:#E0F8F7; word-wrap:break-word;">$this_sender<br>$fw_header$re_header$this_file_link$this_message<br>$this_msg_time $spaces $reply_link $space3 $forward_link</td>
-            <td width="$identation%"></td>
+            <td width="$indentation%"></td>
           </tr>
           </table>
         </td>
