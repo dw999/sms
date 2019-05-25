@@ -24,6 +24,8 @@
 #                                               use a common data gathering function '_gatherMessage'.
 # V1.0.03       2019-03-19      DW              Show audio and video file download link for all platforms, 
 #                                               Amended function is '_gatherMessage'.
+# V1.0.04       2019-05-25      DW              Amend function '_deliverMessage' to mark all delivery message
+#                                               transaction record status as 'unread'.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -123,7 +125,7 @@ sub sendMessage {
     foreach my $rec (@members) {
       my $this_member_id = $rec->{'user_id'};
       
-      ($ok, $msg) = _deliverMessage($dbh, $msg_id, $user_id, $this_member_id);
+      ($ok, $msg) = _deliverMessage($dbh, $msg_id, $this_member_id);
       
       if ($ok && $this_member_id != $user_id) {     # No need to inform message sender
         #-- If a member is offline, and user_list.inform_new_msg = 1, then he/she will be informed. --#
@@ -303,42 +305,25 @@ __SQL
 
 
 sub _deliverMessage {
-  my ($dbh, $msg_id, $sender_id, $receiver_id) = @_;
+  my ($dbh, $msg_id, $receiver_id) = @_;
   my ($ok, $msg, $sql, $sth);
   
   $ok = 1;
   $msg = '';
   
-  if ($sender_id == $receiver_id) {
-    $sql = <<__SQL;
-    INSERT INTO msg_tx
-    (msg_id, receiver_id, read_status, read_time)
-    VALUES
-    (?, ?, 'R', CURRENT_TIMESTAMP())
+  $sql = <<__SQL;
+  INSERT INTO msg_tx
+  (msg_id, receiver_id, read_status)
+  VALUES
+  (?, ?, 'U')
 __SQL
 
-    $sth = $dbh->prepare($sql);
-    if (!$sth->execute($msg_id, $sender_id)) {
-      $msg = "Unable to deliver message. Error: " . $sth->errstr;
-      $ok = 0;
-    }
-    $sth->finish;
+  $sth = $dbh->prepare($sql);
+  if (!$sth->execute($msg_id, $receiver_id)) {
+    $msg = "Unable to deliver message. Error: " . $sth->errstr;
+    $ok = 0;
   }
-  else {
-    $sql = <<__SQL;
-    INSERT INTO msg_tx
-    (msg_id, receiver_id, read_status)
-    VALUES
-    (?, ?, 'U')
-__SQL
-
-    $sth = $dbh->prepare($sql);
-    if (!$sth->execute($msg_id, $receiver_id)) {
-      $msg = "Unable to deliver message. Error: " . $sth->errstr;
-      $ok = 0;
-    }
-    $sth->finish;
-  }
+  $sth->finish;
   
   return ($ok, $msg);
 }

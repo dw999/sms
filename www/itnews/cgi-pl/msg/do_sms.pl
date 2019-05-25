@@ -43,7 +43,10 @@
 #                                               a group, then load previous messages as user kick on the 'Read More'
 #                                               button at the top of loaded messages.
 # V2.0.02       2019-03-11      DW              Add a blank line below date separation row as send a new message.
-# V2.0.03       2019-03-27      DW              Set animation time of scrolling to 'page_end' object to 500ms on all places. 
+# V2.0.03       2019-03-27      DW              Set animation time of scrolling to 'page_end' object to 500ms on all places.
+# V2.0.04       2019-05-25      DW              Let newly sent message as 'unread' and then load all 'unread' message(s). It
+#                                               fixes a case which show last sent message twice if the most recent sent out
+#                                               message is failure.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -335,7 +338,7 @@ sub printJavascriptSection {
             \$('#btn_attach_file').show();
             \$('#btn_audio_input').show();            
             //*-- Refresh message section --*//
-            loadNewMessages($group_id, $user_id, 1);
+            loadNewMessages($group_id, $user_id, 0);
             update_token = new_token;
             noReply();
           },
@@ -461,7 +464,7 @@ sub printJavascriptSection {
           success: function(response) {
             var new_token = response;            
             //*-- Refresh message section (just load the last sent message only) --*//
-            loadNewMessages($group_id, $user_id, 1);
+            loadNewMessages($group_id, $user_id, 0);
             update_token = new_token;                        
             \$('#btn_send_photo').removeAttr("disabled");
             \$('#btn_send_photo').attr('src', '/images/send.png');
@@ -515,7 +518,7 @@ sub printJavascriptSection {
           success: function(response) {
             var new_token = response;            
             //*-- Refresh message section (just load the last sent message only) --*//
-            loadNewMessages($group_id, $user_id, 1);
+            loadNewMessages($group_id, $user_id, 0);
             update_token = new_token;                        
             \$('#btn_send_file').removeAttr("disabled");
             \$('#btn_send_file').attr('src', '/images/send.png');
@@ -587,7 +590,7 @@ sub printJavascriptSection {
           success: function(response) {
             var new_token = response;            
             //*-- Refresh message section (just load the last sent message only) --*//
-            loadNewMessages($group_id, $user_id, 1);
+            loadNewMessages($group_id, $user_id, 0);
             update_token = new_token;                        
             \$('#btn_send_sound').removeAttr("disabled");
             \$('#btn_send_sound').attr('src', '/images/send.png');
