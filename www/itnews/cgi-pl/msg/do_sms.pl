@@ -77,6 +77,10 @@ my $rows_limit = getMessageBlockSize($dbh);                # Number of last mess
 my %m_params = ('new_msg_only' => 0, 'rows_limit' => $rows_limit, 'f_m_id' => $f_m_id);
 my @message = getGroupMessage($dbh, $group_id, $user_id, \%m_params);  # Defined on sm_msglib.pl
 
+#-- Let message and identation width percentage be two variables to simplify program maintenance. --# 
+my $msg_width = 90;                                        # Message width percentage.            
+my $identation = 100 - $msg_width;                         # Identation width percentage.
+
 printStyleSection();
 printJavascriptSection();
 printMessagesForm($group_id, $group_role);
@@ -727,8 +731,8 @@ sub printJavascriptSection {
                     "  <td width='100%'>" +
                     "    <table width='100%' cellspacing=0 cellpadding=0 style='table-layout:fixed;'>" +
                     "    <tr>" +
-                    "      <td width='10%'></td>" +
-                    "      <td width='90%' style='background-color:#F4F7CE; word-wrap:break-word;'>" + fw_header + re_header + this_file_link + this_message + "<br>" + this_msg_time + " $spaces " + delete_link + " $space3 " + reply_link + " $space3 " + forward_link + "</td>" +
+                    "      <td width='$identation%'></td>" +
+                    "      <td width='$msg_width%' style='background-color:#F4F7CE; word-wrap:break-word;'>" + fw_header + re_header + this_file_link + this_message + "<br>" + this_msg_time + " $spaces " + delete_link + " $space3 " + reply_link + " $space3 " + forward_link + "</td>" +
                     "    </tr>" +
                     "    </table>" +
                     "  </td>" +
@@ -743,8 +747,8 @@ sub printJavascriptSection {
                     "  <td width='100%'>" +
                     "    <table width='100%' cellspacing=0 cellpadding=0 style='table-layout:fixed;'>" +
                     "    <tr>" + 
-                    "      <td width='90%' style='background-color:#E0F8F7; word-wrap:break-word;'>" + this_sender + "<br>" + fw_header + re_header + this_file_link + this_message + "<br>" + this_msg_time + " $spaces " + reply_link + " $space3 " + forward_link + "</td>" +
-                    "      <td width='10%'></td>" +
+                    "      <td width='$msg_width%' style='background-color:#E0F8F7; word-wrap:break-word;'>" + this_sender + "<br>" + fw_header + re_header + this_file_link + this_message + "<br>" + this_msg_time + " $spaces " + reply_link + " $space3 " + forward_link + "</td>" +
+                    "      <td width='$identation%'></td>" +
                     "    </tr>" +
                     "    </table>" +
                     "  </td>" +
@@ -895,8 +899,8 @@ sub printJavascriptSection {
                       "  <td width='100%'>" +
                       "    <table width='100%' cellspacing=0 cellpadding=0 style='table-layout:fixed;'>" +
                       "    <tr>" +
-                      "      <td width='20%'></td>" +
-                      "      <td width='80%' style='background-color:#F4F7CE; word-wrap:break-word;'>" + fw_header + re_header + this_file_link + this_message + "<br>" + this_msg_time + " $spaces " + delete_link + " $space3 " + reply_link + " $space3 " + forward_link + "</td>" +
+                      "      <td width='$identation%'></td>" +
+                      "      <td width='$msg_width%' style='background-color:#F4F7CE; word-wrap:break-word;'>" + fw_header + re_header + this_file_link + this_message + "<br>" + this_msg_time + " $spaces " + delete_link + " $space3 " + reply_link + " $space3 " + forward_link + "</td>" +
                       "    </tr>" +
                       "    </table>" +
                       "  </td>" +
@@ -911,8 +915,8 @@ sub printJavascriptSection {
                       "  <td width='100%'>" +
                       "    <table width='100%' cellspacing=0 cellpadding=0 style='table-layout:fixed;'>" +
                       "    <tr>" + 
-                      "      <td width='80%' style='background-color:#E0F8F7; word-wrap:break-word;'>" + this_sender + "<br>" + fw_header + re_header + this_file_link + this_message + "<br>" + this_msg_time + " $spaces " + reply_link + " $space3 " + forward_link + "</td>" +
-                      "      <td width='20%'></td>" +
+                      "      <td width='$msg_width%' style='background-color:#E0F8F7; word-wrap:break-word;'>" + this_sender + "<br>" + fw_header + re_header + this_file_link + this_message + "<br>" + this_msg_time + " $spaces " + reply_link + " $space3 " + forward_link + "</td>" +
+                      "      <td width='$identation%'></td>" +
                       "    </tr>" +
                       "    </table>" +
                       "  </td>" +
@@ -1111,8 +1115,8 @@ __HTML
         <td width="100%">
           <table width="100%" cellspacing=0 cellpadding=0 style="table-layout:fixed;">
           <tr>
-            <td width="10%"></td>
-            <td width="90%" style="background-color:#F4F7CE; word-wrap:break-word;">$fw_header$re_header$this_file_link$this_message<br>$this_msg_time $spaces $delete_link $space3 $reply_link $space3 $forward_link</td>
+            <td width="$identation%"></td>
+            <td width="$msg_width%" style="background-color:#F4F7CE; word-wrap:break-word;">$fw_header$re_header$this_file_link$this_message<br>$this_msg_time $spaces $delete_link $space3 $reply_link $space3 $forward_link</td>
           </tr>
           </table>
         </td>
@@ -1129,8 +1133,8 @@ __HTML
         <td width="100%">
           <table width="100%" cellspacing=0 cellpadding=0 style="table-layout:fixed;">
           <tr>
-            <td width="90%" style="background-color:#E0F8F7; word-wrap:break-word;">$this_sender<br>$fw_header$re_header$this_file_link$this_message<br>$this_msg_time $spaces $reply_link $space3 $forward_link</td>
-            <td width="10%"></td>
+            <td width="$msg_width%" style="background-color:#E0F8F7; word-wrap:break-word;">$this_sender<br>$fw_header$re_header$this_file_link$this_message<br>$this_msg_time $spaces $reply_link $space3 $forward_link</td>
+            <td width="$identation%"></td>
           </tr>
           </table>
         </td>
