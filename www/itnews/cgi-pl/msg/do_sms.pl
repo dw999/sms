@@ -44,9 +44,10 @@
 #                                               button at the top of loaded messages.
 # V2.0.02       2019-03-11      DW              Add a blank line below date separation row as send a new message.
 # V2.0.03       2019-03-27      DW              Set animation time of scrolling to 'page_end' object to 500ms on all places.
-# V2.0.04       2019-05-25      DW              Let newly sent message as 'unread' and then load all 'unread' message(s). It
-#                                               fixes a case which show last sent message twice if the most recent sent out
-#                                               message is failure.
+# V2.0.04       2019-05-25      DW              1. Let newly sent message as 'unread' and then load all 'unread' message(s). It
+#                                                  fixes an issue which shows last sent message twice if the most recently sent
+#                                                  out message is failure.
+#                                               2. Extend message display width by 10%.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -726,8 +727,8 @@ sub printJavascriptSection {
                     "  <td width='100%'>" +
                     "    <table width='100%' cellspacing=0 cellpadding=0 style='table-layout:fixed;'>" +
                     "    <tr>" +
-                    "      <td width='20%'></td>" +
-                    "      <td width='80%' style='background-color:#F4F7CE; word-wrap:break-word;'>" + fw_header + re_header + this_file_link + this_message + "<br>" + this_msg_time + " $spaces " + delete_link + " $space3 " + reply_link + " $space3 " + forward_link + "</td>" +
+                    "      <td width='10%'></td>" +
+                    "      <td width='90%' style='background-color:#F4F7CE; word-wrap:break-word;'>" + fw_header + re_header + this_file_link + this_message + "<br>" + this_msg_time + " $spaces " + delete_link + " $space3 " + reply_link + " $space3 " + forward_link + "</td>" +
                     "    </tr>" +
                     "    </table>" +
                     "  </td>" +
@@ -742,8 +743,8 @@ sub printJavascriptSection {
                     "  <td width='100%'>" +
                     "    <table width='100%' cellspacing=0 cellpadding=0 style='table-layout:fixed;'>" +
                     "    <tr>" + 
-                    "      <td width='80%' style='background-color:#E0F8F7; word-wrap:break-word;'>" + this_sender + "<br>" + fw_header + re_header + this_file_link + this_message + "<br>" + this_msg_time + " $spaces " + reply_link + " $space3 " + forward_link + "</td>" +
-                    "      <td width='20%'></td>" +
+                    "      <td width='90%' style='background-color:#E0F8F7; word-wrap:break-word;'>" + this_sender + "<br>" + fw_header + re_header + this_file_link + this_message + "<br>" + this_msg_time + " $spaces " + reply_link + " $space3 " + forward_link + "</td>" +
+                    "      <td width='10%'></td>" +
                     "    </tr>" +
                     "    </table>" +
                     "  </td>" +
@@ -1110,8 +1111,8 @@ __HTML
         <td width="100%">
           <table width="100%" cellspacing=0 cellpadding=0 style="table-layout:fixed;">
           <tr>
-            <td width="20%"></td>
-            <td width="80%" style="background-color:#F4F7CE; word-wrap:break-word;">$fw_header$re_header$this_file_link$this_message<br>$this_msg_time $spaces $delete_link $space3 $reply_link $space3 $forward_link</td>
+            <td width="10%"></td>
+            <td width="90%" style="background-color:#F4F7CE; word-wrap:break-word;">$fw_header$re_header$this_file_link$this_message<br>$this_msg_time $spaces $delete_link $space3 $reply_link $space3 $forward_link</td>
           </tr>
           </table>
         </td>
@@ -1128,8 +1129,8 @@ __HTML
         <td width="100%">
           <table width="100%" cellspacing=0 cellpadding=0 style="table-layout:fixed;">
           <tr>
-            <td width="80%" style="background-color:#E0F8F7; word-wrap:break-word;">$this_sender<br>$fw_header$re_header$this_file_link$this_message<br>$this_msg_time $spaces $reply_link $space3 $forward_link</td>
-            <td width="20%"></td>
+            <td width="90%" style="background-color:#E0F8F7; word-wrap:break-word;">$this_sender<br>$fw_header$re_header$this_file_link$this_message<br>$this_msg_time $spaces $reply_link $space3 $forward_link</td>
+            <td width="10%"></td>
           </tr>
           </table>
         </td>
