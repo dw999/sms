@@ -102,9 +102,13 @@
       <br>
       # <font color='darkblue'><b>./install_sms.sh</b></font><br>
       <br>
-      Screen like Figure 1 will be displayed. You may now press enter to start SMS server installion.
+      Firstly, you will be asked to select your desired web server which will be used for SMS server operation. Screen like Figure 1(a)
+      will be seen. You may either enter 1 to select Nginx web server or enter 2 to select Apache web server, and press the enter key
+      to proceed. Then, screen like Figure 1(b) will be displayed. You may now press enter to start SMS server installion.
     </td>
   </tr>
+
+  <tr><td colspan=2>&nbsp;</td></tr>
 
   <tr>
     <td></td>
@@ -112,7 +116,22 @@
       <table class=table>
       <tr>
         <td align=center>
-          <a href="start_install.png"><img src='start_install.png' width=870></a><br>Figure 1    
+          <a href="select_web_server.png"><img src='select_web_server.png' width=870></a><br>Figure 1(a)    
+        </td>
+      </tr>  
+      </table>
+    </td>
+  </tr>
+  
+  <tr><td colspan=2>&nbsp;</td></tr>
+
+  <tr>
+    <td></td>
+    <td>
+      <table class=table>
+      <tr>
+        <td align=center>
+          <a href="start_install.png"><img src='start_install.png' width=870></a><br>Figure 1(b)    
         </td>
       </tr>  
       </table>
@@ -397,6 +416,10 @@
       This step may sometimes fail (Figure 13), but don't worry, you can repeat this process later after installation by running
       the below command to subscribe SSL certificates again:<br>
       <br>
+      If you select Nginx web server, input:<br>
+      # <font color='darkblue'><b>certbot --nginx</b></font><br>
+      <br>
+      If you select Apache web server, input:<br>
       # <font color='darkblue'><b>certbot --apache</b></font><br>
       <br>
       SSL certificates are used to provide the secrecy of your online communication, which is the most important part of the SMS
@@ -545,7 +568,7 @@
     <td></td>
     <td>
       If SSL certificates generation is failure in step 7, you may do it again as Figure 17 shown. If everything is OK, screen
-      similar to Figure 18 will be seem.  
+      similar to Figure 18 will be seem. Note: If you select Nginx web server, the input command should be changed to 'certbot --nginx'. 
     </td>
   </tr>
   
@@ -574,6 +597,20 @@
         </td>
       </tr>  
       </table>
+    </td>
+  </tr>
+
+  <tr><td colspan=2>&nbsp;</td></tr>
+  
+  <tr>
+    <td></td>
+    <td>
+      <b>Remark:</b><br>
+      I have installed and configured a software firewall for you during SMS server installation, which open ports 22, 80 and 443 to let users
+      come to your SMS server. However, you may have another firewall between your SMS server and the internet. For example, a home WiFi router
+      often has a built-in firewall to prevent all incoming connection by default, so that you must configure port forwarding to let outside users
+      connect the SMS server behind your router. For port forwarding configuration, please consult your router manual. If any required port is
+      blocked, SMS server will not function normally, and SSL certificate generation process will be failure.
     </td>
   </tr>
 
