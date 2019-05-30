@@ -33,6 +33,7 @@
 # V1.0.07       2019-02-04      DW              Extend short upload file name to avoid hackers
 #                                               guess it easily.
 # V1.0.08       2019-04-28      DW              Add new function 'sessionExist'.
+# V1.0.09       2019-05-30      DW              Add new function 'informReferrer'.
 ##########################################################################################
 
 use strict;
@@ -1068,6 +1069,36 @@ __SQL
   
   if (!$ok) {
     $msg .= "Error is found as inform system administrator(s) for event '$subject': \n\n" . $msg;
+  }
+  
+  return ($ok, $msg);
+}
+
+
+sub informReferrer {
+  my ($dbh, $refer_email, $subject, $mail_content) = @_;
+  my ($ok, $msg, $from_mail, $from_user, $from_pass, $smtp_server, $port);
+  
+  $ok = 1;
+  $msg = '';
+  
+  if (allTrim($refer_email) ne '') {
+    ($from_mail, $from_user, $from_pass, $smtp_server, $port) = getSysEmailSender($dbh);                      # Defined on sm_webenv.pl
+
+    my $body = "Hi there, \n\n" .
+               "$mail_content \n\n" .
+               "Best Regards, \n" .
+               "Information Team.\n";
+      
+    my ($this_ok, $this_msg) = sendOutGmail($from_mail, $refer_email, $from_user, $from_pass, $smtp_server, $port, $subject, $body);     # Defined on sm_webenv.pl
+    if (!$this_ok) {
+      $msg = "Unable to inform new user's referrer.\n";
+      $ok = 0;
+    }        
+  }
+  else {
+    $msg = "Referrer email address is blank, so that he/she cannot be informed.";
+    $ok = 0;
   }
   
   return ($ok, $msg);

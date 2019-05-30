@@ -22,7 +22,9 @@
 # V1.0.01       2018-08-10      DW              Remove using 'crypt' to encrypt user passwords
 #                                               due to it's serious limitation (only first 8
 #                                               characters are used for encrypted password).
-# V1.0.02       2018-09-21      DW              Use new encryption method to protect user passwords. 
+# V1.0.02       2018-09-21      DW              Use new encryption method to protect user passwords.
+# V1.0.03       2019-05-30      DW              Inform new user's referrer, he/she has been joined,
+#                                               if the referrer is not system administrator.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -71,6 +73,11 @@ if ($ok) {
     my $subject = "New member has joined";
     my $mail_content = decode('utf8', "A new guy $user / $alias / $name (username / alias / name) who is referred by $referer has joined us as member.");
     informSystemAdmin($dbh, $subject, $mail_content);             # Defined on sm_webenv.pl
+    if (!isSysAdmin($dbh, $refer)) {
+      #-- If new user's referrer is not system administrator, inform him. --#
+      $mail_content = decode('utf8', "A new guy $alias / $name (alias / name) who is referred by you has joined us as member.");
+      informReferrer($dbh, $refer, $subject, $mail_content);      # Defined on sm_webenv.pl
+    }
   }
 }
 
@@ -289,6 +296,29 @@ __SQL
   if ($sth->execute($refer_email)) {
     my @data = $sth->fetchrow_array();
     $result = allTrim($data[0]) . " / " . allTrim($data[1]) . " / " . allTrim($data[2]) . " (username / alias / name)";
+  }
+  $sth->finish;
+  
+  return $result;
+}
+
+
+sub isSysAdmin {
+  my ($dbh, $refer_email) = @_;
+  my ($sql, $sth, $role, $result);
+  
+  $result = 0;
+  
+  $sql = <<__SQL;
+  SELECT user_role 
+    FROM user_list
+    WHERE email = ?
+__SQL
+  
+  $sth = $dbh->prepare($sql);
+  if ($sth->execute($refer_email)) {
+    ($role) = $sth->fetchrow_array();
+    $result = ($role + 0 == 2)? 1 : 0;
   }
   $sth->finish;
   
