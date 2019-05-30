@@ -25,6 +25,7 @@
 # V1.0.02       2018-08-23      DW              Add Telegram ID maintenance.
 # V1.0.03       2018-09-21      DW              Use new encryption method to protect user passwords.
 # V1.0.04       2019-04-09      DW              Clear a typo.
+# V1.0.05       2019-05-30      DW              Change self Telegram ID checking bot. 
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -473,7 +474,7 @@ __HTML
     Click 'Check my Telegram ID' => Click Send Message => Click Start to get
     your Telegram ID, then input your Telegram ID to the field below, and save it.
     <br>
-    <a href="https://t.me/my_id_bot">Check my Telegram ID</a>
+    <a href="https://telegram.me/userinfobot">Check my Telegram ID</a>
     <br>
     <br>
 __HTML
