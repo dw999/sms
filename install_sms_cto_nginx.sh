@@ -218,7 +218,7 @@ echo "Get jQuery"
 curl -O https://code.jquery.com/jquery-2.1.4.min.js >> /tmp/sms_install.log
 mv jquery-2.1.4.min.js jquery.min.js
 echo "Get jQuery Mobile"
-curl -O http://jquerymobile.com/resources/download/jquery.mobile-1.4.5.zip >> /tmp/sms_install.log
+curl -O https://jquerymobile.com/resources/download/jquery.mobile-1.4.5.zip >> /tmp/sms_install.log
 unzip jquery.mobile-1.4.5.zip -d jqm >> /tmp/sms_install.log
 rm -f jquery.mobile-1.4.5.zip >> /tmp/sms_install.log
 echo "Get jvavscript cookie"
