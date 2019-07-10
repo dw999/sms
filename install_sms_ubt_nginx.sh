@@ -15,7 +15,7 @@
 ###
 
 #=========================================================================================================
-# Program: install_sms_ubuntu.sh
+# Program: install_sms_ubt_nginx.sh
 #
 # Ver         Date            Author          Comment
 # =======     ===========     ===========     ==========================================
@@ -62,6 +62,7 @@ fi
 
 #-- Define variables --#
 export BUILD_PRELOAD=N
+export PATH=$PATH:/usr/sbin:/usr/local/sbin
 
 #-- Start process --#
 echo "Before you start the SMS installation, you must fulfil the following requirements:"
@@ -214,9 +215,14 @@ echo "==========================================================================
 #-- Copy program files and prepare directories access rights --#
 mkdir -p /www
 cp -Rf ./www/* /www
+mkdir -p /www/itnews/data
+mkdir -p /www/itnews/data/thumbnail
+mkdir -p /www/pdatools/data
+mkdir -p /www/pdatools/data/thumbnail
 chmod 777 /www/itnews/data
 chmod 777 /www/itnews/data/thumbnail
 chmod 777 /www/pdatools/data
+chmod 777 /www/pdatools/data/thumbnail
 chmod 777 /www/pdatools/cgi-pl/tools
 chmod 777 /www/pdatools/cgi-pl/tools/*
 chmod 777 /www/pdatools/images
