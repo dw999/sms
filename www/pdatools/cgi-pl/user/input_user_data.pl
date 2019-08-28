@@ -25,6 +25,8 @@
 # V1.0.01       2019-01-14      DW              Handle transient status 'S' of selected applicant
 #                                               to ensure correct token must be given, before
 #                                               he/she can go to this web page.
+# V1.0.02       2019-08-28      DW              As 'Save' button is clicked, then disable it to prevent
+#                                               multiple user account records adding.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -156,6 +158,7 @@ sub printJavascriptSection {
   <script type="text/javascript">
     function goCreateUserAccount() {
       if (dataSetValid()) {
+        document.getElementById("save").disabled = true;
         document.getElementById("frmAddUser").action = "/cgi-pl/user/create_user_acct.pl";
         document.getElementById("frmAddUser").submit();
       }
