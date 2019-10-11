@@ -26,6 +26,8 @@
 # V1.0.05       2018-09-21      DW              Take care message loading on demand by passing the ID of
 #                                               the first load message to the calling program. Note: this
 #                                               data is stored on local storage of the web browser.
+# V1.0.06       2018-10-11      DW              Fix a security loophole by check whether current user is member
+#                                               of given message group.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -56,6 +58,12 @@ my $user_id = $user_info{'USER_ID'} + 0;
 
 my $ok = 1;
 my $msg = '';
+
+if (!isGroupMember($dbh, $user_id, $group_id)) {            # Defined on sm_msglib.pl
+  #-- Someone may try to hack other users, switch him/her away. --#
+  redirectTo("/cgi-pl/msg/message.pl");
+  exit;
+}
 
 printJavascriptSection();
 
