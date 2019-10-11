@@ -48,8 +48,9 @@
 #                                                  fixes an issue which shows last sent message twice if the most recently sent
 #                                                  out message is failure.
 #                                               2. Extend message display width by 10%.
-# V2.0.05       2019-10-11      DW              Fix a security loophole by checking whether current user is member of given message
-#                                               group (parameter g_id) before further processing. 
+# V2.0.05       2019-10-11      DW              - Fix a security loophole by checking whether current user is member of given message
+#                                                 group (parameter g_id) before further processing.
+#                                               - Initialize javascript variable op_flag in order to fix a file uploading problem.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -161,7 +162,8 @@ sub printJavascriptSection {
   <script>
     var update_token = "$update_token";
     var scheduler_id;
-    var op_flag;
+    //*-- op_flag must be initialised to avoid file uploading problem --*//
+    var op_flag = '';
     var op_user_id;
     var op_msg;
     var group_id = $group_id;
