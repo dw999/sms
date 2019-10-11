@@ -48,6 +48,8 @@
 #                                                  fixes an issue which shows last sent message twice if the most recently sent
 #                                                  out message is failure.
 #                                               2. Extend message display width by 10%.
+# V2.0.05       2019-10-11      DW              Fix a security loophole by checking whether current user is member of given message
+#                                               group (parameter g_id) before further processing. 
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -81,9 +83,14 @@ my @message = getGroupMessage($dbh, $group_id, $user_id, \%m_params);  # Defined
 my $msg_width = 90;                                        # Message width percentage.            
 my $indentation = 100 - $msg_width;                        # Indentation width percentage.
 
-printStyleSection();
-printJavascriptSection();
-printMessagesForm($group_id, $group_role);
+if (isGroupMember($dbh, $user_id, $group_id)) {            # Defined on sm_msglib.pl
+  printStyleSection();
+  printJavascriptSection();
+  printMessagesForm($group_id, $group_role);
+}
+else {
+  redirectTo("/cgi-pl/msg/message.pl");  
+}
 
 dbclose($dbh);
 #-- End Main Section --#

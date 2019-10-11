@@ -26,6 +26,8 @@
 #                                               Amended function is '_gatherMessage'.
 # V1.0.04       2019-05-25      DW              Amend function '_deliverMessage' to mark all delivery message
 #                                               transaction record status as 'unread'.
+# V1.0.05       2019-10-11      DW              Add function 'isGroupMember' to verify whether a given user is
+#                                               member of a given group.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -1549,6 +1551,29 @@ sub loadAudioConverter {
   }
   else {
     $result = '';
+  }
+  
+  return $result;
+}
+
+
+sub isGroupMember {
+  my ($dbh, $user_id, $group_id) = @_;
+  my ($sql, $sth, $result);
+  
+  $sql = <<__SQL;
+  SELECT COUNT(*) AS cnt
+    FROM group_member
+    WHERE group_id = ?
+      AND user_id = ?
+__SQL
+    
+  $sth = $dbh->prepare($sql);
+  if ($sth->execute($group_id, $user_id)) {
+    ($result) = $sth->fetchrow_array();
+  }
+  else {
+    $result = 0;
   }
   
   return $result;
