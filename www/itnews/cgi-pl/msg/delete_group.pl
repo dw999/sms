@@ -18,7 +18,10 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-07-13      DW              Remove entire messaging group. 
+# V1.0.00       2018-07-13      DW              Remove entire messaging group.
+# V1.0.01       2019-10-12      DW              Fix a security loophole by checking whether current
+#                                               user is group administrator or system administrator
+#                                               before proceed to message group deletion.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -37,16 +40,40 @@ my $group_id = paramAntiXSS('group_id') + 0;
 my $dbh = dbconnect($COOKIE_MSG);                          # Function 'getGroupMembers' need database connection, so it is put in here.
 
 my %user_info = printHead($COOKIE_MSG);                    # Defined on sm_webenv.pl
+my $user_id = $user_info{'USER_ID'} + 0;
 
-my ($ok, $msg) = deleteMessageGroup($dbh, $group_id);      # Defined on sm_msglib.pl
+#-- Only group administrator or system administrator can delete a message group --#
+if (getGroupRole($dbh, $group_id, $user_id) > 0 || isHeSysAdmin($dbh, $user_id) > 0) {     # getGroupRole is defined on sm_msglib.pl, isHeSysAdmin is defined on sm_user.pl
+  my ($ok, $msg) = deleteMessageGroup($dbh, $group_id);    # Defined on sm_msglib.pl
 
-if ($ok) {
-  redirectTo("/cgi-pl/msg/message.pl");
+  if ($ok) {
+    redirectTo("/cgi-pl/msg/message.pl");
+  }
+  else {
+    alert($msg);
+    back();
+  }
 }
 else {
-  alert($msg);
-  back();
+  returnToCaller($group_id);  
 }
 
 dbclose($dbh);
 #-- End Main Section --#
+
+
+sub returnToCaller {
+  my ($group_id) = @_;
+ 
+  print <<__JS;
+  <script src="/js/js.cookie.min.js"></script>
+  <script src="/js/common_lib.js"></script>
+  
+  <script>
+    var is_iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g)? true : false);
+    var f_m_id = (is_iOS == false)? getLocalStoredItem("m_id") : Cookies.get("m_id");        // Defined on common_lib.js : js.cookie.min.js
+    var top_id = (is_iOS == false)? getLocalStoredItem("top_id") : Cookies.get("top_id");
+    window.location.href = "/cgi-pl/msg/do_sms.pl?g_id=$group_id&f_m_id=" + f_m_id + "&top_id=" + top_id;
+  </script>
+__JS
+}

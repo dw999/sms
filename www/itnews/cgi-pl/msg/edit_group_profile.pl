@@ -26,8 +26,11 @@
 # V1.0.05       2018-09-21      DW              Take care message loading on demand by passing the ID of
 #                                               the first load message to the calling program. Note: this
 #                                               data is stored on local storage of the web browser.
-# V1.0.06       2018-10-11      DW              Fix a security loophole by check whether current user is member
+# V1.0.06       2018-10-11      DW              Fix a security loophole by checking whether current user is member
 #                                               of given message group.
+# V1.0.07       2018-10-12      DW              Fix another security loophole by checking whether current user is
+#                                               group administrator or system administrator for some message group
+#                                               administrative tasks, such as add new members, delete group members, etc.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -86,38 +89,52 @@ elsif ($op == 2) {     # List group member
   printGroupMemberList();
 }
 elsif ($op == 3) {     # Add member
-  if ($oper_mode eq 'S') {
-    my @new_members = getNewMembersToBeAdded($dbh, $group_id);
+  #-- Only group administrator or system administrator can add new member(s) --#
+  if (getGroupRole($dbh, $group_id, $user_id) > 0 || isHeSysAdmin($dbh, $user_id) > 0) {     # getGroupRole is defined on sm_msglib.pl, isHeSysAdmin is defined on sm_user.pl
+    if ($oper_mode eq 'S') {
+      my @new_members = getNewMembersToBeAdded($dbh, $group_id);
     
-    ($ok, $msg) = addNewMemberToGroup($dbh, $group_id, \@new_members);
-    if ($ok) {
-      returnToCaller($group_id);
+      ($ok, $msg) = addNewMemberToGroup($dbh, $group_id, \@new_members);
+      if ($ok) {
+        returnToCaller($group_id);
+      }
+      else {
+        alert($msg);
+        back();      
+      }
     }
     else {
-      alert($msg);
-      back();      
+      printAddMemberForm();  
     }
   }
   else {
-    printAddMemberForm();  
+    #-- A common group member try to add new member(s), return him/her to the group. --#
+    returnToCaller($group_id);
   }
 }
 elsif ($op == 4) {     # Delete member
-  if ($oper_mode eq 'S') {
-    my @delete_members = getMembersToBeDeleted();
+  #-- Only group administrator or system administrator can remove group member(s) --#
+  if (getGroupRole($dbh, $group_id, $user_id) > 0 || isHeSysAdmin($dbh, $user_id) > 0) {     # getGroupRole is defined on sm_msglib.pl, isHeSysAdmin is defined on sm_user.pl  
+    if ($oper_mode eq 'S') {
+      my @delete_members = getMembersToBeDeleted();
     
-    ($ok, $msg) = deleteGroupMember($dbh, $group_id, \@delete_members);
-    if ($ok) {
-      returnToCaller($group_id);
+      ($ok, $msg) = deleteGroupMember($dbh, $group_id, \@delete_members);
+      if ($ok) {
+        returnToCaller($group_id);
+      }
+      else {
+        alert($msg);
+        back();
+      }    
     }
     else {
-      alert($msg);
-      back();
-    }    
+      printDeleteMemberForm();  
+    }
   }
   else {
-    printDeleteMemberForm();  
-  }  
+    #-- A common group member try to delete group member(s), return him/her to the group. --#
+    returnToCaller($group_id);    
+  }
 }
 elsif ($op == 5) {     # Exit group
   ($ok, $msg) = quitMessageGroup($dbh, $group_id, $member_id);
@@ -131,73 +148,101 @@ elsif ($op == 5) {     # Exit group
   }
 }
 elsif ($op == 6) {     # Promote group member to group administrator
-  if ($oper_mode eq 'S') {
-    my @promote_members = getPromoteMembers();
+  #-- Only group administrator or system administrator can promote group member(s) --#
+  if (getGroupRole($dbh, $group_id, $user_id) > 0 || isHeSysAdmin($dbh, $user_id) > 0) {     # getGroupRole is defined on sm_msglib.pl, isHeSysAdmin is defined on sm_user.pl    
+    if ($oper_mode eq 'S') {
+      my @promote_members = getPromoteMembers();
     
-    ($ok, $msg) = promoteMemberToGroupAdmin($dbh, $group_id, \@promote_members);
-    if ($ok) {
-      returnToCaller($group_id);
+      ($ok, $msg) = promoteMemberToGroupAdmin($dbh, $group_id, \@promote_members);
+      if ($ok) {
+        returnToCaller($group_id);
+      }
+      else {
+        alert($msg);
+        back();
+      }    
     }
     else {
-      alert($msg);
-      back();
-    }    
+      printPromoteMemberForm(); 
+    }
   }
   else {
-    printPromoteMemberForm(); 
+    #-- A common group member try to promote other group member(s), return him/her to the group. --#
+    returnToCaller($group_id);        
   }
 }
 elsif ($op == 7) {     # Demote group administrator to group member
-  if ($oper_mode eq 'S') {
-    my @demote_members = getDemoteMembers();
+  #-- Only group administrator or system administrator can demote group administrator(s) --#
+  if (getGroupRole($dbh, $group_id, $user_id) > 0 || isHeSysAdmin($dbh, $user_id) > 0) {     # getGroupRole is defined on sm_msglib.pl, isHeSysAdmin is defined on sm_user.pl     
+    if ($oper_mode eq 'S') {
+      my @demote_members = getDemoteMembers();
     
-    ($ok, $msg) = demoteGroupAdmin($dbh, $group_id, \@demote_members);
-    if ($ok) {
-      returnToCaller($group_id);
+      ($ok, $msg) = demoteGroupAdmin($dbh, $group_id, \@demote_members);
+      if ($ok) {
+        returnToCaller($group_id);
+      }
+      else {
+        alert($msg);
+        back();
+      }        
     }
     else {
-      alert($msg);
-      back();
-    }        
+      printDemoteAdminForm(); 
+    }
   }
   else {
-    printDemoteAdminForm(); 
-  }  
+    #-- A common group member try to demote group administrator(s), return him/her to the group. --#
+    returnToCaller($group_id);            
+  }
 }
 elsif ($op == 8) {     # Auto deletion setup for private group
-  if ($oper_mode eq 'S') {
-    ($ok, $msg) = updateAutoDeleteSettings($dbh, $group_id, $auto_delete, $delete_after);
-    if ($ok) {
-      returnToCaller($group_id);
+  #-- Only group administrator or system administrator can modify auto deletion settings for private group --#
+  if (getGroupRole($dbh, $group_id, $user_id) > 0 || isHeSysAdmin($dbh, $user_id) > 0) {     # getGroupRole is defined on sm_msglib.pl, isHeSysAdmin is defined on sm_user.pl       
+    if ($oper_mode eq 'S') {
+      ($ok, $msg) = updateAutoDeleteSettings($dbh, $group_id, $auto_delete, $delete_after);
+      if ($ok) {
+        returnToCaller($group_id);
+      }
+      else {
+        alert($msg);
+        back();
+      }            
     }
     else {
-      alert($msg);
-      back();
-    }            
+      if (isPrivateGroup($dbh, $group_id)) {      # Defined on sm_msglib.pl
+        printAutoDeleteSetupForm($dbh, $group_id);
+      }
+      else {
+        alert("Sorry, this is not a private group!");
+        returnToCaller($group_id);
+      }
+    }
   }
   else {
-    if (isPrivateGroup($dbh, $group_id)) {      # Defined on sm_msglib.pl
-      printAutoDeleteSetupForm($dbh, $group_id);
-    }
-    else {
-      alert("Sorry, this is not a private group!");
-      returnToCaller($group_id);
-    }
+    #-- A common group member try to modify auto deletion settings of a private group, return him/her to the group. --#
+    returnToCaller($group_id);                
   }
 }
 elsif ($op == 9) {     # Manually send notification to group members
-  if ($oper_mode eq 'S') {
-    ($ok, $msg) = sendGroupInformMessage($dbh, $group_id, $inform_message);
-    if ($ok) {
-      returnToCaller($group_id);
+  #-- Only group administrator or system administrator can send notification to group members manually --#
+  if (getGroupRole($dbh, $group_id, $user_id) > 0 || isHeSysAdmin($dbh, $user_id) > 0) {     # getGroupRole is defined on sm_msglib.pl, isHeSysAdmin is defined on sm_user.pl         
+    if ($oper_mode eq 'S') {
+      ($ok, $msg) = sendGroupInformMessage($dbh, $group_id, $inform_message);
+      if ($ok) {
+        returnToCaller($group_id);
+      }
+      else {
+        alert($msg);
+        back();
+      }
     }
     else {
-      alert($msg);
-      back();
+      printSendInformMessageForm($dbh, $group_id);
     }
   }
   else {
-    printSendInformMessageForm($dbh, $group_id);
+    #-- A common group member try to send notification manually, return him/her to the group. --#
+    returnToCaller($group_id);                    
   }
 }
 
