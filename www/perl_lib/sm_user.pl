@@ -30,6 +30,7 @@
 #                                               'authenticateLoginUser'.
 # V1.0.05       2019-01-14      DW              Add function 'setApplicantStatus'.
 # V1.0.06       2019-04-26      DW              Fix a security hole on function 'authenticateLoginUser'.
+# V1.0.07       2019-10-12      DW              Add function 'isHeSysAdmin'.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -1567,6 +1568,17 @@ __SQL
   
   return ($ok, $msg);
 }
+
+
+sub isHeSysAdmin {
+  my ($dbh, $user_id) = @_;
+  my ($role, $result);
   
+  $role = getUserRole($dbh, $user_id);               
+  $result = ($role == 2)? 1 : 0;
+  
+  return $result;
+}
+
 
 1;

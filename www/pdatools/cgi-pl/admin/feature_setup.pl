@@ -22,6 +22,7 @@
 # V1.0.01       2019-03-25      DW              Add optionl SQL script for database schema 
 #                                               updating as feature is added, modified and
 #                                               deleted.
+# V1.0.02       2019-10-12      DW              Function 'isHeSysAdmin' is moved to sm_user.pl
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -57,7 +58,7 @@ my %feature_dtl = (($op eq 'D' || $op eq 'E') && $oper_mode ne 'S')? getFeatureI
 
 printJavascriptSection();
 
-if (isHeSysAdmin($dbx, $user_id)) {
+if (isHeSysAdmin($dbx, $user_id)) {                        # Defined on sm_user.pl
   if ($op eq 'A') {
     if ($oper_mode eq 'S') {
       my ($ok, $msg) = addNewFeature($dbh, $feature_url, $feature_icon, $feature_sql, $assign_to_list, $list_order);
@@ -248,17 +249,6 @@ sub printJavascriptSection {
     }
   </script>
 __JS
-}
-
-
-sub isHeSysAdmin {
-  my ($dbx, $user_id) = @_;
-  my ($role, $result);
-  
-  $role = getUserRole($dbx, $user_id);               # Defined on sm_user.pl
-  $result = ($role == 2)? 1 : 0;
-  
-  return $result;  
 }
 
 

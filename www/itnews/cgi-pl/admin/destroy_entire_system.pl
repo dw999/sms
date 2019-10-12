@@ -19,7 +19,8 @@
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
 # V1.0.00       2018-07-17      DW              Destroy entire system in most dangerous situation.
-# V1.0.01       2019-02-20      DW              Destroy database for decoy site also.
+# V1.0.01       2019-02-20      DW              Destroy database of decoy site also.
+# V1.0.02       2019-10-12      DW              Function 'isHeSysAdmin' is moved to sm_user.pl
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -41,15 +42,17 @@ my %user_info = printHead($COOKIE_MSG);                    # Defined on sm_weben
 my $user_id = $user_info{'USER_ID'} + 0;
 my $ip_address = allTrim($user_info{'IP_ADDRESS'});
 
-if (isHeSysAdmin($dbh, $user_id)) {
+if (isHeSysAdmin($dbh, $user_id)) {                        # Defined on sm_user.pl
   #-- Destroy the entire system --#
   eraseEverything();
   redirectTo("https://www.microsoft.com");
 }
 else {
   #-- Something is wrong, the system may be infiltrated by hacker. --#
-  lockUserAcct($dbh, $user_id);
-  informSysAdmin($dbh, $user_id, $ip_address);
+  if ($user_id > 0) {
+    lockUserAcct($dbh, $user_id);
+    informSysAdmin($dbh, $user_id, $ip_address);    
+  }
   #-- Expel the suspicious user --#
   redirectTo("/cgi-pl/auth/logout.pl");  
 }
@@ -57,17 +60,6 @@ else {
 dbclose($dbh);
 dbclose($dbx);
 #-- End Main Section --#
-
-
-sub isHeSysAdmin {
-  my ($dbh, $user_id) = @_;
-  my ($role, $result);
-  
-  $role = getUserRole($dbh, $user_id);               # Defined on sm_user.pl
-  $result = ($role == 2)? 1 : 0;
-  
-  return $result;
-}
 
 
 sub eraseEverything {

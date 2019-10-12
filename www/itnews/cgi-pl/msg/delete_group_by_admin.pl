@@ -19,7 +19,9 @@
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
 # V1.0.00       2018-07-15      DW              Remove selected messaging group(s) by system
-#                                               administrator. 
+#                                               administrator.
+# V1.0.01       2019-10-12      DW              Fix a security loophole by checking whether current
+#                                               user is system administrator.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -40,21 +42,33 @@ my $dbh = dbconnect($COOKIE_MSG);                          # Function 'getGroupM
 
 my %user_info = printHead($COOKIE_MSG);                    # Defined on sm_webenv.pl
 my $user_id = $user_info{'USER_ID'} + 0;
+my $ip_address = allTrim($user_info{'IP_ADDRESS'});
 
-if ($oper_mode eq 'S') {
-  my ($ok, $msg) = deleteSelectedGroups($dbh, \@delete_groups);      
+if (isHeSysAdmin($dbh, $user_id)) {                        # Defined on sm_user.pl
+  if ($oper_mode eq 'S') {
+    my ($ok, $msg) = deleteSelectedGroups($dbh, \@delete_groups);      
 
-  if ($ok) {
-    redirectTo("/cgi-pl/msg/message.pl");
+    if ($ok) {
+      redirectTo("/cgi-pl/msg/message.pl");
+    }
+    else {
+      alert($msg);
+      back();
+    }
   }
   else {
-    alert($msg);
-    back();
+    printJavascriptSection();
+    printSelectGroupToDeleteForm();
   }
 }
 else {
-  printJavascriptSection();
-  printSelectGroupToDeleteForm();
+  #-- Something is wrong, the system may be infiltrated by hacker. --#
+  if ($user_id > 0) {
+    lockUserAcct($dbh, $user_id);
+    informSysAdmin($dbh, $user_id, $ip_address);    
+  }
+  #-- Expel the suspicious user --#
+  redirectTo("/cgi-pl/auth/logout.pl");    
 }
 
 dbclose($dbh);
@@ -212,3 +226,58 @@ __HTML
 
   print $html;
 }
+
+
+sub lockUserAcct {
+  my ($dbh, $user_id) = @_;
+  my ($sql, $sth);
+  
+  $sql = <<__SQL;
+  UPDATE user_list
+    SET status = 'D'
+    WHERE user_id = ?
+__SQL
+  
+  $sth = $dbh->prepare($sql);
+  if (!$sth->execute($user_id)) {
+    my $brief_msg = "Lock user account failure (delete_group_by_admin)"; 
+    my $detail_msg = "Unable to lock a non-administrative user (user id = $user_id) who try to delete message group(s), please lock this guy manually ASAP.";
+    _logSystemError($dbh, $user_id, $detail_msg, $brief_msg);
+  }
+  $sth->finish;
+}
+
+
+sub informSysAdmin {
+  my ($dbh, $user_id, $ip_address) = @_;
+  my ($sql, $sth, $user, $username, $alias, $name, $current_datetime, $subject, $content);
+  
+  $sql = <<__SQL;
+  SELECT user_name, user_alias, name, CURRENT_TIMESTAMP() AS now
+    FROM user_list
+    WHERE user_id = ?   
+__SQL
+
+  $sth = $dbh->prepare($sql);
+  if ($sth->execute($user_id)) {
+    ($username, $alias, $name, $current_datetime) = $sth->fetchrow_array();
+    $user = $username . ((allTrim($alias) ne '')? " (Alias: " . allTrim($alias) . ")" : "") . ((allTrim($name) ne '')? " a.k.a. " . allTrim($name) : "");
+  }
+  else {
+    $user = "id = $user_id";
+	  my ($year, $month, $day, $hour, $min, $sec) = (localtime())[5, 4, 3, 2, 1, 0];
+    $day = sprintf("%02d", $day);
+	  $month = sprintf("%02d", $month++);    
+	  $year += 1900;
+    $hour = sprintf("%02d", $hour);
+    $min = sprintf("%02d", $min);
+    $sec = sprintf("%02d", $sec);
+    $current_datetime = "$year-$month-$day $hour:$min:$sec";
+  }
+  $sth->finish;
+    
+  $subject = "Someone try to delete message group(s), check for it.";
+  $content = "This guy, $user, who is not system administrator but some how get into delete message groups function at $current_datetime from this IP address $ip_address. His/Her account has been locked. Try to find out what is going on.";
+  _informAdminSystemProblem($dbh, $user, $subject, $content);       # Defined on sm_user.pl
+}
+

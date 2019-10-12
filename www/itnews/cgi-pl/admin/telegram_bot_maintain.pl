@@ -18,7 +18,8 @@
 #
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
-# V1.0.00       2018-08-23      DW              Telegram bot profile maintenance. 
+# V1.0.00       2018-08-23      DW              Telegram bot profile maintenance.
+# V1.0.01       2019-10-12      DW              Function 'isHeSysAdmin' is moved to sm_user.pl
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -45,7 +46,7 @@ my %tg_bot_profile;
 
 printJavascriptSection();
 
-if (isHeSysAdmin($dbh, $user_id)) {
+if (isHeSysAdmin($dbh, $user_id)) {                        # Defined on sm_user.pl
   if ($oper_mode eq 'S') {
     my ($ok, $msg) = saveTelegramBotProfile($dbh, $bot_name, $bot_username, $http_api_token);
     if ($ok) {
@@ -68,17 +69,6 @@ else {
 
 dbclose($dbh);
 #-- End Main Section --#
-
-
-sub isHeSysAdmin {
-  my ($dbh, $user_id) = @_;
-  my ($role, $result);
-  
-  $role = getUserRole($dbh, $user_id);               # Defined on sm_user.pl
-  $result = ($role == 2)? 1 : 0;
-  
-  return $result;
-}
 
 
 sub saveTelegramBotProfile {

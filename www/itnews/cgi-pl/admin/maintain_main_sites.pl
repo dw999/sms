@@ -19,6 +19,7 @@
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
 # V1.0.00       2018-09-28      DW              Maintain decoy login site and message site.
+# V1.0.01       2019-10-12      DW              Function 'isHeSysAdmin' is moved to sm_user.pl
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -43,7 +44,7 @@ my %main_sites;
 
 printJavascriptSection();
 
-if (isHeSysAdmin($dbh, $user_id)) {
+if (isHeSysAdmin($dbh, $user_id)) {                        # Defined on sm_user.pl
   if ($oper_mode eq 'S') {
     my ($ok, $msg) = saveMainSites($dbh);
     if ($ok) {
@@ -61,7 +62,7 @@ if (isHeSysAdmin($dbh, $user_id)) {
 }
 else {
   #-- Something is wrong, the system may be infiltrated by hacker. --#
-  redirectTo("/cgi-pl/admin/system_setup.pl");  
+  redirectTo("/cgi-pl/admin/system_setup.pl");    
 }
 
 dbclose($dbh);
@@ -104,17 +105,6 @@ sub printJavascriptSection {
     }
   </script>
 __JS
-}
-
-
-sub isHeSysAdmin {
-  my ($dbh, $user_id) = @_;
-  my ($role, $result);
-  
-  $role = getUserRole($dbh, $user_id);               # Defined on sm_user.pl
-  $result = ($role == 2)? 1 : 0;
-  
-  return $result;
 }
 
 

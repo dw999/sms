@@ -21,6 +21,7 @@
 # V1.0.00       2018-10-05      DW              Maintain a list of decoy sites which are used
 #                                               to redirect intruders away from the messaging
 #                                               site.
+# V1.0.01       2019-10-12      DW              Function 'isHeSysAdmin' is moved to sm_user.pl
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -48,7 +49,7 @@ my %decoy_site;
 
 printJavascriptSection();
 
-if (isHeSysAdmin($dbh, $user_id)) {
+if (isHeSysAdmin($dbh, $user_id)) {                        # Defined on sm_user.pl
   if ($op eq 'A') {
     if ($oper_mode eq 'S') {
       my ($ok, $msg) = addNewDecoySite($dbh, $site_url, $key_words);
@@ -93,8 +94,8 @@ if (isHeSysAdmin($dbh, $user_id)) {
   }
 }
 else {
-  #-- Something is wrong, the system may be infiltrated by hacker. --#
-  redirectTo("/cgi-pl/admin/system_setup.pl");  
+  #-- Something is wrong, the system may be infiltrated by hacker. Expel the suspicious user. --#
+  redirectTo("/cgi-pl/admin/system_setup.pl");
 }
 
 dbclose($dbh);
@@ -151,17 +152,6 @@ sub printJavascriptSection {
     }
   </script>
 __JS
-}
-
-
-sub isHeSysAdmin {
-  my ($dbh, $user_id) = @_;
-  my ($role, $result);
-  
-  $role = getUserRole($dbh, $user_id);               # Defined on sm_user.pl
-  $result = ($role == 2)? 1 : 0;
-  
-  return $result;
 }
 
 

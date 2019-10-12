@@ -23,6 +23,7 @@
 #                                               system behavior.
 # V1.0.01       2019-01-29      DW              Add follow up checking as system settings
 #                                               is added or modified.
+# V1.0.02       2019-10-12      DW              Function 'isHeSysAdmin' is moved to sm_user.pl
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -50,7 +51,7 @@ my %key_dtl;
 
 printJavascriptSection();
 
-if (isHeSysAdmin($dbh, $user_id)) {
+if (isHeSysAdmin($dbh, $user_id)) {                        # Defined on sm_user.pl
   if ($op eq 'A') {
     if ($oper_mode eq 'S') {
       my ($ok, $msg) = addNewSysSetting($dbh, $sys_key, $sys_value);
@@ -96,7 +97,7 @@ if (isHeSysAdmin($dbh, $user_id)) {
 }
 else {
   #-- Something is wrong, the system may be infiltrated by hacker. --#
-  redirectTo("/cgi-pl/admin/system_setup.pl");  
+  redirectTo("/cgi-pl/admin/system_setup.pl");      
 }
 
 dbclose($dbh);
@@ -160,17 +161,6 @@ sub printJavascriptSection {
     }
   </script>
 __JS
-}
-
-
-sub isHeSysAdmin {
-  my ($dbh, $user_id) = @_;
-  my ($role, $result);
-  
-  $role = getUserRole($dbh, $user_id);               # Defined on sm_user.pl
-  $result = ($role == 2)? 1 : 0;
-  
-  return $result;
 }
 
 
