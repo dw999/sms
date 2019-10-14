@@ -23,7 +23,8 @@
 #                                               session(s) of that user.
 # V1.0.02       2019-10-12      DW              Fix a security loophole by checking whether current user
 #                                               is system administrator.
-# V1.0.03       2019-10-14      DW              Fix UTF-8 text garbage issue on email content.
+# V1.0.03       2019-10-14      DW              - Fix UTF-8 text garbage issue on email content.
+#                                               - Prevent unhappy user account(s) to be activated again. 
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -282,7 +283,7 @@ sub getAvailableUsers {
   my ($dbh, $op, $yourself) = @_;
   my ($sql, $sth, $filter, @result);
   
-  $filter = ($op == 1)? "'A'" : "'D', 'U'";
+  $filter = ($op == 1)? "'A'" : "'D'";
   
   $sql = <<__SQL;
   SELECT user_id, user_name, user_alias, status
