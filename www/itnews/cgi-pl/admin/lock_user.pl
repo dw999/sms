@@ -23,12 +23,14 @@
 #                                               session(s) of that user.
 # V1.0.02       2019-10-12      DW              Fix a security loophole by checking whether current user
 #                                               is system administrator.
+# V1.0.03       2019-10-14      DW              Fix UTF-8 text garbage issue on email content.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
 
 use strict;
 use CGI qw/:standard/;
+use Encode qw(decode encode);
 require "sm_webenv.pl";
 require "sm_db.pl";
 require "sm_user.pl";
@@ -377,6 +379,9 @@ __SQL
   $sth = $dbh->prepare($sql);
   if ($sth->execute($user_id)) {
     ($username, $alias, $name, $current_datetime) = $sth->fetchrow_array();
+    $username = decode('utf8', $username);
+    $alias = decode('utf8', $alias);
+    $name = decode('utf8', $name);    
     $user = $username . ((allTrim($alias) ne '')? " (Alias: " . allTrim($alias) . ")" : "") . ((allTrim($name) ne '')? " a.k.a. " . allTrim($name) : "");
   }
   else {

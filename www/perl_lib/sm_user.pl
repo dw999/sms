@@ -31,6 +31,8 @@
 # V1.0.05       2019-01-14      DW              Add function 'setApplicantStatus'.
 # V1.0.06       2019-04-26      DW              Fix a security hole on function 'authenticateLoginUser'.
 # V1.0.07       2019-10-12      DW              Add function 'isHeSysAdmin'.
+# V1.0.08       2019-10-14      DW              Fix UTF-8 encoding issue on functions '_informAdminSystemProblem'
+#                                               and '_informAdminUnhappyUserIsCracked'.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -488,6 +490,8 @@ __SQL
       my $this_admin = (allTrim($rec->{'alias'}) ne '')? $rec->{'alias'} : $rec->{'name'};
       my $this_email = $rec->{'email'};
       
+      $this_admin = decode('utf8', $this_admin);
+      
       $body = "Hi $this_admin, \n\n" .
               "Please note that $user has cracked his/her last record. Be careful. \n\n" .
               "Best Regards, \n" .
@@ -566,6 +570,10 @@ __SQL
     foreach my $rec (@admins) {
       my $this_admin = (allTrim($rec->{'alias'}) ne '')? $rec->{'alias'} : $rec->{'name'};
       my $this_email = $rec->{'email'};
+      
+      #-- Note: Value of '$this_admin' has already UTF-8 encoded. So, it needs to be decoded before put on the email --#
+      #--       content, which will be UTF-8 encoded later.                                                          --#                                                                                        
+      $this_admin = decode('utf8', $this_admin);        
       
       $body = "Hi $this_admin, \n\n" .
               ((allTrim($content) eq '')? "Something unusual of this user <$user> is found, please take a look. \n\n" : "$content \n\n") .

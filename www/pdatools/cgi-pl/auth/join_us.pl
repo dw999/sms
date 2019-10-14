@@ -21,6 +21,7 @@
 # V1.0.00       2018-06-05      DW              Let an applicant be accepted or rejected.
 # V1.0.01       2018-07-27      DW              Inform all system administrators if a new
 #                                               guy has been accepted.
+# V1.0.02       2019-10-14      DW              Fix UTF-8 text garbage issue on email content.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -219,11 +220,16 @@ sub informSysAdminNewGuyAccepted {
     FROM applicant a, user_list b
     WHERE a.refer_email = b.email
       AND a.apply_id = ?
+      AND b.status = 'A'
 __SQL
   
   $sth = $dbh->prepare($sql);
   if ($sth->execute($apply_id)) {
     ($applicant, $referer_username, $referer_alias, $referer_realname) = $sth->fetchrow_array();
+    $applicant = decode('utf8', $applicant);
+    $referer_username = decode('utf8', $referer_username);
+    $referer_alias = decode('utf8', $referer_alias);
+    $referer_realname = decode('utf8', $referer_realname);
   }
   else {
     $msg = "Unable to inform system administrator a new guy is accepted. Error: " . $sth->errstr;
@@ -237,7 +243,7 @@ __SQL
     $referer_realname = allTrim($referer_realname);
     
     $subject = "New guy is accepted";
-    $mail_content = decode('utf8', "A new guy named $applicant has been accepted by our member $referer_username / $referer_alias / $referer_realname (username / alias / name).");    
+    $mail_content = "A new guy named $applicant has been accepted by our member $referer_username / $referer_alias / $referer_realname (username / alias / name).";    
     ($ok, $msg) = informSystemAdmin($dbh, $subject, $mail_content);              # Defined on sm_webenv.pl
   }
   
