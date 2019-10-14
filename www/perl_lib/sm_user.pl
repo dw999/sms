@@ -1431,11 +1431,6 @@ sub sessionAlive {
       #-- Extend session valid period --#
       _extendSessionValidTime($cookie_name, $sess_code);
     }
-    
-    #if ($ip_address ne $curr_ip_addr) {
-    #  #-- Update IP address if it is changed --#
-    #  _updateSessionIpAddress($cookie_name, $sess_code, $curr_ip_addr);
-    #}
   }
     
   return $alive;
@@ -1502,40 +1497,6 @@ __SQL
   }
   else {
     $msg = "Unable to connect database to extend session period";
-    $ok = 0;        
-  }
-  
-  dbclose($db);
-  
-  return ($ok, $msg);
-}
-
-
-sub _updateSessionIpAddress {
-  my ($cookie_name, $sess_code, $curr_ip_addr) = @_;
-  my ($db, $sql, $sth, $ok, $msg);
-  
-  $ok = 1;
-  $msg = '';
-  
-  $db = dbconnect($cookie_name);
-  
-  if ($db) {
-    $sql = <<__SQL;
-    UPDATE web_session
-      SET ip_address = ? 
-      WHERE sess_code = ?
-__SQL
-
-    $sth = $db->prepare($sql);
-    if (!$sth->execute($curr_ip_addr, $sess_code)) {
-      $msg = $sth->errstr;
-      $ok = 0;
-    }
-    $sth->finish;    
-  }
-  else {
-    $msg = "Unable to connect database to update session IP address";
     $ok = 0;        
   }
   
