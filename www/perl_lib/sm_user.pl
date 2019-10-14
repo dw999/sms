@@ -31,8 +31,9 @@
 # V1.0.05       2019-01-14      DW              Add function 'setApplicantStatus'.
 # V1.0.06       2019-04-26      DW              Fix a security hole on function 'authenticateLoginUser'.
 # V1.0.07       2019-10-12      DW              Add function 'isHeSysAdmin'.
-# V1.0.08       2019-10-14      DW              Fix UTF-8 encoding issue on functions '_informAdminSystemProblem'
-#                                               and '_informAdminUnhappyUserIsCracked'.
+# V1.0.08       2019-10-14      DW              - Fix UTF-8 encoding issue on functions '_informAdminSystemProblem'
+#                                                 and '_informAdminUnhappyUserIsCracked'.
+#                                               - Update web session IP address if it is changed.  
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -1427,8 +1428,15 @@ sub sessionAlive {
   }
   
   if ($alive && $extend_session) {
-    #-- Extend session valid period --#
-    _extendSessionValidTime($cookie_name, $sess_code);
+    if ($extend_session) {
+      #-- Extend session valid period --#
+      _extendSessionValidTime($cookie_name, $sess_code);
+    }
+    
+    if ($ip_address ne $curr_ip_addr) {
+      #-- Update IP address if it is changed --#
+      _updateSessionIpAddress($cookie_name, $sess_code, $curr_ip_addr);
+    }
   }
     
   return $alive;
@@ -1495,6 +1503,40 @@ __SQL
   }
   else {
     $msg = "Unable to connect database to extend session period";
+    $ok = 0;        
+  }
+  
+  dbclose($db);
+  
+  return ($ok, $msg);
+}
+
+
+sub _updateSessionIpAddress {
+  my ($cookie_name, $sess_code, $curr_ip_addr) = @_;
+  my ($db, $sql, $sth, $ok, $msg);
+  
+  $ok = 1;
+  $msg = '';
+  
+  $db = dbconnect($cookie_name);
+  
+  if ($db) {
+    $sql = <<__SQL;
+    UPDATE web_session
+      SET ip_address = ? 
+      WHERE sess_code = ?
+__SQL
+
+    $sth = $db->prepare($sql);
+    if (!$sth->execute($curr_ip_addr, $sess_code)) {
+      $msg = $sth->errstr;
+      $ok = 0;
+    }
+    $sth->finish;    
+  }
+  else {
+    $msg = "Unable to connect database to update session IP address";
     $ok = 0;        
   }
   
