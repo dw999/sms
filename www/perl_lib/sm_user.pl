@@ -31,9 +31,8 @@
 # V1.0.05       2019-01-14      DW              Add function 'setApplicantStatus'.
 # V1.0.06       2019-04-26      DW              Fix a security hole on function 'authenticateLoginUser'.
 # V1.0.07       2019-10-12      DW              Add function 'isHeSysAdmin'.
-# V1.0.08       2019-10-14      DW              - Fix UTF-8 encoding issue on functions '_informAdminSystemProblem'
-#                                                 and '_informAdminUnhappyUserIsCracked'.
-#                                               - Update web session IP address if it is changed.  
+# V1.0.08       2019-10-14      DW              Fix UTF-8 encoding issue on functions '_informAdminSystemProblem'
+#                                               and '_informAdminUnhappyUserIsCracked'.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -1433,10 +1432,10 @@ sub sessionAlive {
       _extendSessionValidTime($cookie_name, $sess_code);
     }
     
-    if ($ip_address ne $curr_ip_addr) {
-      #-- Update IP address if it is changed --#
-      _updateSessionIpAddress($cookie_name, $sess_code, $curr_ip_addr);
-    }
+    #if ($ip_address ne $curr_ip_addr) {
+    #  #-- Update IP address if it is changed --#
+    #  _updateSessionIpAddress($cookie_name, $sess_code, $curr_ip_addr);
+    #}
   }
     
   return $alive;
