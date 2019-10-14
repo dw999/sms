@@ -1427,7 +1427,7 @@ sub sessionAlive {
     $alive = 0;    
   }
   
-  if ($alive && $extend_session) {
+  if ($alive) {
     if ($extend_session) {
       #-- Extend session valid period --#
       _extendSessionValidTime($cookie_name, $sess_code);
