@@ -20,6 +20,7 @@
 # Ver         Date            Author          Comment    
 # =======     ===========     ===========     ==========================================
 # V1.0.00     2019-10-02      DW              Install SMS server on CentOS 8 by using Nginx as web server.
+# V1.0.01     2019-10-17      DW              Supply logrotate configuation file sepecified for CentOS 8.
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -373,7 +374,7 @@ echo "Configure scheduled tasks"
 cp -f /etc/crontab /etc/crontab.bkup
 cp -f ./sys/centos7/crontab.sms_only /etc/crontab
 echo "Configure system log rotation"
-cp -f ./sys/centos7/syslog /etc/logrotate.d
+cp -f ./sys/centos8/syslog /etc/logrotate.d
 cp -f ./sys/centos7/nginx /etc/logrotate.d
 systemctl restart crond
 
