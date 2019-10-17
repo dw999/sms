@@ -22,7 +22,8 @@
 # V1.0.00     2018-12-27      DW              Build multimedia file converter 'FFmpeg' for SMS.
 # V1.0.01     2019-04-23      DW              Specify to use Bourne shell explicitly to avoid compatibility
 #                                             issue across different Linux/Unix systems.
-# V1.0.02     2019-05-23      DW              Install pre-requisites utilities on all supported platforms
+# V1.0.02     2019-05-23      DW              Install pre-requisites utilities on all supported platforms.
+# V1.0.03     2019-10-17      DW              Install pre-requisites utilities for CentOS 8.
 #=========================================================================================================
 
 echo ""
@@ -45,6 +46,12 @@ else
     if [[ "$v" -eq 1 ]]
     then
       apt-get -y install bzip2 > /tmp/build_ffmpeg.log
+    else
+      v=`hostnamectl | grep "CentOS Linux 8" | wc -l`
+      if [[ "$v" -eq 1 ]]
+      then
+        dnf -y install bzip2
+      fi  
     fi
   fi
 fi  
