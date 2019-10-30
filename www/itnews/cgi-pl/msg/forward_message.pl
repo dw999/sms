@@ -27,6 +27,8 @@
 # V1.0.03       2018-09-21      DW              Take care message loading on demand by passing the ID of
 #                                               the first load message to the calling program. Note: this
 #                                               data is stored on local storage of the web browser.
+# V1.0.04       2019-10-30      DW              Secure this function by checking whether current
+#                                               user is member of both message forwarding groups.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -59,26 +61,48 @@ my %fw_message = ();
 printJavascriptSection();
 
 if ($oper_mode eq 'S') {
-  ($ok, $msg, %fw_message) = getForwardMessageDetails($dbh, $msg_id);
-  if ($ok) {
-    ($ok, $msg) = forwardMessage($dbh, $user_id, $to_group_id, $a_message, \%fw_message);
+  my $is_from_group_member = isGroupMember($dbh, $user_id, $from_group_id);    # Defined on sm_msglib.pl
+  my $is_to_group_member = isGroupMember($dbh, $user_id, $to_group_id);
+  
+  if ($is_from_group_member && $is_to_group_member) {
+    ($ok, $msg, %fw_message) = getForwardMessageDetails($dbh, $msg_id);
     if ($ok) {
-      if ($from_group_id == $to_group_id) {
-        returnToCaller($to_group_id);
+      ($ok, $msg) = forwardMessage($dbh, $user_id, $to_group_id, $a_message, \%fw_message);
+      if ($ok) {
+        if ($from_group_id == $to_group_id) {
+          returnToCaller($to_group_id);
+        }
+        else {
+          clearLocalData();
+          redirectTo("/cgi-pl/msg/do_sms.pl?g_id=$to_group_id");
+        }
       }
       else {
-        clearLocalData();
-        redirectTo("/cgi-pl/msg/do_sms.pl?g_id=$to_group_id");
-      }
+        alert($msg);
+        returnToCaller($from_group_id);
+      }    
     }
     else {
       alert($msg);
       returnToCaller($from_group_id);
-    }    
+    }
   }
   else {
-    alert($msg);
-    returnToCaller($from_group_id);
+    my $user_alias = getUserName($dbh, $user_id);                                                        # Defined on sm_user.pl
+    my $question = '';
+    
+    if (!$is_from_group_member && $is_to_group_member) {
+      $question = "$user_alias, why you try to steal message from another group?";
+    }
+    elsif ($is_from_group_member && !$is_to_group_member) {
+      $question = "$user_alias, why you try to give your message to another group which you are not member?";
+    }
+    else {
+      $question = "$user_alias, why you try to hack the system and steal messages from other groups?";
+    }
+    
+    warnOtherGroupMembers($dbh, $user_id, $question);
+    redirectTo("/cgi-pl/msg/message.pl");
   }
 }
 else {
@@ -316,6 +340,45 @@ __SQL
   }
   
   return @result;
+}
+
+
+sub warnOtherGroupMembers {
+  my ($dbh, $user_id, $question) = @_;
+  my (@msg_groups);
+    
+  #-- Step 1: Gather all message groups involve this user --# 
+  @msg_groups = getGroupsCouldBeForwarded($dbh, $user_id);
+  foreach my $rec (@msg_groups) {
+    #-- Step 2: Select a member of each group to ask this guy a question --#
+    my $this_group_id = $rec->{'group_id'} + 0;
+    my $this_member_id = selectGroupMember($dbh, $this_group_id, $user_id);
+    if ($this_group_id > 0 && $this_member_id > 0) {
+      ($ok, $msg) = sendMessage($dbh, $this_member_id, $this_group_id, $question, '', '', 0);       # Defined on sm_msglib.pl  
+    }
+  }
+}
+
+
+sub selectGroupMember {
+  my ($dbh, $group_id, $user_id) = @_;
+  my ($sql, $sth, $result, @data);
+  
+  $sql = <<__SQL;
+  SELECT user_id, group_role
+    FROM group_member
+    WHERE group_id = ?
+      AND user_id <> ?
+    ORDER BY group_role  
+__SQL
+
+  $sth = $dbh->prepare($sql);
+  if ($sth->execute($group_id, $user_id)) {
+    @data = $sth->fetchrow_array();
+    $result = $data[0]; 
+  }
+  
+  return $result + 0;
 }
 
 
