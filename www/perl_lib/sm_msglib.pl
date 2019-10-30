@@ -28,6 +28,10 @@
 #                                               transaction record status as 'unread'.
 # V1.0.05       2019-10-11      DW              Add function 'isGroupMember' to verify whether a given user is
 #                                               member of a given group.
+# V1.0.06       2019-10-30      DW              - Secure function '_addMessageRecord' by checking whether message
+#                                                 sender is member of the specified group.
+#                                               - Refine function 'isGroupMember' by considering group member user
+#                                                 status.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -193,57 +197,63 @@ sub _addMessageRecord {
   $op_flag = allTrim($op_flag);
   $op_msg = allTrim($op_msg);
   
-  #-- Get group message encryption key --#
-  ($ok, $msg, $key) = _getMessageGroupKey($dbh, $group_id);
+  if (isGroupMember($dbh, $user_id, $group_id)) {
+    #-- Get group message encryption key --#
+    ($ok, $msg, $key) = _getMessageGroupKey($dbh, $group_id);
     
-  #-- Encrypt message --#
-  if ($ok) {
-    ($ok, $encrypted_msg) = _encrypt_str($message, $key);            # Defined on sm_user.pl
-    if (!$ok) {
-      $msg = "Unable to encrypt message, process is failure.";
-    }    
-  }
-    
-  if ($ok) {
-    if ($op_flag eq 'R') {
-      #-- Message reply --#
-      if (utf8_length($op_msg) > 30) {                               # Defined on sm_webenv.pl
-        $op_msg = utf8_substring($op_msg, 0, 30) . '...';            # Defined on sm_webenv.pl
-      }
-      #-- Note: The process should go on, even this process is failure. --#
-      ($xok, $encrypted_op_msg) = _encrypt_str($op_msg, $key);       # Defined on sm_user.pl
+    #-- Encrypt message --#
+    if ($ok) {
+      ($ok, $encrypted_msg) = _encrypt_str($message, $key);            # Defined on sm_user.pl
+      if (!$ok) {
+        $msg = "Unable to encrypt message, process is failure.";
+      }    
     }
     
-    #-- Create message record --#
-    $sql = <<__SQL;
-    INSERT INTO message
-    (group_id, sender_id, send_time, send_status, msg, fileloc, op_flag, op_user_id, op_msg)
-    VALUES
-    (?, ?, CURRENT_TIMESTAMP(), 'S', ?, ?, ?, ?, ?)
+    if ($ok) {
+      if ($op_flag eq 'R') {
+        #-- Message reply --#
+        if (utf8_length($op_msg) > 30) {                               # Defined on sm_webenv.pl
+          $op_msg = utf8_substring($op_msg, 0, 30) . '...';            # Defined on sm_webenv.pl
+        }
+        #-- Note: The process should go on, even this process is failure. --#
+        ($xok, $encrypted_op_msg) = _encrypt_str($op_msg, $key);       # Defined on sm_user.pl
+      }
+    
+      #-- Create message record --#
+      $sql = <<__SQL;
+      INSERT INTO message
+      (group_id, sender_id, send_time, send_status, msg, fileloc, op_flag, op_user_id, op_msg)
+      VALUES
+      (?, ?, CURRENT_TIMESTAMP(), 'S', ?, ?, ?, ?, ?)
 __SQL
   
-    $sth = $dbh->prepare($sql);
-    if (!$sth->execute($group_id, $user_id, $encrypted_msg, $fileloc, $op_flag, $op_user_id, $encrypted_op_msg)) {
-      $msg = "Unable to add message. Error: " . $sth->errstr;
-      $ok = 0;
-    }
-    $sth->finish;
-  
-    if ($ok) {
-      $sth = $dbh->prepare("SELECT LAST_INSERT_ID()");
-      if ($sth->execute()) {
-        ($msg_id) = $sth->fetchrow_array();
-        if ($msg_id <= 0) {
-          $msg = "Unable to retrieve the message id by unknown reason";
-          $ok = 0;
-        }      
-      }
-      else {
-        $msg = "Unable to retrieve the message id. Error: " . $sth->errstr;
+      $sth = $dbh->prepare($sql);
+      if (!$sth->execute($group_id, $user_id, $encrypted_msg, $fileloc, $op_flag, $op_user_id, $encrypted_op_msg)) {
+        $msg = "Unable to add message. Error: " . $sth->errstr;
         $ok = 0;
       }
       $sth->finish;
+  
+      if ($ok) {
+        $sth = $dbh->prepare("SELECT LAST_INSERT_ID()");
+        if ($sth->execute()) {
+          ($msg_id) = $sth->fetchrow_array();
+          if ($msg_id <= 0) {
+            $msg = "Unable to retrieve the message id by unknown reason";
+            $ok = 0;
+          }      
+        }
+        else {
+          $msg = "Unable to retrieve the message id. Error: " . $sth->errstr;
+          $ok = 0;
+        }
+        $sth->finish;
+      }
     }
+  }
+  else {
+    $msg = "Message sender is not member of this group, process is aborted.";
+    $ok = 0;
   }
   
   if ($ok) {
@@ -1563,9 +1573,11 @@ sub isGroupMember {
   
   $sql = <<__SQL;
   SELECT COUNT(*) AS cnt
-    FROM group_member
-    WHERE group_id = ?
-      AND user_id = ?
+    FROM group_member a, user_list b
+    WHERE a.user_id = b.user_id
+      AND b.status = 'A' 
+      AND a.group_id = ?
+      AND a.user_id = ?
 __SQL
     
   $sth = $dbh->prepare($sql);
