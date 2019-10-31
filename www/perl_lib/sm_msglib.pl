@@ -32,6 +32,9 @@
 #                                                 sender is member of the specified group.
 #                                               - Refine function 'isGroupMember' by considering group member user
 #                                                 status.
+# V1.0.07       2019-10-31      DW              Refine function 'sendMessage' to secure message sending process.
+#                                               Put message sender checking on function 'sendMessage' rather than
+#                                               on function '_addMessageRecord'.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -120,36 +123,47 @@ sub sendMessage {
   $ok = 1;
   $msg = '';
 
-  #-- Step 1: Gather group member list --#
-  @members = getMessageGroupMembers($dbh, $group_id);
+  if (isGroupMember($dbh, $user_id, $group_id)) {  
+    #-- Step 1: Gather group member list --#
+    @members = getMessageGroupMembers($dbh, $group_id);
   
-  #-- Step 2: Add message record --# 
-  ($ok, $msg, $msg_id) = _addMessageRecord($dbh, $user_id, $group_id, $message, $fileloc, $op_flag, $op_user_id, $op_msg);
+    #-- Step 2: Add message record --# 
+    ($ok, $msg, $msg_id) = _addMessageRecord($dbh, $user_id, $group_id, $message, $fileloc, $op_flag, $op_user_id, $op_msg);
   
-  #-- Step 3: Delivery message to all members (include message sender) --#
-  if ($ok) {
-    foreach my $rec (@members) {
-      my $this_member_id = $rec->{'user_id'};
+    #-- Step 3: Delivery message to all members (include message sender) --#
+    if ($ok) {
+      foreach my $rec (@members) {
+        my $this_member_id = $rec->{'user_id'};
       
-      ($ok, $msg) = _deliverMessage($dbh, $msg_id, $this_member_id);
+        ($ok, $msg) = _deliverMessage($dbh, $msg_id, $this_member_id);
       
-      if ($ok && $this_member_id != $user_id) {     # No need to inform message sender
-        #-- If a member is offline, and user_list.inform_new_msg = 1, then he/she will be informed. --#
-        if (_needToInformMember($dbh, $this_member_id)) {
-          #-- Note: Since email sending is a very slow process, so we put record in a queue, another background process will send out --#
-          #--       email to inform group member accordingly.                                                                         --#
-          ($ok, $msg) = _addNewMessageInformQueueRec($dbh, $this_member_id);          
-        }        
-      }
+        if ($ok && $this_member_id != $user_id) {     # No need to inform message sender
+          #-- If a member is offline, and user_list.inform_new_msg = 1, then he/she will be informed. --#
+          if (_needToInformMember($dbh, $this_member_id)) {
+            #-- Note: Since email sending is a very slow process, so we put record in a queue, another background process will send out --#
+            #--       email to inform group member accordingly.                                                                         --#
+            ($ok, $msg) = _addNewMessageInformQueueRec($dbh, $this_member_id);          
+          }        
+        }
       
-      last if (!$ok);
-    }    
+        last if (!$ok);
+      }    
+    }
+    else {
+      #-- If it is unable to create a new message record, but related attached file is existed, deleted it. --#  
+      if (-f $fileloc) {
+        unlink $fileloc;
+      }    
+    }
   }
   else {
-    #-- If it is unable to create a new message record, but related attached file is existed, deleted it. --#  
+    $msg = "Message sender is not member of this group, process is aborted.";
+    $ok = 0;
+
+    #-- If a new message record should not be created, but related attached file is existed, deleted it. --#  
     if (-f $fileloc) {
       unlink $fileloc;
-    }    
+    }        
   }
   
   return ($ok, $msg);  
@@ -197,63 +211,57 @@ sub _addMessageRecord {
   $op_flag = allTrim($op_flag);
   $op_msg = allTrim($op_msg);
   
-  if (isGroupMember($dbh, $user_id, $group_id)) {
-    #-- Get group message encryption key --#
-    ($ok, $msg, $key) = _getMessageGroupKey($dbh, $group_id);
+  #-- Get group message encryption key --#
+  ($ok, $msg, $key) = _getMessageGroupKey($dbh, $group_id);
     
-    #-- Encrypt message --#
-    if ($ok) {
-      ($ok, $encrypted_msg) = _encrypt_str($message, $key);            # Defined on sm_user.pl
-      if (!$ok) {
-        $msg = "Unable to encrypt message, process is failure.";
-      }    
+  #-- Encrypt message --#
+  if ($ok) {
+    ($ok, $encrypted_msg) = _encrypt_str($message, $key);            # Defined on sm_user.pl
+    if (!$ok) {
+      $msg = "Unable to encrypt message, process is failure.";
+    }    
+  }
+    
+  if ($ok) {
+    if ($op_flag eq 'R') {
+      #-- Message reply --#
+      if (utf8_length($op_msg) > 30) {                               # Defined on sm_webenv.pl
+        $op_msg = utf8_substring($op_msg, 0, 30) . '...';            # Defined on sm_webenv.pl
+      }
+      #-- Note: The process should go on, even this process is failure. --#
+      ($xok, $encrypted_op_msg) = _encrypt_str($op_msg, $key);       # Defined on sm_user.pl
     }
     
-    if ($ok) {
-      if ($op_flag eq 'R') {
-        #-- Message reply --#
-        if (utf8_length($op_msg) > 30) {                               # Defined on sm_webenv.pl
-          $op_msg = utf8_substring($op_msg, 0, 30) . '...';            # Defined on sm_webenv.pl
-        }
-        #-- Note: The process should go on, even this process is failure. --#
-        ($xok, $encrypted_op_msg) = _encrypt_str($op_msg, $key);       # Defined on sm_user.pl
-      }
-    
-      #-- Create message record --#
-      $sql = <<__SQL;
-      INSERT INTO message
-      (group_id, sender_id, send_time, send_status, msg, fileloc, op_flag, op_user_id, op_msg)
-      VALUES
-      (?, ?, CURRENT_TIMESTAMP(), 'S', ?, ?, ?, ?, ?)
+    #-- Create message record --#
+    $sql = <<__SQL;
+    INSERT INTO message
+    (group_id, sender_id, send_time, send_status, msg, fileloc, op_flag, op_user_id, op_msg)
+    VALUES
+    (?, ?, CURRENT_TIMESTAMP(), 'S', ?, ?, ?, ?, ?)
 __SQL
   
-      $sth = $dbh->prepare($sql);
-      if (!$sth->execute($group_id, $user_id, $encrypted_msg, $fileloc, $op_flag, $op_user_id, $encrypted_op_msg)) {
-        $msg = "Unable to add message. Error: " . $sth->errstr;
+    $sth = $dbh->prepare($sql);
+    if (!$sth->execute($group_id, $user_id, $encrypted_msg, $fileloc, $op_flag, $op_user_id, $encrypted_op_msg)) {
+      $msg = "Unable to add message. Error: " . $sth->errstr;
+      $ok = 0;
+    }
+    $sth->finish;
+  
+    if ($ok) {
+      $sth = $dbh->prepare("SELECT LAST_INSERT_ID()");
+      if ($sth->execute()) {
+        ($msg_id) = $sth->fetchrow_array();
+        if ($msg_id <= 0) {
+          $msg = "Unable to retrieve the message id by unknown reason";
+          $ok = 0;
+        }      
+      }
+      else {
+        $msg = "Unable to retrieve the message id. Error: " . $sth->errstr;
         $ok = 0;
       }
       $sth->finish;
-  
-      if ($ok) {
-        $sth = $dbh->prepare("SELECT LAST_INSERT_ID()");
-        if ($sth->execute()) {
-          ($msg_id) = $sth->fetchrow_array();
-          if ($msg_id <= 0) {
-            $msg = "Unable to retrieve the message id by unknown reason";
-            $ok = 0;
-          }      
-        }
-        else {
-          $msg = "Unable to retrieve the message id. Error: " . $sth->errstr;
-          $ok = 0;
-        }
-        $sth->finish;
-      }
     }
-  }
-  else {
-    $msg = "Message sender is not member of this group, process is aborted.";
-    $ok = 0;
   }
   
   if ($ok) {
