@@ -29,6 +29,8 @@
 #                                               data is stored on local storage of the web browser.
 # V1.0.04       2019-10-30      DW              Secure this function by checking whether current
 #                                               user is member of both message forwarding groups.
+# V1.0.05       2019-10-31      DW              Refine function 'selectGroupMember' by considering selected
+#                                               group member status.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -365,11 +367,13 @@ sub selectGroupMember {
   my ($sql, $sth, $result, @data);
   
   $sql = <<__SQL;
-  SELECT user_id, group_role
-    FROM group_member
-    WHERE group_id = ?
-      AND user_id <> ?
-    ORDER BY group_role  
+  SELECT a.user_id, a.group_role
+    FROM group_member a, user_list b
+    WHERE a.user_id = b.user_id
+      AND b.status = 'A' 
+      AND a.group_id = ?
+      AND a.user_id <> ?
+    ORDER BY a.group_role  
 __SQL
 
   $sth = $dbh->prepare($sql);
