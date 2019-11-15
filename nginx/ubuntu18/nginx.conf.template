@@ -72,6 +72,12 @@ http {
         # Configuring HSTS in Nginx
         add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
+        # Further secure Nginx 
+        add_header X-Frame-Options "SAMEORIGIN";
+        add_header X-XSS-Protection "1; mode=block";
+        add_header X-Content-Type-Options nosniff;
+        add_header X-Permitted-Cross-Domain-Policies master-only;
+
         # Load configuration files for the default server block.
         include /etc/nginx/default.d/*.conf;
 
@@ -121,6 +127,12 @@ http {
 
         # Configuring HSTS in Nginx
         add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+        # Further secure Nginx 
+        add_header X-Frame-Options "SAMEORIGIN";
+        add_header X-XSS-Protection "1; mode=block";
+        add_header X-Content-Type-Options nosniff;
+        add_header X-Permitted-Cross-Domain-Policies master-only;
 
         # Load configuration files for the default server block.
         include /etc/nginx/default.d/*.conf;
