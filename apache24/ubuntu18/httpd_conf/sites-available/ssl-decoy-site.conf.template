@@ -14,6 +14,12 @@
 		# Configure HSTS
 		Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains;"
 
+    # Further secure Apache Server
+    Header set X-XSS-Protection "1; mode=block"
+    Header always append X-Frame-Options SAMEORIGIN
+    Header set X-Content-Type-Options nosniff
+    Header set X-Permitted-Cross-Domain-Prolicies "master-only"
+
 		ErrorLog ${APACHE_LOG_DIR}/error.log
 		CustomLog "|/usr/bin/rotatelogs ${APACHE_LOG_DIR}/decoy-access_%Y%m%d 86400" common
 

@@ -79,6 +79,12 @@ LogLevel warn
 # Configure HSTS
 Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains;"
 
+# Further secure Apache Server
+Header set X-XSS-Protection "1; mode=block"
+Header always append X-Frame-Options SAMEORIGIN
+Header set X-Content-Type-Options nosniff
+Header set X-Permitted-Cross-Domain-Prolicies "master-only"
+
 #   SSL Engine Switch:
 #   Enable/Disable SSL for this virtual host.
 SSLEngine on
@@ -228,6 +234,12 @@ SSLCACertificateFile /etc/pki/tls/certs/decoy_site_ca_bundle.crt
 
   # Configure HSTS
   Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains;"
+
+  # Further secure Apache Server
+  Header set X-XSS-Protection "1; mode=block"
+  Header always append X-Frame-Options SAMEORIGIN
+  Header set X-Content-Type-Options nosniff
+  Header set X-Permitted-Cross-Domain-Prolicies "master-only"
     
   SSLEngine on
   SSLProtocol all -SSLv2 -SSLv3 -TLSv1 -TLSv1.1 
