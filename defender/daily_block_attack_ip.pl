@@ -33,6 +33,7 @@
 # V1.0.05       2019-05-11      DW              Quit process if 'remove_firewall_blocking_rule.pl' is running, in order
 #                                               to avoid firewalld rules configuration file updating racing situation.
 # V1.0.06       2019-05-12      DW              Quit process if another copy of 'daily_block_attack_ip.pl' is running.
+# V1.0.07       2019-12-15      DW              Use system log file as source in order to increase performance.
 #
 # Remark: Database schema is as follows:
 #         
@@ -55,7 +56,7 @@ use strict;
 use Proc::ProcessTable;
 use DBI;
 
-my $workfile = "/tmp/secure" . allTrim(sprintf("%.0f", rand(2000))) . ".txt";
+my $workfile;           # System authentication log file.
 my $dsn;                # Database configuration.  
 my $dbh;                # Database connection handle. 
 my $database = 'defendb';  # Database for the table to store hackers' IP addresses.
@@ -82,85 +83,77 @@ if (otherHackerBlockerIsRunning()) {
 print "Start Date/Time: " . getCurrentDate(1) . "\n\n";
 
 my $os = (scalar(@ARGV) > 0)? lc(allTrim($ARGV[0])) : '';   # Possible values are 'centos7' and 'ubuntu18'
-my $cmd = "cp /var/log/" . (($os eq 'centos7')? 'secure' : 'auth.log') . " $workfile";
-my $ok = system($cmd);
+$workfile = "/var/log/" . (($os eq 'centos7')? 'secure' : 'auth.log');
 
-if ($ok != -1) {
-  %reserved_ip = fillReservedIpAddress();
+%reserved_ip = fillReservedIpAddress();
 
-  #-- Connect database --#
-  $dsn = "DBI:mysql:database=$database;host=$host;";
-  $dbh = DBI->connect($dsn, $user, $pass, {'RaiseError' => 1});
+#-- Connect database --#
+$dsn = "DBI:mysql:database=$database;host=$host;";
+$dbh = DBI->connect($dsn, $user, $pass, {'RaiseError' => 1});
 
-  open FILE, "<", $workfile or die("Unable to open the file $workfile \n");
-  while (<FILE>) {
-    my $this_line = $_;
+open FILE, "<", $workfile or die("Unable to open the file $workfile \n");
+while (<FILE>) {
+  my $this_line = $_;
     
-    if (attackVectorIsFound($this_line)) {   
-      my $this_hacker_ip = getHackerIpAddress($this_line);
-      my $this_reserved_ip = $reserved_ip{$this_hacker_ip} + 0;
+  if (attackVectorIsFound($this_line)) {   
+    my $this_hacker_ip = getHackerIpAddress($this_line);
+    my $this_reserved_ip = $reserved_ip{$this_hacker_ip} + 0;
     
-      if (allTrim($this_hacker_ip) ne '' && $this_reserved_ip != 1) {        
-        if (!isActiveHackerIpExist($this_hacker_ip)) {
-          if (!firewallRuleRemoverIsRunning()) {
-            my $add_firewall_rule_ok = addBlockingRuleToFirewall($this_hacker_ip);
+    if (allTrim($this_hacker_ip) ne '' && $this_reserved_ip != 1) {        
+      if (!isActiveHackerIpExist($this_hacker_ip)) {
+        if (!firewallRuleRemoverIsRunning()) {
+          my $add_firewall_rule_ok = addBlockingRuleToFirewall($this_hacker_ip);
 
-            if ($add_firewall_rule_ok != -1) {
-              if (isHackerIpExist($this_hacker_ip)) {
-                updateAttackDate($this_hacker_ip);
-              }
-              else {
-                saveHackerIp($this_hacker_ip);      
-              }
-            
-              $cnt++;  
-            }  
-            else {
-              $err_msg .= "Error 1: Unable to add blocking rule of hacker IP address $this_hacker_ip, check for it.\n";
-              $error = 1; 
+          if ($add_firewall_rule_ok != -1) {
+            if (isHackerIpExist($this_hacker_ip)) {
+              updateAttackDate($this_hacker_ip);
             }
-          }
+            else {
+              saveHackerIp($this_hacker_ip);      
+            }
+            
+            $cnt++;  
+          }  
           else {
-            #-- If firewall rules remover is running, skip new hacker IP address blocking to avoid firewall rules update racing. --#
-            $err_msg .= "Error 3: Since firewall rules remover is running, hacker IP address $this_hacker_ip blocking is skipped.\n";
-            $error = 1;
+            $err_msg .= "Error 1: Unable to add blocking rule of hacker IP address $this_hacker_ip, check for it.\n";
+            $error = 1; 
           }
-        }    
-        else {
-          updateAttackDate($this_hacker_ip);
         }
+        else {
+          #-- If firewall rules remover is running, skip new hacker IP address blocking to avoid firewall rules update racing. --#
+          $err_msg .= "Error 3: Since firewall rules remover is running, hacker IP address $this_hacker_ip blocking is skipped.\n";
+          $error = 1;
+        }
+      }    
+      else {
+        updateAttackDate($this_hacker_ip);
       }
     }
   }
+}
   
-  if ($cnt > 0) {
-    if (!$error) {         # If error is found, don't refresh firewall rules even $cnt > 0.
-      my $reload_ok = reloadFirewall();
+if ($cnt > 0) {
+  if (!$error) {         # If error is found, don't refresh firewall rules even $cnt > 0.
+    my $reload_ok = reloadFirewall();
     
-      if ($reload_ok == -1) {
-        $err_msg .= "Error 2: Unable to refresh firewall rules, check for it.\n";
-        $error = 1;     
-      }
-      else {
-        print "$cnt hacker IP address(es) is/are added.\n";
-      }
+    if ($reload_ok == -1) {
+      $err_msg .= "Error 2: Unable to refresh firewall rules, check for it.\n";
+      $error = 1;     
     }
     else {
-      print "Although $cnt hacker IP address(es) is/are added, firewall rules cannot be reloaded due to error is found.\n";
+      print "$cnt hacker IP address(es) is/are added.\n";
     }
   }
   else {
-    print "No need to refresh firewall\n";
+    print "Although $cnt hacker IP address(es) is/are added, firewall rules cannot be reloaded due to error is found.\n";
   }
-
-  $dbh->disconnect;  
-  close(FILE);
-  unlink $workfile;
 }
 else {
-  $err_msg = "Error 0: Unable to make a temporary working copy of the access log, check for it.\n";
-  $error = 1; 
+  print "No need to refresh firewall\n";
 }
+
+$dbh->disconnect;  
+close(FILE);
 
 if ($error == 1) {
   print "$err_msg \n";
