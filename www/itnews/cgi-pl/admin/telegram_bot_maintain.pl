@@ -19,7 +19,8 @@
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
 # V1.0.00       2018-08-23      DW              Telegram bot profile maintenance.
-# V1.0.01       2019-10-12      DW              Function 'isHeSysAdmin' is moved to sm_user.pl
+# V1.0.01       2019-10-12      DW              Function 'isHeSysAdmin' is moved to sm_user.pl   
+# V1.0.02       2020-01-13      DW              Fix a minor issue on label.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -246,7 +247,7 @@ sub printDataInputForm {
       <input type="text" id="bot_name" name="bot_name" value="$tg_bot_profile{'bot_name'}">
       <label for="bot_username">Bot username:</label>      
       <input type="text" id="bot_username" name="bot_username" value="$tg_bot_profile{'bot_username'}">
-      <label for="bot_username">HTTP API Token:</label>      
+      <label for="http_api_token">HTTP API Token:</label>      
       <input type="text" id="http_api_token" name="http_api_token" value="$tg_bot_profile{'http_api_token'}">      
       <br>
       <input type="button" id="save" name="save" value="Save" onClick="saveTgBotProfile();">
