@@ -34,6 +34,8 @@
 #                                               to avoid firewalld rules configuration file updating racing situation.
 # V1.0.06       2019-05-12      DW              Quit process if another copy of 'daily_block_attack_ip.pl' is running.
 # V1.0.07       2019-12-15      DW              Use system log file as source in order to increase performance.
+# V1.0.08       2020-04-21      DW              Add paramter "--zone=public" to IP address blocking command, since I set
+#                                               firewalld configuration "AllowZoneDrifting=no".
 #
 # Remark: Database schema is as follows:
 #         
@@ -193,8 +195,11 @@ sub fillReservedIpAddress {
   my ($i, $this_ip, %result, @c_class);
   
   $result{'127.0.0.1'} = 1;
-  
-  #-- Protect common internal IP addresses --#
+
+  #-- Protect commonly used internal IP addresses. If your internal IP addresses are   --#
+  #-- different, add them in here. If it is possible, also include your ISP provided   --*
+  #-- external IP address here. However, your external IP address may be changed after --*
+  #-- you restart your broadband router.                                               --*
   for ($i = 0; $i <= 254; $i++) {
     $this_ip = "192.168.0.$i";
     $result{$this_ip} = 1;
@@ -310,7 +315,7 @@ sub addBlockingRuleToFirewall {
   my ($cmd, $ok); 
   
   $cmd = <<__CMD;
-  firewall-cmd --permanent --add-rich-rule="rule family='ipv4' source address='$hacker_ip' reject"
+  firewall-cmd --permanent --zone=public --add-rich-rule="rule family='ipv4' source address='$hacker_ip' reject"
 __CMD
 
   $ok = system($cmd); 

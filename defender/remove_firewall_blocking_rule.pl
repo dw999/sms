@@ -20,6 +20,8 @@
 # =======       ===========     ===========     =========================
 # V1.0.00       2017-01-30      DW              Remove IP address blocking rules on firewall
 #                                               which exceed a pre-defined period.
+# V1.0.01       2020-04-21      DW              Add parameter "--zone=public" to IP address
+#                                               blocking removal command.
 ##########################################################################################
 
 use strict;
@@ -35,7 +37,7 @@ my $pass = 'Txf742kp4M';  # Database password.
 my $cnt = 0;
 my $error = 0;
 my $err_msg = '';
-my $hacker_ip_block_days = 1;    # Day(s) that hacker's IP addresses will be blocked. Max. blocking days is 1825.
+my $hacker_ip_block_days = 2;    # Day(s) that hacker's IP addresses will be blocked. Max. blocking days is 1825.
 my @ip_list = ();
 
 
@@ -115,7 +117,7 @@ sub removeFirewallBlockingRule {
   my ($cmd, $ok); 
   
   $cmd = <<__CMD;
-  firewall-cmd --permanent --remove-rich-rule="rule family='ipv4' source address='$hacker_ip' reject"
+  firewall-cmd --permanent --zone=public --remove-rich-rule="rule family='ipv4' source address='$hacker_ip' reject"
 __CMD
 
   $ok = system($cmd); 
