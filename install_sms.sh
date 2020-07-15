@@ -25,6 +25,7 @@
 # V1.0.02     2019-05-17      DW              Let user select desired web server for SMS installation on CentOS 7.
 # V1.0.03     2019-05-21      DW              Let user select desired web server for SMS installation on Debian 9 and Ubuntu 18.04.
 # V1.0.04     2019-10-02      DW              Include CentOS Linux 8 as SMS supported platform.
+# V1.0.05     2020-07-15      DW              Include Ubuntu 20.04 as SMS supported platform. 
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -94,6 +95,28 @@ then
   else
     chmod +x ./install_sms_ubt_nginx.sh
     source ./install_sms_ubt_nginx.sh
+  fi    
+  exit 0
+fi
+
+v=`hostnamectl | grep "Ubuntu 20.04" | wc -l`
+if [[ "$v" -eq 1 ]]
+then
+  echo "Please select web server for SMS installation:"
+  echo ""
+  echo "1. Nginx web server"
+  echo "2. Apache web server"
+  echo ""
+  echo "Note: If you don't know how to choose, select Nginx web server."
+  echo ""
+  read -p "Your choice (1 or 2): " choice
+  if (test ${choice} = '2')
+  then
+    chmod +x ./install_sms_ubuntu_20.sh
+    source ./install_sms_ubuntu_20.sh
+  else
+    chmod +x ./install_sms_ubt_20_nginx.sh
+    source ./install_sms_ubt_20_nginx.sh
   fi    
   exit 0
 fi

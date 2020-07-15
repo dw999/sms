@@ -15,6 +15,7 @@ What platform SMS server support
 - 2019-04-24  Support x86_64 Ubuntu 18.04
 - 2019-04-25  Support x86_64 Debian Linux 9
 - 2019-10-08  Support x86_64 CentOS 8
+- 2020-07-15  Support x86_64 Ubuntu 20.04
 
 Prerequisites of SMS server installation
 ----------------------------------------

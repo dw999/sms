@@ -7,3 +7,5 @@ Progression Log of SMS
 - 2019-05-21 SMS is added Nginx as one of web server selection options on Debian 9 Linux.
 - 2019-05-22 SMS is added Nginx as one of web server selection options on Ubuntu 18.04 Linux.
 - 2019-10-08 SMS supports CentOS 8 for both Apache and Nginx web servers.
+- 2020-07-15 SMS supports Ubuntu Linux 20.04 for both Apache and Nginx web servers.
+
