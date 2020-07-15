@@ -33,6 +33,10 @@
 # V1.0.07       2019-10-12      DW              Add function 'isHeSysAdmin'.
 # V1.0.08       2019-10-14      DW              Fix UTF-8 encoding issue on functions '_informAdminSystemProblem'
 #                                               and '_informAdminUnhappyUserIsCracked'.
+# V1.0.09       2020-07-15      DW              Change encrypted function '_encrypt_str' output format to hexadecimal
+#                                               string, in order to work-around a potential UTF-8 database issue.
+#                                               Since the amendment of '_encrypt_str', decryption function '_decrypt_str'
+#                                               must be changed accordingly. 
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -205,7 +209,7 @@ sub _encrypt_str {
   
   $cipher = Crypt::CBC->new(-key => $key, -cipher => 'Rijndael');
   if ($cipher) {
-    $encrypted = $cipher->encrypt($plaintext);
+    $encrypted = $cipher->encrypt_hex($plaintext);
     $ok = 1;
   }
   
@@ -222,7 +226,7 @@ sub _decrypt_str {
   
   $cipher = Crypt::CBC->new(-key => $key, -cipher => 'Rijndael');
   if ($cipher) {
-    $decrypted = $cipher->decrypt($encrypted);
+    $decrypted = $cipher->decrypt_hex($encrypted);
     $ok = 1;
   }
   
