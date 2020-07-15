@@ -19,6 +19,8 @@
 -- =======       ===========     ===========     ==========================================
 -- V1.0.00       2018-12-12      DW              Create databases for SMS, and put in essential data.
 -- V1.0.01       2019-05-24      DW              Define indexes for all database tables.
+-- V1.0.02       2020-06-19      DW              Make all databases using utf8mb4 character set which   
+--                                               make them truely supporting all UTF-8 data storage.
 --
 -- Remark: It is part of SMS installation program.
 -----------------------------------------------------------------------------------------------------
@@ -26,8 +28,8 @@
 DROP DATABASE IF EXISTS msgdb;
 
 CREATE DATABASE msgdb
-  DEFAULT CHARACTER SET utf8
-  DEFAULT COLLATE utf8_general_ci;
+  DEFAULT CHARACTER SET utf8mb4
+  DEFAULT COLLATE utf8mb4_unicode_ci;
 
 GRANT ALL ON msgdb.* TO 'msgadmin'@localhost IDENTIFIED BY 'cPx634BzAr1338Ux';
 
@@ -52,7 +54,7 @@ CREATE TABLE user_list
   cracked_date datetime,
   inform_new_msg int,
   PRIMARY KEY (user_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE INDEX idx_usr_name ON user_list(user_name);
 CREATE INDEX idx_usr_role_status ON user_list(user_role, status);
@@ -68,7 +70,7 @@ CREATE TABLE tg_bot_profile
   bot_name varchar(128),
   bot_username varchar(128),
   http_api_token varchar(256)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE applicant
 (
@@ -82,7 +84,7 @@ CREATE TABLE applicant
   seed varchar(256),
   token varchar(512),  
   PRIMARY KEY (apply_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Note: 'token' in UTF-8 is too long to be used as primary key.
 CREATE TABLE login_token_queue
@@ -93,7 +95,7 @@ CREATE TABLE login_token_queue
   token_seed varchar(256),
   status varchar(6),
   user_id bigint
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE INDEX idx_token ON login_token_queue(token);
 
@@ -107,7 +109,7 @@ CREATE TABLE web_session
   secure_key varchar(128),
   status varchar(2),
   PRIMARY KEY (sess_code)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE INDEX idx_usr_id ON web_session(user_id);
 
@@ -119,7 +121,7 @@ CREATE TABLE hack_history
   last_hack_time datetime,
   hack_cnt int,
   ip_blocked int 
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE INDEX idx_usr_id_ipv4 ON hack_history(user_id, ipv4_addr); 
 
@@ -134,7 +136,7 @@ CREATE TABLE msg_group
   status varchar(6),
   refresh_token varchar(16),
   PRIMARY KEY (group_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE group_member
 (
@@ -159,7 +161,7 @@ CREATE TABLE message
   op_user_id bigint,
   op_msg text,  
   PRIMARY KEY (msg_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE INDEX idx_grp_id_msg_id ON message(group_id, msg_id);
 
@@ -170,7 +172,7 @@ CREATE TABLE msg_tx
   read_status varchar(6),
   read_time datetime,
   PRIMARY KEY (msg_id, receiver_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE INDEX idx_msg_id ON msg_tx(msg_id);
 CREATE INDEX idx_rev_id_msg_id ON msg_tx(receiver_id, msg_id);
@@ -181,7 +183,7 @@ CREATE TABLE new_msg_inform
   period datetime,
   status varchar(2),
   try_cnt int
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE INDEX idx_usr_id_status ON new_msg_inform(user_id, status); 
 
@@ -194,7 +196,7 @@ CREATE TABLE unhappy_login_history
   loc_latitude numeric(13,6),
   browser_signature varchar(512),
   PRIMARY KEY (log_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE INDEX idx_usr_id ON unhappy_login_history(user_id);
 
@@ -202,7 +204,7 @@ CREATE TABLE decoy_sites
 (
   site_url varchar(512),
   key_words varchar(512)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 LOCK TABLES `decoy_sites` WRITE;
 INSERT INTO `decoy_sites` VALUES ('https://nexter.org','News'),('https://techcrunch.com','Tech News'),('https://thenextweb.com','Tech News'),('https://www.wired.com','Tech News'),('https://www.firstpost.com/tech','Tech News'),('https://gizmodo.com','Tech News'),('https://mashable.com','Tech News'),('https://www.theverge.com','Tech News'),('https://www.digitaltrends.com','Tech News'),('https://www.techradar.com','Tech News'),('https://www.macrumors.com','Tech News'),('https://www.codeproject.com','Programming Forum'),('https://stackoverflow.com','Programming Forum'),('https://forum.xda-developers.com','Programming Forum'),('https://bytes.com','Programming Forum'),('https://www.webhostingtalk.com','Forum'),('https://thehackernews.com','IT security news'),('https://www.infosecurity-magazine.com','IT security news'),('https://www.csoonline.com','IT security news'),('https://www.tripwire.com/state-of-security','IT security news'),('https://www.troyhunt.com','IT security blog'),('https://www.lastwatchdog.com','IT security watch'),('https://www.schneier.com','IT security watch'),('https://blogs.akamai.com','IT security blog'),('https://krebsonsecurity.com','IT security news'),('https://taosecurity.blogspot.com/?m=1','IT security blog'),('https://www.pcworld.com','IT news'),('https://www.welivesecurity.com','IT security news'),('https://www.afcea.org/content','IT security news'),('https://threatpost.com','IT security news'),('https://www.computerworld.com/category/emerging-technology','IT news'),('https://www.grahamcluley.com','IT security news'),('https://www.itsecurityguru.org','IT security news');
@@ -217,7 +219,7 @@ CREATE TABLE sys_error_log
   log_time datetime,
   browser_signature varchar(512),
   PRIMARY KEY (log_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE sys_email_sender
 (
@@ -229,14 +231,14 @@ CREATE TABLE sys_email_sender
   port int,
   status varchar(1),
   PRIMARY KEY (ms_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE sites
 (
   site_type varchar(10),
   site_dns varchar(128),
   status varchar(1)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 LOCK TABLES `sites` WRITE;
 INSERT INTO `sites` VALUES ('DECOY','https://decoy.site.com','A'),('MESSAGE','https://messaging.site.net','A');
@@ -248,7 +250,7 @@ CREATE TABLE file_type
   file_ext varchar(16),
   file_type varchar(64),
   PRIMARY KEY (ftype_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 LOCK TABLES `file_type` WRITE;
 ALTER TABLE `file_type` DISABLE KEYS;
@@ -261,7 +263,7 @@ CREATE TABLE sys_settings
   sys_key varchar(64) not null,
   sys_value varchar(512),
   PRIMARY KEY (sys_key)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 LOCK TABLES `sys_settings` WRITE;
 INSERT INTO `sys_settings` VALUES ('audio_converter',"/usr/bin/ffmpeg -i '{input_file}' '{output_file}'"),('connection_mode','0'),('decoy_company_name','PDA Tools'),('msg_block_size','30'),('session_period','02:00:00'),('old_msg_delete_days','14');
@@ -271,8 +273,8 @@ UNLOCK TABLES;
 DROP DATABASE IF EXISTS pdadb;
 
 CREATE DATABASE pdadb
-  DEFAULT CHARACTER SET utf8
-  DEFAULT COLLATE utf8_general_ci;
+  DEFAULT CHARACTER SET utf8mb4
+  DEFAULT COLLATE utf8mb4_unicode_ci;
 
 GRANT ALL ON pdadb.* TO 'pdadmin'@localhost IDENTIFIED BY 'Yt83344Keqpkgw34';
 
@@ -288,7 +290,7 @@ CREATE TABLE web_session
   secure_key varchar(128),
   status varchar(2),
   PRIMARY KEY (sess_code)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE INDEX idx_usr_id ON web_session(user_id);
 
@@ -298,7 +300,7 @@ CREATE TABLE feature_store
   feature_url varchar(512),
   feature_icon varchar(256),
   PRIMARY KEY (feature_id)  
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 LOCK TABLES `feature_store` WRITE;
 ALTER TABLE `feature_store` DISABLE KEYS;
@@ -310,7 +312,7 @@ CREATE TABLE feature_list
 (
   feature_id bigint,
   list_order int
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 LOCK TABLES `feature_list` WRITE;
 INSERT INTO `feature_list` VALUES (1,1),(2,2);
@@ -325,7 +327,7 @@ CREATE TABLE schedule_event
   ev_start datetime,
   ev_end datetime,
   PRIMARY KEY (event_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE INDEX idx_usr_id_ev_start ON schedule_event(user_id, ev_start); 
 
@@ -337,7 +339,7 @@ CREATE TABLE schedule_reminder
   remind_unit varchar(16),
   has_informed int,
   PRIMARY KEY (reminder_id) 
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE notes
 (
@@ -348,7 +350,7 @@ CREATE TABLE notes
   create_date datetime,
   update_date datetime,  
   PRIMARY KEY (notes_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 
