@@ -20,7 +20,9 @@
 -- V1.0.00       2018-12-12      DW              Create databases for SMS, and put in essential data.
 -- V1.0.01       2019-05-24      DW              Define indexes for all database tables.
 -- V1.0.02       2020-06-19      DW              Make all databases using utf8mb4 character set which   
---                                               make them truely supporting all UTF-8 data storage.
+--                                               let them fully support UTF-8 data storage.
+-- V1.0.03       2020-07-16      DW              Use 'longtext' for message related fields on table
+--                                               'message'.
 --
 -- Remark: It is part of SMS installation program.
 -----------------------------------------------------------------------------------------------------
@@ -155,11 +157,11 @@ CREATE TABLE message
   sender_id bigint,
   send_time datetime,  
   send_status varchar(6),  
-  msg text,
+  msg longtext,
   fileloc varchar(512),
   op_flag varchar(1),
   op_user_id bigint,
-  op_msg text,  
+  op_msg longtext,  
   PRIMARY KEY (msg_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
