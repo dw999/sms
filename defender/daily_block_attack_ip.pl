@@ -21,7 +21,7 @@
 # V1.0.00       2017-01-30      DW              System attacking monitoring and hacker IP
 #                                               addresses blocking for Red Hat/CentOS 7.
 #                                               Note: 1. Using built-in firewall is assumed.
-#                                                     2. Firewall and this Perl script is placed
+#                                                     2. Firewall and this Perl script are placed
 #                                                        on same machine.
 # V1.0.01       2017-03-03      DW              Add a new attack vector identity "Bad protocol version identification".
 # V1.0.02       2017-04-16      DW              Fix a logical bug for firewall rule update.
@@ -36,6 +36,7 @@
 # V1.0.07       2019-12-15      DW              Use system log file as source in order to increase performance.
 # V1.0.08       2020-04-21      DW              Add paramter "--zone=public" to IP address blocking command, since I set
 #                                               firewalld configuration "AllowZoneDrifting=no".
+# V1.0.09       2020-07-22      DW              Take care Nginx web sites attacking also.
 #
 # Remark: Database schema is as follows:
 #         
@@ -93,6 +94,7 @@ $workfile = "/var/log/" . (($os eq 'centos7')? 'secure' : 'auth.log');
 $dsn = "DBI:mysql:database=$database;host=$host;";
 $dbh = DBI->connect($dsn, $user, $pass, {'RaiseError' => 1});
 
+#-- Processing system security log --#
 open FILE, "<", $workfile or die("Unable to open the file $workfile \n");
 while (<FILE>) {
   my $this_line = $_;
@@ -133,7 +135,24 @@ while (<FILE>) {
     }
   }
 }
-  
+close(FILE);
+
+#-- Processing Nginx log files (if they exist) --#
+$workfile = "/var/log/nginx/decoy-access.log";
+if (-f $workfile) {
+  processWebSiteAttacker($workfile);
+}
+
+$workfile = "/var/log/nginx/msg-access.log";
+if (-f $workfile) {
+  processWebSiteAttacker($workfile);
+}
+
+$workfile = "/var/log/nginx/access.log";
+if (-f $workfile) {
+  processWebSiteAttacker($workfile);
+}
+
 if ($cnt > 0) {
   if (!$error) {         # If error is found, don't refresh firewall rules even $cnt > 0.
     my $reload_ok = reloadFirewall();
@@ -155,7 +174,6 @@ else {
 }
 
 $dbh->disconnect;  
-close(FILE);
 
 if ($error == 1) {
   print "$err_msg \n";
@@ -373,3 +391,79 @@ sub allTrim {
 }
 
 
+sub webSiteAttackVectorIsFound {
+  my ($line) = @_;
+
+  if ($line =~ /function=call_user_func_array/) {
+    return 1;
+  }
+
+  if ($line =~ /thonkphp/) {
+    return 1; 
+  }
+
+  if ($line =~ /XDEBUG_SESSION_START=phpstorm/) {
+    return 1;
+  }
+
+  if ($line =~ /api/ && $line =~ /jsonws/) {
+    return 1;
+  }
+
+  if ($line =~ /phpunit/) {
+    return 1;
+  }
+
+  if ($line =~ /phpmyadmin/i) {
+    return 1;
+  }
+
+  return 0;
+}
+
+
+sub processWebSiteAttacker {
+  my ($log) = @_;
+
+  open FILE, "<", $log or die("Unable to open the file $log \n");
+  while (<FILE>) {
+    my $this_line = $_;
+    
+    if (webSiteAttackVectorIsFound($this_line)) {   
+      my $this_hacker_ip = getHackerIpAddress($this_line);
+      my $this_reserved_ip = $reserved_ip{$this_hacker_ip} + 0;
+    
+      if (allTrim($this_hacker_ip) ne '' && $this_reserved_ip != 1) {        
+        if (!isActiveHackerIpExist($this_hacker_ip)) {
+          if (!firewallRuleRemoverIsRunning()) {
+            my $add_firewall_rule_ok = addBlockingRuleToFirewall($this_hacker_ip);
+
+            if ($add_firewall_rule_ok != -1) {
+              if (isHackerIpExist($this_hacker_ip)) {
+                updateAttackDate($this_hacker_ip);
+              }
+              else {
+                saveHackerIp($this_hacker_ip);      
+              }
+            
+              $cnt++;  
+            }  
+            else {
+              $err_msg .= "Error 1: Unable to add blocking rule of hacker IP address $this_hacker_ip (via website), check for it.\n";
+              $error = 1; 
+            }
+          }
+          else {
+            #-- If firewall rules remover is running, skip new hacker IP address blocking to avoid firewall rules update racing. --#
+            $err_msg .= "Error 3: Since firewall rules remover is running, hacker IP address $this_hacker_ip blocking is skipped.\n";
+            $error = 1;
+          }
+        }    
+        else {
+          updateAttackDate($this_hacker_ip);
+        }
+      }
+    }
+  }
+  close(FILE);
+}
