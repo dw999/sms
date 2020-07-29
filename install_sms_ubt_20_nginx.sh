@@ -183,7 +183,7 @@ echo "install libauthen-passphrase-perl"
 apt-get -y install libauthen-passphrase-perl >> /tmp/sms_install.log
 echo "Install libproc-processtable-perl"
 apt-get -y install libproc-processtable-perl >> /tmp/sms_install.log
-echo "install perl-www-telegram-botapi"
+echo "install WWW::Telegram::BotAPI"
 cpan WWW::Telegram::BotAPI >> /tmp/sms_install.log
 echo "install Email::Sender::Transport::SMTP::TLS"
 cpan Email::Sender::Transport::SMTP::TLS >> /tmp/sms_install.log
