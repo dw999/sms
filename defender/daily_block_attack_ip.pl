@@ -414,7 +414,19 @@ sub webSiteAttackVectorIsFound {
     return 1;
   }
 
-  if ($line =~ /phpmyadmin/i) {
+  if ($line =~ /phpmyadmin/i && $line =~ /php-my-admin/i) {
+    return 1;
+  }
+
+  if ($line =~ /b3astmode/i) {
+    return 1;
+  }
+
+  if ($line =~ /\\x/) {
+    return 1;
+  }
+
+  if ($line =~ /wget/ && $line =~ /chmod/) {
     return 1;
   }
 
