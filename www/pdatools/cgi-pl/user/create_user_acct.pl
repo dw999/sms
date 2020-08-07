@@ -25,6 +25,8 @@
 # V1.0.02       2018-09-21      DW              Use new encryption method to protect user passwords.
 # V1.0.03       2019-05-30      DW              Inform new user's referrer, he/she has been joined,
 #                                               if the referrer is not system administrator.
+# V1.0.04       2020-08-06      DW              Create a private group for newly registered user and
+#                                               his/her referrer.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -126,7 +128,7 @@ __SQL
     #-- Check whether approval period has been passed --#
     if ($ok) {
       if (_isTimeLimitPassed($dbh, $apply_date, '7 00:00:00')) {      # Note: 1. '7 00:00:00' means 7 days, 2. It is defined on sm_user.pl
-        setApplicantStatus($dbh, $apply_id, 'T');                     # Timeout.
+        setApplicantStatus($dbh, $apply_id, 'T');                     # Defined on sm_user.pl
         $msg = "You are too late to finalize your registration, valid period has been passed. Please apply again.";
         $ok = 0;
       }      
@@ -205,7 +207,12 @@ sub createUserAccount {
     ($ok, $msg) = addUserAccount($dbh, $user, $name, $email, $alias, $happy_passwd, $unhappy_passwd, $refer_email);
     
     if ($ok) {
-      ($ok, $msg) = setApplicantStatus($dbh, $apply_id, 'C');
+      #-- Create a private group between the newly added user and his/her referrer --#
+      ($ok, $msg) = createFirstPrivateGroup($dbh, $user, $alias, $name, $refer_email);  
+    }
+    
+    if ($ok) {
+      ($ok, $msg) = setApplicantStatus($dbh, $apply_id, 'C');      # Defined on sm_user.pl
     }
     
     if ($ok) {
@@ -250,6 +257,37 @@ __SQL
     $ok = 0;
   }
   $sth->finish;
+  
+  return ($ok, $msg);
+}
+
+
+sub createFirstPrivateGroup {
+  my ($dbh, $user, $alias, $name, $refer_email) = @_;
+  my ($ok, $msg, $grp_admin_id, $member_id, $group_id);
+            
+  $ok = 1;
+  $msg = '';
+            
+  #-- Step 1: Try to get user id of the referrer and the newly added user --#
+  $grp_admin_id = getUserIdByName($dbh, $user);         # Defined on sm_user.pl
+  $member_id = getRefererUserId($dbh, $refer_email);
+  
+  if ($grp_admin_id > 0 && $member_id > 0) {
+    #-- Note: If referrer of the newly created user becomes inactive or newly added user id cannot be retrieved, this process will be skipped. --# 
+    #-- Step 2: Create the group --#
+    ($ok, $msg, $group_id) = addPrivateGroup($dbh, $alias, 1, 5);
+      
+    if ($ok) {
+      #-- Step 3: Add all persons to group member table --#
+      ($ok, $msg) = addGroupMember($dbh, $group_id, $grp_admin_id, $member_id);
+    }
+      
+    if ($ok) {
+      #-- Step 4: Send the first message on behalf of the group creator to the invited person --#
+      ($ok, $msg) = sendMemberFirstMessage($dbh, $group_id, $grp_admin_id, $name, $alias);
+    }    
+  }
   
   return ($ok, $msg);
 }
@@ -323,4 +361,102 @@ __SQL
   $sth->finish;
   
   return $result;
+}
+
+
+sub addPrivateGroup {
+  my ($dbh, $group_name, $auto_delete, $delete_after) = @_;
+  my ($sql, $sth, $ok, $msg, $group_id, $encrypt_key);
+  
+  $ok = 1;
+  $msg = '';  
+  $group_id = 0;
+  $encrypt_key = _generateRandomStr('A', 32);                # Defined on sm_webenv.pl
+  
+  $sql = <<__SQL;
+  INSERT INTO msg_group
+  (group_name, group_type, msg_auto_delete, delete_after_read, encrypt_key, status, refresh_token)
+  VALUES
+  (?, 1, ?, ?, ?, 'A', '')
+__SQL
+  
+  $sth = $dbh->prepare($sql);
+  if (!$sth->execute($group_name, $auto_delete, $delete_after, $encrypt_key)) {
+    $msg = "Unable to create group. Error: " . $sth->errstr;
+    $ok = 0;
+  }
+  $sth->finish;
+  
+  if ($ok) {
+    #-- Retrieve the newly added group id --#
+    $sth = $dbh->prepare("SELECT LAST_INSERT_ID()");
+    if ($sth->execute()) {
+      ($group_id) = $sth->fetchrow_array();
+      if ($group_id <= 0) {
+        $msg = "Unable to retrieve newly created group id by unknown reason.";
+        $ok = 0;
+      }      
+    }
+    else {
+      $msg = "Unable to retrieve newly created group id. Error: " . $sth->errstr;
+      $ok = 0;
+    }
+    $sth->finish;
+  }
+
+  return ($ok, $msg, $group_id);  
+}
+
+
+sub addGroupMember {
+  my ($dbh, $group_id, $user_id, $member_id) = @_;
+  my ($ok, $msg, $sql, $sth);
+  
+  $ok = 1;
+  $msg = '';
+  
+  #-- This is the group administrator --#
+  $sql = <<__SQL;
+  INSERT INTO group_member
+  (group_id, user_id, group_role)
+  VALUES
+  (?, ?, '1')
+__SQL
+  
+  $sth = $dbh->prepare($sql);
+  if (!$sth->execute($group_id, $user_id)) {
+    $msg = "Unable to add group administrator. Error: " . $sth->errstr;
+    $ok = 0;
+  }
+  $sth->finish;
+
+  if ($ok) {    
+    #-- This is the group member, the only member. --#
+    $sql = <<__SQL;
+    INSERT INTO group_member
+    (group_id, user_id, group_role)
+    VALUES
+    (?, ?, '0')
+__SQL
+  
+    $sth = $dbh->prepare($sql);
+    if (!$sth->execute($group_id, $member_id)) {
+      $msg = "Unable to add group member. Error: " . $sth->errstr;
+      $ok = 0;
+    }
+    $sth->finish;    
+  }
+  
+  return ($ok, $msg);
+}
+
+
+sub sendMemberFirstMessage {
+  my ($dbh, $group_id, $user_id, $name, $alias) = @_;
+  my ($ok, $msg, $message);
+  
+  $message = "I am $name, and my alias is $alias. Please add me to appropriate group(s).";
+  ($ok, $msg) = sendMessage($dbh, $user_id, $group_id, $message);               # Defined on sm_msglib.pl
+  
+  return ($ok, $msg);
 }
