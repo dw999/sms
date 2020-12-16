@@ -37,7 +37,8 @@
 # V1.0.08       2020-04-21      DW              Add paramter "--zone=public" to IP address blocking command, since I set
 #                                               firewalld configuration "AllowZoneDrifting=no".
 # V1.0.09       2020-07-22      DW              Take care Nginx web sites attacking also.
-# V1.0.10       2020-12-16      DW              Fix a bug which update the 'hit_date' of active hacker IP address constinuously.  
+# V1.0.10       2020-12-16      DW              - Fix a bug which update the 'hit_date' of active hacker IP address constinuously.
+#                                               - Add option "--quiet" to firewalld command to suppress status displaying.  
 #
 # Remark: Database schema is as follows:
 #         
@@ -331,7 +332,7 @@ sub addBlockingRuleToFirewall {
   my ($cmd, $ok); 
   
   $cmd = <<__CMD;
-  firewall-cmd --permanent --zone=public --add-rich-rule="rule family='ipv4' source address='$hacker_ip' reject"
+  firewall-cmd --quiet --permanent --zone=public --add-rich-rule="rule family='ipv4' source address='$hacker_ip' reject"
 __CMD
 
   $ok = system($cmd); 
@@ -469,9 +470,6 @@ sub processWebSiteAttacker {
             $error = 1;
           }
         }    
-        else {
-          updateAttackDate($this_hacker_ip);
-        }
       }
     }
   }
