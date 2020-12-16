@@ -37,6 +37,7 @@
 # V1.0.08       2020-04-21      DW              Add paramter "--zone=public" to IP address blocking command, since I set
 #                                               firewalld configuration "AllowZoneDrifting=no".
 # V1.0.09       2020-07-22      DW              Take care Nginx web sites attacking also.
+# V1.0.10       2020-12-16      DW              Fix a bug which update the 'hit_date' of active hacker IP address constinuously.  
 #
 # Remark: Database schema is as follows:
 #         
@@ -129,9 +130,6 @@ while (<FILE>) {
           $error = 1;
         }
       }    
-      else {
-        updateAttackDate($this_hacker_ip);
-      }
     }
   }
 }
