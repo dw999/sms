@@ -19,6 +19,7 @@
 -- =======       ===========     ===========     ==========================================
 -- V1.0.00       2018-12-22      DW              Create database for CentOS/RedHat 7 defender.
 -- V1.0.01       2019-05-24      DW              Define indexes for database table.
+-- V1.0.02       2020-12-25      DW              Change data type of hacker_ip.hit_date to 'datetime'.
 --
 -- Remark: It is part of SMS installation program.
 -----------------------------------------------------------------------------------------------------
@@ -37,7 +38,7 @@ USE defendb;
 CREATE TABLE `hacker_ip` (
   `ipv4_address` varchar(20) DEFAULT NULL,
   `ipv6_address` varchar(255) DEFAULT NULL,
-  `hit_date` date DEFAULT NULL,
+  `hit_date` datetime DEFAULT NULL,
   `is_active` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
