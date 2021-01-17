@@ -51,6 +51,7 @@
 # V2.0.05       2019-10-11      DW              - Fix a security loophole by checking whether current user is member of given message
 #                                                 group (parameter g_id) before further processing.
 #                                               - Initialize javascript variable op_flag in order to fix a file uploading problem.
+# V2.0.06       2021-01-17      DW              Put message background colours into variables, so that they can be changed later more easily. 
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -77,6 +78,8 @@ my $update_token = getMessageUpdateToken($dbh, $group_id); # Defined on sm_msgli
 my $group_role = getGroupRole($dbh, $group_id, $user_id);  # Defined on sm_msglib.pl
 my $group_type = getGroupType($dbh, $group_id);            # Defined on sm_msglib.pl
 my $rows_limit = getMessageBlockSize($dbh);                # Number of last messages will be loaded initially.
+my $my_msg_colour = '#F5EDB3';                             # Background colour of my message.
+my $rv_msg_colour = '#CFF3F9';                             # Background colour of received message.
 my %m_params = ('new_msg_only' => 0, 'rows_limit' => $rows_limit, 'f_m_id' => $f_m_id);
 my @message = getGroupMessage($dbh, $group_id, $user_id, \%m_params);  # Defined on sm_msglib.pl
 
@@ -741,7 +744,7 @@ sub printJavascriptSection {
                     "    <table width='100%' cellspacing=0 cellpadding=0 style='table-layout:fixed;'>" +
                     "    <tr>" +
                     "      <td width='$indentation%'></td>" +
-                    "      <td width='$msg_width%' style='background-color:#F4F7CE; word-wrap:break-word;'>" + fw_header + re_header + this_file_link + this_message + "<br>" + this_msg_time + " $spaces " + delete_link + " $space3 " + reply_link + " $space3 " + forward_link + "</td>" +
+                    "      <td width='$msg_width%' style='background-color:$my_msg_colour; word-wrap:break-word;'>" + fw_header + re_header + this_file_link + this_message + "<br>" + this_msg_time + " $spaces " + delete_link + " $space3 " + reply_link + " $space3 " + forward_link + "</td>" +
                     "    </tr>" +
                     "    </table>" +
                     "  </td>" +
@@ -756,7 +759,7 @@ sub printJavascriptSection {
                     "  <td width='100%'>" +
                     "    <table width='100%' cellspacing=0 cellpadding=0 style='table-layout:fixed;'>" +
                     "    <tr>" + 
-                    "      <td width='$msg_width%' style='background-color:#E0F8F7; word-wrap:break-word;'>" + this_sender + "<br>" + fw_header + re_header + this_file_link + this_message + "<br>" + this_msg_time + " $spaces " + reply_link + " $space3 " + forward_link + "</td>" +
+                    "      <td width='$msg_width%' style='background-color:$rv_msg_colour; word-wrap:break-word;'>" + this_sender + "<br>" + fw_header + re_header + this_file_link + this_message + "<br>" + this_msg_time + " $spaces " + reply_link + " $space3 " + forward_link + "</td>" +
                     "      <td width='$indentation%'></td>" +
                     "    </tr>" +
                     "    </table>" +
@@ -909,7 +912,7 @@ sub printJavascriptSection {
                       "    <table width='100%' cellspacing=0 cellpadding=0 style='table-layout:fixed;'>" +
                       "    <tr>" +
                       "      <td width='$indentation%'></td>" +
-                      "      <td width='$msg_width%' style='background-color:#F4F7CE; word-wrap:break-word;'>" + fw_header + re_header + this_file_link + this_message + "<br>" + this_msg_time + " $spaces " + delete_link + " $space3 " + reply_link + " $space3 " + forward_link + "</td>" +
+                      "      <td width='$msg_width%' style='background-color:$my_msg_colour; word-wrap:break-word;'>" + fw_header + re_header + this_file_link + this_message + "<br>" + this_msg_time + " $spaces " + delete_link + " $space3 " + reply_link + " $space3 " + forward_link + "</td>" +
                       "    </tr>" +
                       "    </table>" +
                       "  </td>" +
@@ -924,7 +927,7 @@ sub printJavascriptSection {
                       "  <td width='100%'>" +
                       "    <table width='100%' cellspacing=0 cellpadding=0 style='table-layout:fixed;'>" +
                       "    <tr>" + 
-                      "      <td width='$msg_width%' style='background-color:#E0F8F7; word-wrap:break-word;'>" + this_sender + "<br>" + fw_header + re_header + this_file_link + this_message + "<br>" + this_msg_time + " $spaces " + reply_link + " $space3 " + forward_link + "</td>" +
+                      "      <td width='$msg_width%' style='background-color:$rv_msg_colour; word-wrap:break-word;'>" + this_sender + "<br>" + fw_header + re_header + this_file_link + this_message + "<br>" + this_msg_time + " $spaces " + reply_link + " $space3 " + forward_link + "</td>" +
                       "      <td width='$indentation%'></td>" +
                       "    </tr>" +
                       "    </table>" +
@@ -1125,7 +1128,7 @@ __HTML
           <table width="100%" cellspacing=0 cellpadding=0 style="table-layout:fixed;">
           <tr>
             <td width="$indentation%"></td>
-            <td width="$msg_width%" style="background-color:#F4F7CE; word-wrap:break-word;">$fw_header$re_header$this_file_link$this_message<br>$this_msg_time $spaces $delete_link $space3 $reply_link $space3 $forward_link</td>
+            <td width="$msg_width%" style="background-color:$my_msg_colour; word-wrap:break-word;">$fw_header$re_header$this_file_link$this_message<br>$this_msg_time $spaces $delete_link $space3 $reply_link $space3 $forward_link</td>
           </tr>
           </table>
         </td>
@@ -1142,7 +1145,7 @@ __HTML
         <td width="100%">
           <table width="100%" cellspacing=0 cellpadding=0 style="table-layout:fixed;">
           <tr>
-            <td width="$msg_width%" style="background-color:#E0F8F7; word-wrap:break-word;">$this_sender<br>$fw_header$re_header$this_file_link$this_message<br>$this_msg_time $spaces $reply_link $space3 $forward_link</td>
+            <td width="$msg_width%" style="background-color:$rv_msg_colour; word-wrap:break-word;">$this_sender<br>$fw_header$re_header$this_file_link$this_message<br>$this_msg_time $spaces $reply_link $space3 $forward_link</td>
             <td width="$indentation%"></td>
           </tr>
           </table>
