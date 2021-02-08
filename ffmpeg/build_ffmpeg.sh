@@ -24,6 +24,7 @@
 #                                             issue across different Linux/Unix systems.
 # V1.0.02     2019-05-23      DW              Install pre-requisites utilities on all supported platforms.
 # V1.0.03     2019-10-17      DW              Install pre-requisites utilities for CentOS 8.
+# V1.0.04     2021-02-08      DW              Use variable 'FF_VER' to control download FFmpeg source code version. 
 #=========================================================================================================
 
 echo ""
@@ -75,11 +76,14 @@ echo "Download FFmpeg and required additional libraries, please wait..."
 echo "================================================================="
 echo ""
 echo "Download FFmpeg"
-curl -O https://ffmpeg.org/releases/ffmpeg-4.1.tar.bz2 >> /tmp/build_ffmpeg.log
-bzip2 -d ffmpeg-4.1.tar.bz2 >> /tmp/build_ffmpeg.log
-tar -xvf ffmpeg-4.1.tar >> /tmp/build_ffmpeg.log
-mv -fv ./ffmpeg-4.1 ./ffmpeg >> /tmp/build_ffmpeg.log
-rm -f ffmpeg-4.1.tar >> /tmp/build_ffmpeg.log
+#-- FFmpeg version number, it is used to control commands below. Note: Previous working version is 4.1 --#
+FF_VER="4.3.1"
+#-- Download FFmpeg source code according to 'FF_VER' --#
+curl -O https://ffmpeg.org/releases/ffmpeg-$FF_VER.tar.bz2 >> /tmp/build_ffmpeg.log
+bzip2 -d ffmpeg-$FF_VER.tar.bz2 >> /tmp/build_ffmpeg.log
+tar -xvf ffmpeg-$FF_VER.tar >> /tmp/build_ffmpeg.log
+mv -fv ./ffmpeg-$FF_VER ./ffmpeg >> /tmp/build_ffmpeg.log
+rm -f ffmpeg-$FF_VER.tar >> /tmp/build_ffmpeg.log
 
 echo ""
 echo "Download and compile libogg"
