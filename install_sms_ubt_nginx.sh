@@ -20,6 +20,8 @@
 # Ver         Date            Author          Comment
 # =======     ===========     ===========     ==========================================
 # V1.0.00     2019-05-21      DW              Install SMS on Ubuntu 18.04 with Nginx web server.
+# V1.0.01     2021-02-10      DW              CertBot installation method has been changed by using snap, so that 
+#                                             this SMS installation script is updated accordingly. 
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -60,11 +62,28 @@ then
   exit 1
 fi
 
+#-- If snapd doesn't exist, install it now and reboot the system. --#
+sn=`dpkg -l | grep "ii  snapd" | wc -l`
+if [[ "$sn" -eq 0 ]]
+then
+  echo "Install snapd, please wait..."
+  apt-get -y install snapd >> /tmp/sms_install.log
+  systemctl enable --now snapd.socket >> /tmp/sms_install.log
+  systemctl start snapd.socket >> /tmp/sms_install.log
+  systemctl enable --now snap.seeded.service >> /tmp/sms_install.log
+  systemctl start snap.seeded.service >> /tmp/sms_install.log
+  echo ""
+  echo "Since snapd has just been installed, you need to reboot the server and run the installation program again."
+  read -p "Press enter to reboot the server..."
+  shutdown -r now  
+fi
+
 #-- Define variables --#
 export BUILD_PRELOAD=N
 export PATH=$PATH:/usr/sbin:/usr/local/sbin
 
 #-- Start process --#
+clear
 echo "Before you start the SMS installation, you must fulfil the following requirements:"
 echo ""
 echo "1. You must be administrative user. (i.e. You are 'root' or 'root' equivalent user)"
@@ -80,14 +99,14 @@ echo "==========================================================================
 echo "Step 1: Install required applications"
 echo "=================================================================================="
 echo "Refresh software repository..."
+apt-get update >> /tmp/sms_install.log
 apt-get -y install curl gnupg2 ca-certificates lsb-release > /tmp/sms_install.log
 #-- Refresh software package repository --#
-apt-get update >> /tmp/sms_install.log
+#apt-get update >> /tmp/sms_install.log
 apt-get -y install software-properties-common >> /tmp/sms_install.log
 add-apt-repository -y universe >> /tmp/sms_install.log
 #-- Create CertBot packages repository for Ubuntu --#
-add-apt-repository -y ppa:certbot/certbot >> /tmp/sms_install.log
-apt-get update >> /tmp/sms_install.log
+#add-apt-repository -y ppa:certbot/certbot >> /tmp/sms_install.log
 echo "Install and configure internet time utilities"
 apt-get -y install ntp ntpdate >> /tmp/sms_install.log
 #-- Ensure ntpd is stopped. Otherwise, the next step will fail. --#
@@ -123,6 +142,8 @@ firewall-cmd --zone=public --permanent --add-icmp-block=echo-request
 firewall-cmd --reload
 echo "Install unzip"
 apt-get -y install unzip >> /tmp/sms_install.log
+echo "Install bzip2"
+apt-get -y install bzip2 >> /tmp/sms_install.log
 echo "Install MariaDB" 
 apt-get -y install mariadb-server mariadb-client >> /tmp/sms_install.log
 echo "Install Nginx web server"
@@ -141,8 +162,14 @@ echo "Install development tools"
 apt-get -y install build-essential >> /tmp/sms_install.log
 echo "Install Git version control system"
 apt-get -y install git >> /tmp/sms_install.log
+echo "Refresh snap core"
+snap wait system seed.loaded
+snap install core
+snap refresh core
 echo "Install free DNS certificates auto renew utility"
-apt-get -y install certbot python-certbot-nginx >> /tmp/sms_install.log
+#apt-get -y install certbot python-certbot-nginx >> /tmp/sms_install.log
+snap install --classic certbot >> /tmp/sms_install.log
+ln -s /snap/bin/certbot /usr/bin/certbot
 
 echo ""
 echo "----------------------------------------------------------------------------------"

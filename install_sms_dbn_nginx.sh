@@ -20,6 +20,8 @@
 # Ver         Date            Author          Comment
 # =======     ===========     ===========     ==========================================
 # V1.0.00     2019-05-20      DW              Install SMS on Debian Linux 9 with Nginx as web server.
+# V1.0.01     2021-02-10      DW              CertBot installation method has been changed by using snap, so that 
+#                                             this SMS installation script is updated accordingly. 
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -60,11 +62,29 @@ then
   exit 1
 fi
 
+#-- If snapd doesn't exist, install it now and reboot the system. --#
+sn=`dpkg -l | grep "ii  snapd" | wc -l`
+if [[ "$sn" -eq 0 ]]
+then
+  echo "Install snapd, please wait..."
+  apt-get update
+  apt-get -y install snapd >> /tmp/sms_install.log
+  systemctl enable --now snapd.socket >> /tmp/sms_install.log
+  systemctl start snapd.socket >> /tmp/sms_install.log
+  systemctl enable --now snap.seeded.service >> /tmp/sms_install.log
+  systemctl start snap.seeded.service >> /tmp/sms_install.log
+  echo ""
+  echo "Since snapd has just been installed, you need to reboot the server and run the installation program again."
+  read -p "Press enter to reboot the server..."
+  shutdown -r now  
+fi
+
 #-- Define variables --#
 export BUILD_PRELOAD=N
 export PATH=$PATH:/usr/sbin:/usr/local/sbin
 
 #-- Start process --#
+clear
 echo "Before you start the SMS installation, you must fulfil the following requirements:"
 echo ""
 echo "1. You must be administrative user. (i.e. You are 'root' or 'root' equivalent user)"
@@ -81,7 +101,7 @@ echo "Step 1: Install required applications"
 echo "=================================================================================="
 echo "Refresh software repository..."
 #-- Create CertBot packages repository for Debian 9 --#
-echo "deb http://deb.debian.org/debian stretch-backports main" > /etc/apt/sources.list.d/certbot.list
+#echo "deb http://deb.debian.org/debian stretch-backports main" > /etc/apt/sources.list.d/certbot.list
 #-- Create Nginx packages repository for Debian 9 and configure for Nginx installation later --#
 apt-get -y install curl gnupg2 ca-certificates lsb-release > /tmp/sms_install.log
 echo "deb http://nginx.org/packages/debian `lsb_release -cs` nginx" | tee /etc/apt/sources.list.d/nginx.list
@@ -123,6 +143,8 @@ firewall-cmd --zone=public --permanent --add-icmp-block=echo-request
 firewall-cmd --reload
 echo "Install unzip"
 apt-get -y install unzip >> /tmp/sms_install.log
+echo "Install bzip2"
+apt-get -y install bzip2 >> /tmp/sms_install.log
 echo "Install MariaDB" 
 apt-get -y install mariadb-server mariadb-client >> /tmp/sms_install.log
 echo "Install Nginx web server"
@@ -141,8 +163,14 @@ echo "Install development tools"
 apt-get -y install build-essential >> /tmp/sms_install.log
 echo "Install Git version control system"
 apt-get -y install git >> /tmp/sms_install.log
+echo "Refresh snap core"
+snap install core
+snap refresh core
 echo "Install free DNS certificates auto renew utility"
-apt-get -y install certbot python-certbot-nginx -t stretch-backports >> /tmp/sms_install.log
+#apt-get -y install certbot python-certbot-nginx -t stretch-backports >> /tmp/sms_install.log
+snap install --classic certbot >> /tmp/sms_install.log
+ln -s /snap/bin/certbot /usr/bin/certbot
+
 echo ""
 echo "----------------------------------------------------------------------------------"
 echo "Now, you need to configure CPAN which will be used in next step, please accept ALL default values during setup."
@@ -181,7 +209,7 @@ echo "install libauthen-passphrase-perl"
 apt-get -y install libauthen-passphrase-perl >> /tmp/sms_install.log
 echo "Install libproc-processtable-perl"
 apt-get -y install libproc-processtable-perl >> /tmp/sms_install.log
-echo "install perl-www-telegram-botapi"
+echo "install WWW::Telegram::BotAPI"
 git clone https://github.com/Robertof/perl-www-telegram-botapi.git >> /tmp/sms_install.log
 mkdir -p /usr/share/perl5/WWW/Telegram >> /tmp/sms_install.log 
 cp perl-www-telegram-botapi/lib/WWW/Telegram/BotAPI.pm /usr/share/perl5/WWW/Telegram >> /tmp/sms_install.log

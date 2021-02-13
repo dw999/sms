@@ -15,11 +15,13 @@
 ###
 
 #=========================================================================================================
-# Program: install_sms_ubt_nginx.sh
+# Program: install_sms_ubt_20_nginx.sh
 #
 # Ver         Date            Author          Comment
 # =======     ===========     ===========     ==========================================
 # V1.0.00     2020-06-19      DW              Install SMS on Ubuntu 20.04 with Nginx web server.
+# V1.0.01     2021-02-10      DW              CertBot installation method has been changed by using snap, so that 
+#                                             this SMS installation script is updated accordingly. 
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -60,11 +62,28 @@ then
   exit 1
 fi
 
+#-- If snapd doesn't exist, install it now and reboot the system. --#
+sn=`dpkg -l | grep "ii  snapd" | wc -l`
+if [[ "$sn" -eq 0 ]]
+then
+  echo "Install snapd, please wait..."
+  apt-get -y install snapd >> /tmp/sms_install.log
+  systemctl enable --now snapd.socket >> /tmp/sms_install.log
+  systemctl start snapd.socket >> /tmp/sms_install.log
+  systemctl enable --now snap.seeded.service >> /tmp/sms_install.log
+  systemctl start snap.seeded.service >> /tmp/sms_install.log
+  echo ""
+  echo "Since snapd has just been installed, you need to reboot the server and run the installation program again."
+  read -p "Press enter to reboot the server..."
+  shutdown -r now  
+fi
+
 #-- Define variables --#
 export BUILD_PRELOAD=N
 export PATH=$PATH:/usr/sbin:/usr/local/sbin
 
 #-- Start process --#
+clear
 echo "Before you start the SMS installation, you must fulfil the following requirements:"
 echo ""
 echo "1. You must be administrative user. (i.e. You are 'root' or 'root' equivalent user)"
@@ -142,8 +161,14 @@ echo "Install development tools"
 apt-get -y install build-essential >> /tmp/sms_install.log
 echo "Install Git version control system"
 apt-get -y install git >> /tmp/sms_install.log
+echo "Refresh snap core"
+snap wait system seed.loaded
+snap install core
+snap refresh core
 echo "Install free DNS certificates auto renew utility"
-apt-get -y install certbot python3-certbot-nginx >> /tmp/sms_install.log
+#apt-get -y install certbot python3-certbot-nginx >> /tmp/sms_install.log
+snap install --classic certbot >> /tmp/sms_install.log
+ln -s /snap/bin/certbot /usr/bin/certbot
 
 echo ""
 echo "----------------------------------------------------------------------------------"
@@ -184,7 +209,10 @@ apt-get -y install libauthen-passphrase-perl >> /tmp/sms_install.log
 echo "Install libproc-processtable-perl"
 apt-get -y install libproc-processtable-perl >> /tmp/sms_install.log
 echo "install WWW::Telegram::BotAPI"
-cpan WWW::Telegram::BotAPI >> /tmp/sms_install.log
+git clone https://github.com/Robertof/perl-www-telegram-botapi.git >> /tmp/sms_install.log
+mkdir -p /usr/share/perl5/WWW/Telegram >> /tmp/sms_install.log 
+cp perl-www-telegram-botapi/lib/WWW/Telegram/BotAPI.pm /usr/share/perl5/WWW/Telegram >> /tmp/sms_install.log
+rm -rf perl-www-telegram-botapi >> /tmp/sms_install.log
 echo "install Email::Sender::Transport::SMTP::TLS"
 cpan Email::Sender::Transport::SMTP::TLS >> /tmp/sms_install.log
 

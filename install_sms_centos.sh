@@ -30,6 +30,8 @@
 #                                               issue across different Linux/Unix systems.
 # V1.0.05     2019-05-09      DW              Unify firewall application used on supported platforms, and then the SMS system defender.
 # V1.0.06     2019-05-11      DW              Add Perl library Proc::ProcessTable installation for SMS defender.
+# V1.0.07     2021-02-07      DW              CertBot installation method has been changed by using snap, so that 
+#                                             this SMS installation script is updated accordingly. 
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -87,11 +89,37 @@ then
   shutdown -r now
 fi  
 
+#-- Ensure the enterprise packages repository installed --#
+er=`yum list installed epel-release | grep epel-release | wc -l`
+if [[ "$er" -eq 0 ]]
+then 
+  echo "Install enterprise packages repository"
+  yum -y install epel-release >> /tmp/sms_install.log
+fi
+
+#-- If snapd doesn't exist, install it now and reboot the system. --#
+sn=`yum list installed snapd | grep snapd | wc -l`
+if [[ "$sn" -eq 0 ]]
+then
+  echo "Install snapd, please wait..."
+  yum -y install snapd >> /tmp/sms_install.log
+  systemctl enable --now snapd.socket >> /tmp/sms_install.log
+  systemctl start snapd.socket >> /tmp/sms_install.log
+  systemctl enable --now snap.seeded.service >> /tmp/sms_install.log
+  systemctl start snap.seeded.service >> /tmp/sms_install.log
+  ln -s /var/lib/snapd/snap /snap
+  echo ""
+  echo "Since snapd has just been installed, you need to reboot the server and run the installation program again."
+  read -p "Press enter to reboot the server..."
+  shutdown -r now  
+fi
+
 #-- Define variables --#
 export BUILD_PRELOAD=N
 export PATH=$PATH:/usr/sbin:/usr/local/sbin
 
 #-- Start process --#
+clear
 echo "Before you start the SMS installation, you must fulfil the following requirements:"
 echo ""
 echo "1. You must be administrative user. (i.e. You are 'root' or 'root' equivalent user)"
@@ -135,6 +163,8 @@ echo "Install curl"
 yum -y install curl.x86_64 >> /tmp/sms_install.log
 echo "Install unzip"
 yum -y install unzip.x86_64 >> /tmp/sms_install.log
+echo "Install bzip2"
+yum -y install bzip2 >> /tmp/sms_install.log
 echo "Install MariaDB"
 yum -y install mariadb.x86_64 >> /tmp/sms_install.log
 yum -y install mariadb-server.x86_64 >> /tmp/sms_install.log
@@ -142,16 +172,20 @@ echo "Install Apache HTTP server"
 yum -y install httpd.x86_64 >> /tmp/sms_install.log
 echo "Install logrotate"
 yum -y install logrotate >> /tmp/sms_install.log
-echo "Install additional enterprise packages repository"
-yum -y install epel-release >> /tmp/sms_install.log
 echo "Install Perl"
 yum -y install perl.x86_64 >> /tmp/sms_install.log
 echo "Install development tools"
 yum -y groupinstall "Development Tools" >> /tmp/sms_install.log
 echo "Install Git version control system"
 yum -y install git.x86_64 >> /tmp/sms_install.log
+echo "Refresh snap core"
+snap wait system seed.loaded
+snap install core
+snap refresh core
 echo "Install free DNS certificates auto renew utility"
-yum -y install python2-certbot-apache >> /tmp/sms_install.log
+#yum -y install python2-certbot-apache >> /tmp/sms_install.log
+snap install --classic certbot >> /tmp/sms_install.log
+ln -s /snap/bin/certbot /usr/bin/certbot
 echo "Install CPAN"
 yum -y install perl-IO-Socket-SSL.noarch >> /tmp/sms_install.log
 yum -y install perl-CPAN.noarch >> /tmp/sms_install.log

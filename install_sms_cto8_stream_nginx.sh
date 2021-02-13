@@ -15,11 +15,13 @@
 ###
 
 #=========================================================================================================
-# Program: install_sms_cto_nginx.sh
+# Program: install_sms_cto8_stream_nginx.sh
 #
 # Ver         Date            Author          Comment    
 # =======     ===========     ===========     ==========================================
 # V1.0.00     2020-12-20      DW              Install SMS server on CentOS Stream 8 by using Nginx as web server.
+# V1.0.01     2021-02-07      DW              CertBot installation method has been changed by using snap, so that 
+#                                             this SMS installation script is updated accordingly. 
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -77,11 +79,40 @@ then
   shutdown -r now
 fi  
 
+#-- Ensure the enterprise packages repository installed --#
+er=`dnf list installed epel-release | grep epel-release | wc -l`
+if [[ "$er" -eq 0 ]]
+then 
+  echo "Install enterprise packages repository"
+  dnf -y install epel-release >> /tmp/sms_install.log
+else
+  echo "Refresh software repository, please wait..."
+  dnf -y upgrade >> /tmp/sms_install.log
+fi
+
+#-- If snapd doesn't exist, install it now and reboot the system. --#
+sn=`dnf list installed snapd | grep snapd | wc -l`
+if [[ "$sn" -eq 0 ]]
+then
+  echo "Install snapd, please wait..."
+  dnf -y install snapd >> /tmp/sms_install.log
+  systemctl enable --now snapd.socket >> /tmp/sms_install.log
+  systemctl start snapd.socket >> /tmp/sms_install.log
+  systemctl enable --now snap.seeded.service >> /tmp/sms_install.log
+  systemctl start snap.seeded.service >> /tmp/sms_install.log
+  ln -s /var/lib/snapd/snap /snap
+  echo ""
+  echo "Since snapd has just been installed, you need to reboot the server and run the installation program again."
+  read -p "Press enter to reboot the server..."
+  shutdown -r now  
+fi
+
 #-- Define variables --#
 export BUILD_PRELOAD=N
 export PATH=$PATH:/usr/sbin:/usr/local/sbin
 
 #-- Start process --#
+clear
 echo "Before you start the SMS installation, you must fulfil the following requirements:"
 echo ""
 echo "1. You must be administrative user. (i.e. You are 'root' or 'root' equivalent user)"
@@ -120,14 +151,18 @@ echo "Install curl"
 dnf -y install curl.x86_64 >> /tmp/sms_install.log
 echo "Install unzip"
 dnf -y install unzip.x86_64 >> /tmp/sms_install.log
+echo "Install bzip2"
+dnf -y install bzip2 >> /tmp/sms_install.log
 echo "Install wget"
 dnf -y install wget.x86_64 >> /tmp/sms_install.log
 echo "Install MariaDB"
 dnf -y install mariadb-server.x86_64 >> /tmp/sms_install.log
 echo "Install logrotate"
 dnf -y install logrotate >> /tmp/sms_install.log
-echo "Install additional enterprise packages repository"
-dnf -y install epel-release >> /tmp/sms_install.log
+echo "Refresh snap core"
+snap wait system seed.loaded
+snap install core
+snap refresh core
 echo "Install Git version control system"
 dnf -y install git.x86_64 >> /tmp/sms_install.log
 echo "Install Perl"
@@ -175,10 +210,11 @@ chown root.root /etc/rc.d/rc.local
 chmod +x /etc/rc.d/rc.local
 echo "Install free DNS certificates auto renew utility"
 dnf -y install wget python2-tools python2-devel gcc python2-virtualenv augeas-libs libffi-devel openssl-devel python3-virtualenv >> /tmp/sms_install.log
-wget https://dl.eff.org/certbot-auto
-mv certbot-auto /usr/bin/certbot
-chown root /usr/bin/certbot
-chmod 0755 /usr/bin/certbot
+#wget https://dl.eff.org/certbot-auto
+#mv certbot-auto /usr/bin/certbot
+#chown root /usr/bin/certbot
+#chmod 0755 /usr/bin/certbot
+snap install --classic certbot >> /tmp/sms_install.log
 echo "Install CPAN"
 dnf -y install perl-IO-Socket-SSL.noarch >> /tmp/sms_install.log
 dnf -y install perl-CPAN.noarch >> /tmp/sms_install.log
@@ -213,8 +249,6 @@ dnf -y install ImageMagick-perl.x86_64 >> /tmp/sms_install.log
 dnf -y install ImageMagick-doc.x86_64 >> /tmp/sms_install.log
 dnf -y install ImageMagick-devel.x86_64 >> /tmp/sms_install.log
 dnf -y install ImageMagick-c++.x86_64 >> /tmp/sms_install.log
-echo "install WWW::Telegram::BotAPI"
-cpan WWW::Telegram::BotAPI
 echo "install Crypt::CBC"
 cpan Crypt::CBC >> /tmp/sms_install.log
 echo "install Crypt::Eksblowfish"
@@ -235,6 +269,8 @@ echo "install Authen::Passphrase"
 cpan Authen::Passphrase >> /tmp/sms_install.log
 echo "Install Proc::ProcessTable"
 cpan Proc::ProcessTable >> /tmp/sms_install.log
+echo "install WWW::Telegram::BotAPI"
+cpan WWW::Telegram::BotAPI >> /tmp/sms_install.logs
 echo "install Email::Sender::Transport::SMTP::TLS"
 cpan Email::Sender::Transport::SMTP::TLS >> /tmp/sms_install.log
 
