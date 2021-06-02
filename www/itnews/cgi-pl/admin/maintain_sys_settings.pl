@@ -24,6 +24,7 @@
 # V1.0.01       2019-01-29      DW              Add follow up checking as system settings
 #                                               is added or modified.
 # V1.0.02       2019-10-12      DW              Function 'isHeSysAdmin' is moved to sm_user.pl
+# V1.0.03       2021-06-02      DW              Remove 'add' and 'delete' functions of this module.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -531,8 +532,10 @@ sub printSysSettingList {
       <thead>
         <tr style="background-color:lightblue">
           <td width=30% align=center valign=center><b>Key</b></td>
-          <td width=50% align=center valign=center><b>Value</b></td>
+          <td width=70% align=center valign=center><b>Value</b></td>
+          <!--
           <td align=center valign=center><b>Delete</b></td>
+          //-->
         </tr>
       </thead>
       <tbody>
@@ -550,20 +553,23 @@ __HTML
           <td valign=center style="word-wrap:break-word">
             <a href="javascript:editSysSetting('$this_sys_key')">$this_sys_value</a>
           </td>
+          <!--
           <td align=center valign=center>
             <input type=button id="del_ss" name="del_ss" data-icon="delete" data-iconpos="notext" onClick="deleteSysSetting('$this_sys_key')">
           </td>
+          //-->
         </tr>
 __HTML
   }
   
   $html .= <<__HTML;
-        <tr style="background-color:lightblue"><td align=center colspan=3>End</td></tr>
+        <tr style="background-color:lightblue"><td align=center colspan=2>End</td></tr>
       </tbody>
       </table>
     </div>
 
     <div data-role="footer" data-position="fixed" data-tap-toggle="false">
+      <!--
       <table width=100% cellspacing=0 cellpadding=0 style="table-layout:fixed">
       <thead></thead>
       <tbody>
@@ -571,6 +577,7 @@ __HTML
           <td align=center valign=center><input type=button id="add_ss" name="add_ss" value="Add System Setting" data-icon="plus" onClick="addSysSetting()"></td>
         </tr>
       </tbody>
+      //-->
     </div>
   </div>
   </form>
