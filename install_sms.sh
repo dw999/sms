@@ -27,7 +27,8 @@
 # V1.0.04     2019-10-02      DW              Include CentOS Linux 8 as SMS supported platform.
 # V1.0.05     2020-07-15      DW              Include Ubuntu 20.04 as SMS supported platform. 
 # V1.0.06     2020-12-20      DW              Include CentOS Stream 8 as SMS supported platform.
-# V1.0.07     2021-04-03      DW              Include AlmaLinux 8.3 as SMS supported platform.
+# V1.0.07     2021-04-03      DW              Include AlmaLinux 8.x as SMS supported platform.
+# V1.0.08     2021-07-04      DW              Include Rocky Linux 8.x as SMS supported platform. 
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -119,6 +120,28 @@ then
   else
     chmod +x ./install_sms_alma8_nginx.sh
     source ./install_sms_alma8_nginx.sh
+  fi
+  exit 0
+fi
+
+v=`hostnamectl | grep "Rocky Linux 8" | wc -l`
+if [[ "$v" -eq 1 ]]
+then
+  echo "Please select web server for SMS installation:"
+  echo ""
+  echo "1. Nginx web server"
+  echo "2. Apache web server"
+  echo ""
+  echo "Note: If you don't know how to choose, select Nginx web server."
+  echo ""
+  read -p "Your choice (1 or 2): " choice
+  if (test ${choice} = '2')
+  then
+    chmod +x ./install_sms_rocky8.sh
+    source ./install_sms_rocky8.sh
+  else
+    chmod +x ./install_sms_rocky8_nginx.sh
+    source ./install_sms_rocky8_nginx.sh
   fi
   exit 0
 fi
