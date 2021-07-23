@@ -22,6 +22,8 @@
 #                                               which exceed a pre-defined period.
 # V1.0.01       2020-04-21      DW              Add parameter "--zone=public" to IP address
 #                                               blocking removal command.
+# V1.0.02       2021-07-23      DW              Improve function 'getOldHackerIpList' to let 
+#                                               time calculation precise to hour.
 ##########################################################################################
 
 use strict;
@@ -51,7 +53,7 @@ $dbh = DBI->connect($dsn, $user, $pass, {'RaiseError' => 1});
 foreach my $this_hacker_ip (@ip_list) {
   my $ok = removeFirewallBlockingRule($this_hacker_ip);
   if ($ok != -1) {
-    print "$this_hacker_ip has been removed from firewall blocking rule.\n";
+    print "$this_hacker_ip is removed from firewall blocking rule.\n";
     markHackerIpInactive($this_hacker_ip);
     $cnt++;
   }  
@@ -85,22 +87,16 @@ $dbh->disconnect;
 
 sub getOldHackerIpList {
   my ($hacker_ip_block_days) = @_;
-  my ($sql, $sth, $lower_block_date, @data, @result);
+  my ($sql, $sth, $block_hours, @data, @result);
 
-  #-- Step 1: Determine the releasing date --#
-  $sql = "SELECT FROM_DAYS(TO_DAYS(SYSDATE()) - $hacker_ip_block_days)";
-  $sth = $dbh->prepare($sql);
-  $sth->execute();
-  @data = $sth->fetchrow_array();
-  $lower_block_date = allTrim($data[0]);
-  $sth->finish();
-
-  #-- Step 2: Get all hacker IP addresses on or older than this date --#
+  #-- Convert blocking days to hours --#
+  $block_hours = $hacker_ip_block_days * 24;
+  
   $sql = "SELECT ipv4_address " .
          "  FROM hacker_ip " .
-         "  WHERE hit_date <= '$lower_block_date' " .
+         "  WHERE TIMESTAMPDIFF(hour, hit_date, CURRENT_TIMESTAMP()) >= $block_hours " .
          "    AND is_active = 1 ";
-         
+
   $sth = $dbh->prepare($sql);
   $sth->execute();
   while (@data = $sth->fetchrow_array()) {
