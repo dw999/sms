@@ -11,3 +11,4 @@ Progression Log of SMS
 - 2020-12-20 SMS supports CentOS Stream 8 for both Apache and Nginx web servers.
 - 2021-04-27 SMS supports AlmaLinux 8.x for both Apache and Nginx web servers.
 - 2021-07-04 SMS supports Rocky Linux 8.x for both Apache and Nginx web servers.
+- 2021-08-30 SMS supports Debian Linux 11 for both Apache and Nginx web servers.
