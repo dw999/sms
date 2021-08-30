@@ -25,6 +25,7 @@
 # V1.0.02     2019-05-23      DW              Install pre-requisites utilities on all supported platforms.
 # V1.0.03     2019-10-17      DW              Install pre-requisites utilities for CentOS 8.
 # V1.0.04     2021-02-08      DW              Use variable 'FF_VER' to control download FFmpeg source code version. 
+# V1.0.05     2021-08-30      DW              Use FFmpeg 4.4 as multimedia file converter, previous working version is 4.3.1.
 #=========================================================================================================
 
 echo ""
@@ -76,8 +77,8 @@ echo "Download FFmpeg and required additional libraries, please wait..."
 echo "================================================================="
 echo ""
 echo "Download FFmpeg"
-#-- FFmpeg version number, it is used to control commands below. Note: Previous working version is 4.1 --#
-FF_VER="4.3.1"
+#-- FFmpeg version number, it is used to control commands below. Note: Previous working version is 4.3.1 --#
+FF_VER="4.4"
 #-- Download FFmpeg source code according to 'FF_VER' --#
 curl -O https://ffmpeg.org/releases/ffmpeg-$FF_VER.tar.bz2 >> /tmp/build_ffmpeg.log
 bzip2 -d ffmpeg-$FF_VER.tar.bz2 >> /tmp/build_ffmpeg.log
