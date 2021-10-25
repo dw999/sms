@@ -30,6 +30,7 @@
 # V1.0.07     2021-04-03      DW              Include AlmaLinux 8.x as SMS supported platform.
 # V1.0.08     2021-07-04      DW              Include Rocky Linux 8.x as SMS supported platform. 
 # V1.0.09     2021-08-30      DW              Include Debian 11 as SMS supported platform.
+# V1.0.10     2021-10-25      DW              Include Oracle Linux 8.x as SMS supported platform.
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -143,6 +144,28 @@ then
   else
     chmod +x ./install_sms_rocky8_nginx.sh
     source ./install_sms_rocky8_nginx.sh
+  fi
+  exit 0
+fi
+
+v=`hostnamectl | grep "Oracle Linux Server 8" | wc -l`
+if [[ "$v" -eq 1 ]]
+then
+  echo "Please select web server for SMS installation:"
+  echo ""
+  echo "1. Nginx web server"
+  echo "2. Apache web server"
+  echo ""
+  echo "Note: If you don't know how to choose, select Nginx web server."
+  echo ""
+  read -p "Your choice (1 or 2): " choice
+  if (test ${choice} = '2')
+  then
+    chmod +x ./install_sms_ol8.sh
+    source ./install_sms_ol8.sh
+  else
+    chmod +x ./install_sms_ol8_nginx.sh
+    source ./install_sms_ol8_nginx.sh
   fi
   exit 0
 fi

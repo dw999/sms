@@ -15,11 +15,11 @@
 ###
 
 #=========================================================================================================
-# Program: install_sms_rocky8.sh
+# Program: install_sms_ol8.sh
 #
 # Ver         Date            Author          Comment    
 # =======     ===========     ===========     ==========================================
-# V1.0.00     2021-07-04      DW              Install SMS on Rocky Linux 8.x and use Apache web server.
+# V1.0.00     2021-10-25      DW              Install SMS on Oracle Linux Server 8.x and use Apache web server.
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -28,12 +28,12 @@ setterm -blank 0
 clear
 
 #-- Check currently running operating system and it's version --#
-v=`hostnamectl | grep "Rocky Linux 8" | wc -l`
+v=`hostnamectl | grep "Oracle Linux Server 8" | wc -l`
 if [[ "$v" -eq 0 ]]
 then
   echo "Currently Running" `hostnamectl | grep "Operating System"`
   echo ""
-  echo "This SMS installation program is specified for Rocky Linux 8.x only, running on other Linux distro is"
+  echo "This SMS installation program is specified for Oracle Linux Server 8.x only, running on other Linux distro is"
   echo "likely to fail."
   echo ""
   read -p "Do you want to continue (Y/N)? " TOGO
@@ -78,11 +78,11 @@ then
 fi  
 
 #-- Ensure the enterprise packages repository installed --#
-er=`dnf list installed epel-release | grep epel-release | wc -l`
+er=`dnf list installed oracle-epel-release-el8 | grep oracle-epel-release-el8 | wc -l`
 if [[ "$er" -eq 0 ]]
 then 
   echo "Install enterprise packages repository"
-  dnf -y install epel-release >> /tmp/sms_install.log
+  dnf -y install oracle-epel-release-el8 >> /tmp/sms_install.log
 else 
   echo "Refresh software repository, please wait..."
   dnf -y upgrade >> /tmp/sms_install.log
@@ -196,6 +196,8 @@ echo "install perl-CGI.noarch"
 dnf -y install perl-CGI.noarch >> /tmp/sms_install.log
 echo "install perl-DBI.x86_64"
 dnf -y install perl-DBI.x86_64 >> /tmp/sms_install.log
+echo "install perl-DBD-MySQL.x86_64"
+dnf -y install perl-DBD-MySQL.x86_64 >> /tmp/sms_install.log
 echo "install perl-URI-1.60-9.el7.noarch"
 dnf -y install perl-URI.noarch >> /tmp/sms_install.log
 echo "install perl-Encode.x86_64"

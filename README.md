@@ -18,8 +18,9 @@ What platform SMS server support
 - 2020-07-15  Support x86_64 Ubuntu 20.04
 - 2020-12-20  Support x86_64 Centos Stream 8
 - 2021-04-27  Support x86_64 AlmaLinux 8.x 
-- 2021-07-04  Support X86_64 Rocky Linux 8.x
-- 2021-08-30  Support X86_64 Debian Linux 11
+- 2021-07-04  Support x86_64 Rocky Linux 8.x
+- 2021-08-30  Support x86_64 Debian Linux 11
+- 2021-10-26  Support x86_64 Oracle Linux 8.x
 
 Prerequisites of SMS server installation
 ----------------------------------------

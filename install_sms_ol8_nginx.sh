@@ -15,11 +15,11 @@
 ###
 
 #=========================================================================================================
-# Program: install_sms_rocky8.sh
+# Program: install_sms_ol8_nginx.sh
 #
 # Ver         Date            Author          Comment    
 # =======     ===========     ===========     ==========================================
-# V1.0.00     2021-07-04      DW              Install SMS on Rocky Linux 8.x and use Apache web server.
+# V1.0.00     2021-10-25      DW              Install SMS server on Oracle Linux 8.x by using Nginx as web server.
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -28,12 +28,12 @@ setterm -blank 0
 clear
 
 #-- Check currently running operating system and it's version --#
-v=`hostnamectl | grep "Rocky Linux 8" | wc -l`
+v=`hostnamectl | grep "Oracle Linux Server 8" | wc -l`
 if [[ "$v" -eq 0 ]]
 then
   echo "Currently Running" `hostnamectl | grep "Operating System"`
   echo ""
-  echo "This SMS installation program is specified for Rocky Linux 8.x only, running on other Linux distro is"
+  echo "This SMS installation program is specified for Oracle Linux Server 8.x only, running on other Linux distro is"
   echo "likely to fail."
   echo ""
   read -p "Do you want to continue (Y/N)? " TOGO
@@ -78,12 +78,12 @@ then
 fi  
 
 #-- Ensure the enterprise packages repository installed --#
-er=`dnf list installed epel-release | grep epel-release | wc -l`
+er=`dnf list installed oracle-epel-release-el8 | grep oracle-epel-release-el8 | wc -l`
 if [[ "$er" -eq 0 ]]
 then 
   echo "Install enterprise packages repository"
-  dnf -y install epel-release >> /tmp/sms_install.log
-else 
+  dnf -y install oracle-epel-release-el8 >> /tmp/sms_install.log
+else  
   echo "Refresh software repository, please wait..."
   dnf -y upgrade >> /tmp/sms_install.log
 fi
@@ -151,10 +151,10 @@ echo "Install unzip"
 dnf -y install unzip.x86_64 >> /tmp/sms_install.log
 echo "Install bzip2"
 dnf -y install bzip2 >> /tmp/sms_install.log
+echo "Install wget"
+dnf -y install wget.x86_64 >> /tmp/sms_install.log
 echo "Install MariaDB"
 dnf -y install mariadb-server.x86_64 >> /tmp/sms_install.log
-echo "Install Apache HTTP server"
-dnf -y install httpd.x86_64 >> /tmp/sms_install.log
 echo "Install rsyslog"
 dnf -y install rsyslog >> /tmp/sms_install.log
 systemctl enable rsyslog
@@ -165,16 +165,53 @@ echo "Refresh snap core"
 snap wait system seed.loaded
 snap install core
 snap refresh core
+echo "Install Git version control system"
+dnf -y install git.x86_64 >> /tmp/sms_install.log
 echo "Install Perl"
 dnf -y install perl.x86_64 >> /tmp/sms_install.log
 echo "Install development tools"
 dnf -y groupinstall "Development Tools" >> /tmp/sms_install.log
-echo "Install Git version control system"
-dnf -y install git.x86_64 >> /tmp/sms_install.log
+#-- Note: Nginx and related packages are belongs to epel, so that they must be installed after epel installation. --#
+echo "Install Nginx web server"
+dnf -y install nginx.x86_64 >> /tmp/sms_install.log
+echo "Install Simple FastCGI wrapper for CGI scripts"
+#-- Install FastCGI development library --#
+wget https://github.com/FastCGI-Archives/FastCGI.com/raw/master/original_snapshot/fcgi-2.4.1-SNAP-0910052249.tar.gz
+tar xzf fcgi-2.4.1-SNAP-0910052249.tar.gz
+cd fcgi-2.4.1-SNAP-0910052249
+./configure
+make
+make install
+cd ..
+rm -rf fcgi-2.4.1-SNAP-0910052249
+rm -f fcgi-2.4.1-SNAP-0910052249.tar.gz
+#-- Install FastCGI script wrapper --#
+git clone https://github.com/IlievIliya92/fcgiwrap.git
+cd fcgiwrap
+autoreconf -i
+#-- Note: "ac_cv_func_malloc_0_nonnull=yes" is used to avoid compilation error "undefined reference to `rpl_malloc'" --#
+ac_cv_func_malloc_0_nonnull=yes ./configure
+make
+make install
+ln -s /usr/local/sbin/fcgiwrap /usr/sbin/fcgiwrap
+cd ..
+rm -rf fcgiwrap
+#-- Install FastCGI script spawn controller --#
+git clone https://github.com/lighttpd/spawn-fcgi.git
+cd spawn-fcgi
+./autogen.sh
+./configure
+make
+make install
+ln -s /usr/local/bin/spawn-fcgi /usr/bin/spawn-fcgi
+cd ..
+rm -rf spawn-fcgi
+echo "Configure FastCGI script wrapper"
+cp -f ./sys/centos8/rc.d/rc.local /etc/rc.d/rc.local
+chown root.root /etc/rc.d/rc.local
+chmod +x /etc/rc.d/rc.local
 echo "Install free DNS certificates auto renew utility"
 dnf -y install wget python2-tools python2-devel gcc python2-virtualenv augeas-libs libffi-devel openssl-devel python3-virtualenv >> /tmp/sms_install.log
-#-- httpd and mod_ssl should have been installed before, put it here for precaution only. --#
-dnf -y install httpd mod_ssl >> /tmp/sms_install.log
 snap install --classic certbot >> /tmp/sms_install.log
 echo "Install CPAN"
 dnf -y install perl-IO-Socket-SSL.noarch >> /tmp/sms_install.log
@@ -196,6 +233,8 @@ echo "install perl-CGI.noarch"
 dnf -y install perl-CGI.noarch >> /tmp/sms_install.log
 echo "install perl-DBI.x86_64"
 dnf -y install perl-DBI.x86_64 >> /tmp/sms_install.log
+echo "install perl-DBD-MySQL.x86_64"
+dnf -y install perl-DBD-MySQL.x86_64 >> /tmp/sms_install.log
 echo "install perl-URI-1.60-9.el7.noarch"
 dnf -y install perl-URI.noarch >> /tmp/sms_install.log
 echo "install perl-Encode.x86_64"
@@ -338,21 +377,17 @@ echo "==========================================================================
 echo "You need to generate two SSL certificates for the sites, I should find their domain names for you, please input SMS"
 echo "administrator email in this step, and select the choice to generate SSL certificates for BOTH sites."
 read -p "Press enter to start..."
-# 1. Change 'ServerName' of decoy site and messaging site on ssl.conf
-# 2. Copy all Apache configuration files (include a specially crafted welcome.conf), pre-load SSL certificates and private key files to locations defined on ssl.conf
-# 3. Run 'certbot --apache' to get new SSL certificate and private key from "Let’s Encrypt"
-perl generate_ssl_conf.pl os=centos7 ws=apache >> /tmp/sms_install.log
-cp -f apache24/centos7/httpd_conf/conf/*.conf /etc/httpd/conf
-cp -f apache24/centos7/httpd_conf/conf.d/*.conf /etc/httpd/conf.d
-cp -f apache24/centos7/ssl_cert_and_key/cert/* /etc/pki/tls/certs
-cp -f apache24/centos7/ssl_cert_and_key/key/* /etc/pki/tls/private
-systemctl enable httpd.service >> /tmp/sms_install.log
-systemctl start httpd.service >> /tmp/sms_install.log
-#-- Note: 1. Apache must be up and running as execute 'certbot'.                                                             --#
+perl generate_ssl_conf.pl os=centos7 ws=nginx >> /tmp/sms_install.log
+cp -f ./nginx/centos7/nginx.conf /etc/nginx
+cp -f ./nginx/centos7/ssl_cert_and_key/cert/* /etc/pki/tls/certs
+cp -f ./nginx/centos7/ssl_cert_and_key/key/* /etc/pki/tls/private
+systemctl enable nginx.service >> /tmp/sms_install.log
+systemctl start nginx.service >> /tmp/sms_install.log
+#-- Note: 1. Nginx must be up and running before execute 'certbot'.                                                          --#
 #--       2. SSL certificates getting process often fail in this stage. If it is the case, just login as root and re-run the --#
 #--          below command.                                                                                                  --# 
-certbot --apache
-y=`cat /etc/httpd/conf.d/ssl.conf | grep "letsencrypt" | wc -l`
+certbot --nginx
+y=`cat /etc/nginx/nginx.conf | grep "letsencrypt" | wc -l`
 if [[ "$y" -eq 0 ]]
 then
   echo ""
@@ -360,7 +395,7 @@ then
   echo "SSL certificate generation process is failure, but don't worry, you may re-run"
   echo "the following command after SMS installation to fix this problem:"
   echo ""
-  echo "certbot --apache"
+  echo "certbot --nginx"
   echo "******************************************************************************"
   echo ""
   read -p "Press enter to continue..."
@@ -375,6 +410,7 @@ cp -f /etc/crontab /etc/crontab.bkup
 cp -f ./sys/centos7/crontab.sms_only /etc/crontab
 echo "Configure system log rotation"
 cp -f ./sys/centos8/syslog /etc/logrotate.d
+cp -f ./sys/centos7/nginx /etc/logrotate.d
 systemctl restart crond
 
 echo ""
