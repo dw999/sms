@@ -31,7 +31,7 @@
 # V1.0.08     2021-07-04      DW              Include Rocky Linux 8.x as SMS supported platform. 
 # V1.0.09     2021-08-30      DW              Include Debian 11 as SMS supported platform.
 # V1.0.10     2021-10-25      DW              Include Oracle Linux 8.x as SMS supported platform.
-# V1.0.11     2022-02-01      DW              Remove CentOS Linux as SMS supported platform since it has passed it's EOL date (2021-12-31).
+# V1.0.11     2022-02-01      DW              Remove CentOS Linux 8 as SMS supported platform since it has passed it's EOL date (2021-12-31).
 #=========================================================================================================
 
 #-- Don't let screen blank --#
