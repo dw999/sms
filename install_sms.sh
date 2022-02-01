@@ -31,6 +31,7 @@
 # V1.0.08     2021-07-04      DW              Include Rocky Linux 8.x as SMS supported platform. 
 # V1.0.09     2021-08-30      DW              Include Debian 11 as SMS supported platform.
 # V1.0.10     2021-10-25      DW              Include Oracle Linux 8.x as SMS supported platform.
+# V1.0.11     2022-02-01      DW              Remove CentOS Linux as SMS supported platform since it has passed it's EOL date (2021-12-31).
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -60,27 +61,30 @@ then
   exit 0
 fi
 
-v=`hostnamectl | grep "CentOS Linux 8" | wc -l`
-if [[ "$v" -eq 1 ]]
-then
-  echo "Please select web server for SMS installation:"
-  echo ""
-  echo "1. Nginx web server"
-  echo "2. Apache web server"
-  echo ""
-  echo "Note: If you don't know how to choose, select Nginx web server."
-  echo ""
-  read -p "Your choice (1 or 2): " choice
-  if (test ${choice} = '2')
-  then  
-    chmod +x ./install_sms_centos8.sh
-    source ./install_sms_centos8.sh
-  else
-    chmod +x ./install_sms_cto8_nginx.sh
-    source ./install_sms_cto8_nginx.sh
-  fi  
-  exit 0
-fi
+#
+# 2022-01-01: CentOS 8 has passed EOL date, so it is pull out from supported platform.
+#
+#v=`hostnamectl | grep "CentOS Linux 8" | wc -l`
+#if [[ "$v" -eq 1 ]]
+#then
+#  echo "Please select web server for SMS installation:"
+#  echo ""
+#  echo "1. Nginx web server"
+#  echo "2. Apache web server"
+#  echo ""
+#  echo "Note: If you don't know how to choose, select Nginx web server."
+#  echo ""
+#  read -p "Your choice (1 or 2): " choice
+#  if (test ${choice} = '2')
+#  then  
+#    chmod +x ./install_sms_centos8.sh
+#    source ./install_sms_centos8.sh
+#  else
+#    chmod +x ./install_sms_cto8_nginx.sh
+#    source ./install_sms_cto8_nginx.sh
+#  fi  
+#  exit 0
+#fi
 
 v=`hostnamectl | grep "CentOS Stream 8" | wc -l`
 if [[ "$v" -eq 1 ]]

@@ -196,7 +196,7 @@ echo "install perl-CGI.noarch"
 dnf -y install perl-CGI.noarch >> /tmp/sms_install.log
 echo "install perl-DBI.x86_64"
 dnf -y install perl-DBI.x86_64 >> /tmp/sms_install.log
-echo "install perl-URI-1.60-9.el7.noarch"
+echo "install perl-URI.noarch"
 dnf -y install perl-URI.noarch >> /tmp/sms_install.log
 echo "install perl-Encode.x86_64"
 dnf -y install perl-Encode.x86_64 >> /tmp/sms_install.log

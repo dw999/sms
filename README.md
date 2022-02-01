@@ -11,23 +11,17 @@ Apache license 2.0
 
 What platform SMS server support
 --------------------------------
-- 2019-04-08  Currently, it supports x86_64 CentOS 7 only.
-- 2019-04-24  Support x86_64 Ubuntu 18.04
-- 2019-04-25  Support x86_64 Debian Linux 9
-- 2019-10-08  Support x86_64 CentOS 8
-- 2020-07-15  Support x86_64 Ubuntu 20.04
-- 2020-12-20  Support x86_64 Centos Stream 8
-- 2021-04-27  Support x86_64 AlmaLinux 8.x 
-- 2021-07-04  Support x86_64 Rocky Linux 8.x
-- 2021-08-30  Support x86_64 Debian Linux 11
-- 2021-10-26  Support x86_64 Oracle Linux 8.x
+- CentOS and similar: CentOS 7, Centos Stream 8, AlmaLinux 8, Rocky Linux 8, Oracle Linux 8.   
+- Debian and similar: Debian 9, Debian 11, Ubuntu 18.04, Ubuntu 20.04.
+
+Note: All supported platforms are for x86_64 version only. 
 
 Prerequisites of SMS server installation
 ----------------------------------------
 - Network connection of your Linux server is well configured and fast enough (> 1Mb/s).
 - You have registered two domain names for the decoy site and messaging site, and they have already been pointed to your server's public IP address.
 - You have an email address for the SMS administrator. (Note: It should not link to your true identity)
-- You have registered at least one Gmail account for SMS server operations.
+- You have registered at least one Gmail account for SMS server operations. (optional if you choose connection method 1, details please refer to user manual.)
 
 How to install SMS server
 -------------------------

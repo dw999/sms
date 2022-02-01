@@ -39,6 +39,7 @@
 # V1.0.09       2020-07-22      DW              Take care Nginx web sites attacking also.
 # V1.0.10       2020-12-16      DW              - Fix a bug which update the 'hit_date' of active hacker IP address constinuously.
 #                                               - Add option "--quiet" to firewalld command to suppress status displaying.  
+# V1.0.11       2022-01-01      DW              Unescape web server log file as check it's content. 
 #
 # Remark: Database schema is as follows:
 #         
@@ -60,6 +61,7 @@
 use strict;
 use Proc::ProcessTable;
 use DBI;
+use URI::Escape;
 
 my $workfile;           # System authentication log file.
 my $dsn;                # Database configuration.  
@@ -438,7 +440,7 @@ sub processWebSiteAttacker {
 
   open FILE, "<", $log or die("Unable to open the file $log \n");
   while (<FILE>) {
-    my $this_line = $_;
+    my $this_line = uri_unescape($_);                # Unescape log file content before checking.
     
     if (webSiteAttackVectorIsFound($this_line)) {   
       my $this_hacker_ip = getHackerIpAddress($this_line);

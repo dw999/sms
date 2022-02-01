@@ -13,3 +13,4 @@ Progression Log of SMS
 - 2021-07-04 SMS supports Rocky Linux 8.x for both Apache and Nginx web servers.
 - 2021-08-30 SMS supports Debian Linux 11 for both Apache and Nginx web servers.
 - 2021-10-26 SMS supports Oracle Linux 8.x for both Apache and Nginx web servers.
+- 2022-02-01 As CentOS 8 has passed it's EOL data, so it is removed from SMS supported platform.
