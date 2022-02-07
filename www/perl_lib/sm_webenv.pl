@@ -34,10 +34,13 @@
 #                                               guess it easily.
 # V1.0.08       2019-04-28      DW              Add new function 'sessionExist'.
 # V1.0.09       2019-05-30      DW              Add new function 'informReferrer'.
+# V1.0.10       2022-01-07      DW              Use CGI::Cookie to create cookie in order to
+#                                               add 'httpOnly' flag to it to increase security.
 ##########################################################################################
 
 use strict;
 use CGI qw/:standard/;
+use CGI::Cookie;
 use DBI;
 use utf8;
 use Path::Class qw/file/;
@@ -764,7 +767,8 @@ sub printHead {
     $ui_ref = getSessionInfo($cookie_name);       # Defined on sm_user.pl
     %user_info = %$ui_ref;
     $user_info{'VALID'} = $new_time_limit; 
-    $cookie = cookie(-name => $cookie_name, -value => \%user_info, -path => '/', -expires => '+2d', -secure => 1);
+    #$cookie = cookie(-name => $cookie_name, -value => \%user_info, -path => '/', -expires => '+2d', -secure => 1);
+    $cookie = CGI::Cookie->new(-name => $cookie_name, -value => \%user_info, -path => '/', -expires => '+2d', -secure => 1, -httponly => 1);
     print header(-type => 'text/html', -charset => 'utf-8', -cookie => $cookie, -cache-control => 'no-cache');
     
     print <<__HTML;

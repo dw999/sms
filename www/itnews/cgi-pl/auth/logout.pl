@@ -21,12 +21,15 @@
 # V1.0.00       2018-06-19      DW              Logout the messaging system.
 # V1.0.01       2018-08-21      DW              Go to login page as logout.
 # V1.0.02       2019-01-21      DW              Go to a arbitrary decoy site as logout. 
+# V1.0.03       2022-01-07      DW              Use CGI::Cookie to create cookie in order to
+#                                               add 'httpOnly' flag to it to increase security.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
 
 use strict;
 use CGI qw/:standard/;
+use CGI::Cookie;
 require "sm_webenv.pl";
 require "sm_db.pl";
 require "sm_user.pl";
@@ -47,7 +50,8 @@ _deleteSession($COOKIE_MSG, $sess_code);                   # Defined on sm_user.
 
 #-- Step 2: Clear cookie --#
 $user_info{'SESS_CODE'} = '';
-$user_cookie = cookie(-name => $COOKIE_MSG, -value => \%user_info, -path => '/', -secure => 1);
+#$user_cookie = cookie(-name => $COOKIE_MSG, -value => \%user_info, -path => '/', -secure => 1);
+$user_cookie = CGI::Cookie->new(-name => $COOKIE_MSG, -value => \%user_info, -path => '/', -expires => '+2d', -secure => 1, -httponly => 1);
 print header(-charset => 'utf-8', -cookie => $user_cookie);
 
 #-- Step 3: Redirect to a randomly selected decoy site. --#

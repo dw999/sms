@@ -22,12 +22,15 @@
 # V1.0.01       2018-12-16      DW              Set cookie expiry period and enforce pass via SSL.
 # V1.0.02       2019-04-26      DW              Fix a security hole.
 # V1.0.03       2019-04-28      DW              Further harden the fixed security hole.  
+# V1.0.04       2022-01-07      DW              Use CGI::Cookie to create cookie in order to
+#                                               add 'httpOnly' flag to it to increase security.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
 
 use strict;
 use CGI qw/:standard/;
+use CGI::Cookie;
 require "sm_webenv.pl";
 require "sm_db.pl";
 require "sm_user.pl";
@@ -71,8 +74,9 @@ sub showPdaTools {
   if (sessionExist($dbp, $user_id, $sess_code)) {       # Defined on sm_webenv.pl
     #-- Set cookie for logon user --#
     $user_info{'SESS_CODE'} = $sess_code;
-    $user_cookie = cookie(-name => $COOKIE_PDA, -value => \%user_info, -path => '/', -expires => '+2d', -secure => 1);  
-    print header(-charset => 'utf-8', -cookie => $user_cookie);
+    #$user_cookie = cookie(-name => $COOKIE_PDA, -value => \%user_info, -path => '/', -expires => '+2d', -secure => 1);  
+    $user_cookie = CGI::Cookie->new(-name => $COOKIE_PDA, -value => \%user_info, -path => '/', -expires => '+2d', -secure => 1, -httponly => 1);
+    print header(-type => 'text/html', -charset => 'utf-8', -cookie => $user_cookie);
     $PRINTHEAD = 1;
   
     #-- Then go to the first page of PDA tools --#

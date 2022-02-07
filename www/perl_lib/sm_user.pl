@@ -37,6 +37,8 @@
 #                                               string, in order to work-around a potential UTF-8 database issue.
 #                                               Since the amendment of '_encrypt_str', decryption function '_decrypt_str'
 #                                               must be changed accordingly. 
+# V1.0.10       2022-01-07      DW              Since I use CGI::Cookie to create cookie now, so I need to change cookie
+#                                               value retrieved method accordingly in function 'getSessionInfo'.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -46,6 +48,7 @@ use URI::Escape;
 use Encode qw(decode encode);
 use Crypt::CBC;
 use CGI qw/:standard/;
+use CGI::Cookie;
 use Authen::Passphrase::BlowfishCrypt;
 require "sm_webenv.pl";
 require "sm_db.pl";
@@ -1282,15 +1285,18 @@ __SQL
 
 sub getSessionInfo {
   my ($cookie_name) = @_;
-  my ($db, $sess_code, $user_id, $sess_until, $ip_address, $http_user_agent, $secure_key, $status, %cookie, %result);
+  my ($db, $sess_code, $user_id, $sess_until, $ip_address, $http_user_agent, $secure_key, $status, %cookie, %c_value, %result);
   
   $cookie_name = allTrim($cookie_name);
   
   if ($cookie_name eq $COOKIE_PDA || $cookie_name eq $COOKIE_MSG) {
     $db = dbconnect($cookie_name);
     if ($db) {
-      %cookie = cookie($cookie_name);
-      $sess_code = $cookie{'SESS_CODE'};
+      #%cookie = cookie($cookie_name);
+      #$sess_code = $cookie{'SESS_CODE'};
+      %cookie = CGI::Cookie->fetch;      
+      %c_value = $cookie{$cookie_name}->value;
+      $sess_code = $c_value{'SESS_CODE'};
       ($user_id, $sess_until, $ip_address, $http_user_agent, $secure_key, $status) = _getSessionDetails($db, $sess_code);
       %result = ('SESS_CODE' => $sess_code, 'USER_ID' => $user_id, 'VALID' => $sess_until, 'IP_ADDRESS' => $ip_address,
                  'HTTP_USER_AGENT' => $http_user_agent, 'SECURE_KEY' => $secure_key, 'STATUS' => $status);      

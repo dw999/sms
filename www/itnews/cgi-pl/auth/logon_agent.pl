@@ -19,12 +19,15 @@
 # Ver           Date            Author          Comment
 # =======       ===========     ===========     ==========================================
 # V1.0.00       2018-05-31      DW              The messaging system login helper. 
+# V1.0.01       2022-01-07      DW              Use CGI::Cookie to create cookie in order to
+#                                               add 'httpOnly' flag to it to increase security.
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
 
 use strict;
 use CGI qw/:standard/;
+use CGI::Cookie;
 use URI::Escape;
 require "sm_webenv.pl";
 require "sm_db.pl";
@@ -66,8 +69,9 @@ sub goLogonProcess {
   if ($ok) {
     #-- Set cookie for logon user --#
     $user_info{'SESS_CODE'} = $sess_code;
-    $user_cookie = cookie(-name => $COOKIE_MSG, -value => \%user_info, -path => '/', -expires => '+2d', -secure => 1);  
-    print header(-charset => 'utf-8', -cookie => $user_cookie);
+    #$user_cookie = cookie(-name => $COOKIE_MSG, -value => \%user_info, -path => '/', -expires => '+2d', -secure => 1);
+    $user_cookie = CGI::Cookie->new(-name => $COOKIE_MSG, -value => \%user_info, -path => '/', -expires => '+2d', -secure => 1, -httponly => 1);  
+    print header(-type => 'text/html', -charset => 'utf-8', -cookie => $user_cookie);
     $PRINTHEAD = 1;
     
     #-- Then go to the first page of messaging --#
