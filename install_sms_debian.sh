@@ -25,6 +25,7 @@
 # V1.0.03     2019-05-11      DW              Add Perl library Proc::ProcessTable installation for SMS defender.
 # V1.0.04     2021-02-10      DW              CertBot installation method has been changed by using snap, so that 
 #                                             this SMS installation script is updated accordingly. 
+# V1.0.05     2022-01-07      DW              Install Perl CGI module explicitly, since it has been removed from the Perl core.
 #=========================================================================================================
 
 #-- Don't let screen blank --#
@@ -210,6 +211,8 @@ cp perl-www-telegram-botapi/lib/WWW/Telegram/BotAPI.pm /usr/share/perl5/WWW/Tele
 rm -rf perl-www-telegram-botapi >> /tmp/sms_install.log
 echo "install Email::Sender::Transport::SMTP::TLS"
 cpan Email::Sender::Transport::SMTP::TLS >> /tmp/sms_install.log
+echo "CGI"
+cpan CGI >> /tmp/sms_install.log
 
 echo ""
 echo "=================================================================================="
