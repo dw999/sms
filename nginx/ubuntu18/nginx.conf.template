@@ -67,7 +67,9 @@ http {
         ssl_protocols TLSv1.2 TLSv1.3;
         ssl_session_cache shared:SSL:1m;
         ssl_session_timeout  10m;
-        ssl_ciphers HIGH:!aNULL:!MD5:!SEED:!IDEA:!3DES:!SHA1:!SHA256:!SHA384:!DSS;
+        #ssl_ciphers HIGH:!aNULL:!MD5:!SEED:!IDEA:!3DES:!SHA1:!SHA256:!SHA384:!DSS;
+        # Enable forward secrecy. It protects data shared between the client and the server even if the private key is compromised.
+        ssl_ciphers "EECDH+ECDSA+AESGCM EECDH+aRSA+AESGCM EECDH+ECDSA+SHA384 EECDH+ECDSA+SHA256 EECDH+aRSA+SHA384 EECDH+aRSA+SHA256 EECDH+aRSA+RC4 EECDH EDH+aRSA RC4 !aNULL !eNULL !LOW !3DES !MD5 !EXP !PSK !SRP !DSS";        
         ssl_prefer_server_ciphers on;
         
         # Configuring HSTS in Nginx
@@ -124,7 +126,9 @@ http {
         ssl_protocols TLSv1.2 TLSv1.3;
         ssl_session_cache shared:SSL:1m;
         ssl_session_timeout  10m;
-        ssl_ciphers HIGH:!aNULL:!MD5:!SEED:!IDEA:!3DES:!SHA1:!SHA256:!SHA384:!DSS;
+        #ssl_ciphers HIGH:!aNULL:!MD5:!SEED:!IDEA:!3DES:!SHA1:!SHA256:!SHA384:!DSS;
+        # Enable forward secrecy. It protects data shared between the client and the server even if the private key is compromised.
+        ssl_ciphers "EECDH+ECDSA+AESGCM EECDH+aRSA+AESGCM EECDH+ECDSA+SHA384 EECDH+ECDSA+SHA256 EECDH+aRSA+SHA384 EECDH+aRSA+SHA256 EECDH+aRSA+RC4 EECDH EDH+aRSA RC4 !aNULL !eNULL !LOW !3DES !MD5 !EXP !PSK !SRP !DSS";        
         ssl_prefer_server_ciphers on;
 
         # Configuring HSTS in Nginx
