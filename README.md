@@ -12,7 +12,7 @@ Apache license 2.0
 What platform SMS server support
 --------------------------------
 - CentOS and similar: CentOS 7, CentOS Stream 8, AlmaLinux 8, Rocky Linux 8, Oracle Linux 8.   
-- Debian and similar: Debian 9, Debian 11, Ubuntu 18.04, Ubuntu 20.04.
+- Debian and similar: Debian 11, Ubuntu 18.04, Ubuntu 20.04.
 
 Note: All supported platforms are for x86_64 version only. 
 
