@@ -66,7 +66,7 @@ http {
         ssl_protocols TLSv1.2 TLSv1.3;
         ssl_session_cache shared:SSL:1m;
         ssl_session_timeout  10m;
-        ssl_ciphers HIGH:!aNULL:!MD5:!SEED:!IDEA:!3DES;
+        ssl_ciphers HIGH:!aNULL:!MD5:!SEED:!IDEA:!3DES:!SHA1:!SHA256:!SHA384:!DSS;
         ssl_prefer_server_ciphers on;
 
         # Configuring HSTS in Nginx
@@ -120,9 +120,10 @@ http {
         
         ssl_certificate "/etc/pki/tls/certs/message-site.crt";
         ssl_certificate_key "/etc/pki/tls/private/message-site.key";
+        ssl_protocols TLSv1.2 TLSv1.3;
         ssl_session_cache shared:SSL:1m;
         ssl_session_timeout  10m;
-        ssl_ciphers HIGH:!aNULL:!MD5:!SEED:!IDEA:!3DES;
+        ssl_ciphers HIGH:!aNULL:!MD5:!SEED:!IDEA:!3DES:!SHA1:!SHA256:!SHA384:!DSS;
         ssl_prefer_server_ciphers on;
 
         # Configuring HSTS in Nginx
