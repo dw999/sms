@@ -109,6 +109,11 @@ http {
             fastcgi_param SCRIPT_FILENAME $request_filename;
         }
 
+        # Define favicon location
+        location = /favicon.ico {
+            alias /www/pdatools/favicon.ico
+        }
+
         error_page 404 /custom-404.html;
         location = /custom-404.html {
         }        
@@ -166,6 +171,11 @@ http {
             fastcgi_pass unix:/var/run/fcgiwrap.socket;
             include fastcgi_params;
             fastcgi_param SCRIPT_FILENAME $request_filename;            
+        }
+
+        # Define favicon location
+        location = /favicon.ico {
+            alias /www/pdatools/favicon.ico
         }
 
         #-- Redirect all illegal resource request to an arbitrary decoy web site --#
