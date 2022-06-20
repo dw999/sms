@@ -175,7 +175,7 @@ http {
 
         # Define favicon location
         location = /favicon.ico {
-            alias /www/pdatools/favicon.ico
+            alias /www/itnews/favicon.ico
         }
 
         #-- Redirect all illegal resource request to an arbitrary decoy web site --#
