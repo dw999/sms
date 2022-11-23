@@ -22,6 +22,7 @@
 #                                               to handle uploaded audio and video files
 #                                               playing and conversion.
 # V1.0.01       2019-10-12      DW              Function 'isHeSysAdmin' is moved to sm_user.pl
+# V1.0.02       2022-11-23      DW              Fix a bug on function saveFileType(). 
 ##########################################################################################
 
 push @INC, '/www/perl_lib';
@@ -153,7 +154,7 @@ sub printJavascriptSection {
         return false;
       }
       
-      if (file_ext == "") {
+      if (file_type == "") {
         alert("Please input file type before saving");
         \$('#file_type').focus();
         return false;
