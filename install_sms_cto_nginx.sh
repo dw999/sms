@@ -257,7 +257,7 @@ curl -O https://jquerymobile.com/resources/download/jquery.mobile-1.4.5.zip >> /
 unzip jquery.mobile-1.4.5.zip -d jqm >> /tmp/sms_install.log
 rm -f jquery.mobile-1.4.5.zip >> /tmp/sms_install.log
 echo "Get jvavscript cookie"
-curl -O https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js 
+curl -O https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js 
 echo "Get editable selection input"
 git clone https://github.com/indrimuska/jquery-editable-select.git >> /tmp/sms_install.log
 echo "Get datetime picker"
