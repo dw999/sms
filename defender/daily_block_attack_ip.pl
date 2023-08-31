@@ -39,7 +39,8 @@
 # V1.0.09       2020-07-22      DW              Take care Nginx web sites attacking also.
 # V1.0.10       2020-12-16      DW              - Fix a bug which update the 'hit_date' of active hacker IP address constinuously.
 #                                               - Add option "--quiet" to firewalld command to suppress status displaying.  
-# V1.0.11       2022-01-01      DW              Unescape web server log file as check it's content. 
+# V1.0.11       2022-01-01      DW              Unescape web server log file as check it's content.
+# V1.0.12       2023-08-31      DW              Remove a rule which will block ssh users incorrectly.  
 #
 # Remark: Database schema is as follows:
 #         
@@ -273,10 +274,6 @@ sub attackVectorIsFound {
     return 1;
   }
   
-  if ($this_line =~ /sshd/ && $this_line =~ /Received disconnect from/ && $this_line =~ /[preauth]/) {
-    return 1;
-  }
-
   return 0;
 }
 
